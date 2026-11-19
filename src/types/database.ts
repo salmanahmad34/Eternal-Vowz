@@ -89,9 +89,23 @@ export interface Invitation {
   venue_details: VenueDetails;
   design_config: DesignConfig;
   is_published: boolean;
+  is_paid?: boolean;
   created_at?: string;
   expires_at?: string;
   updated_at?: string;
+}
+
+export type OrderStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+
+export interface EvOrder {
+  id: string;
+  card_id: string | null;
+  customer_email?: string | null;
+  razorpay_order_id: string;
+  razorpay_payment_id?: string | null;
+  amount: number; // in paise (7900 = ₹79.00)
+  status: OrderStatus;
+  created_at?: string;
 }
 
 export interface Guest {

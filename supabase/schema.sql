@@ -16,12 +16,31 @@ CREATE TABLE IF NOT EXISTS public.ev_cards (
     venue_details JSONB NOT NULL DEFAULT '{}'::jsonb,
     design_config JSONB NOT NULL DEFAULT '{}'::jsonb,
     is_published BOOLEAN NOT NULL DEFAULT true,
+    is_paid BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '30 days'),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.ev_cards
+    ADD COLUMN IF NOT EXISTS is_paid BOOLEAN NOT NULL DEFAULT false;
+
 CREATE INDEX IF NOT EXISTS idx_ev_cards_slug ON public.ev_cards (slug);
+
+-- 1B. RAZORPAY ORDERS TABLE
+CREATE TABLE IF NOT EXISTS public.ev_orders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    card_id UUID REFERENCES public.ev_cards(id) ON DELETE SET NULL,
+    customer_email TEXT,
+    razorpay_order_id TEXT UNIQUE NOT NULL,
+    razorpay_payment_id TEXT,
+    amount INTEGER NOT NULL DEFAULT 7900,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'failed', 'refunded')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ev_orders_card_id ON public.ev_orders (card_id);
+CREATE INDEX IF NOT EXISTS idx_ev_orders_razorpay_order_id ON public.ev_orders (razorpay_order_id);
 
 -- 2. GUESTS TABLE
 CREATE TABLE IF NOT EXISTS public.ev_card_guests (
@@ -76,6 +95,7 @@ EXECUTE FUNCTION public.ev_update_updated_at_column();
 
 -- 5. Row Level Security (RLS) Policies
 ALTER TABLE public.ev_cards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ev_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ev_card_guests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ev_card_rsvps ENABLE ROW LEVEL SECURITY;
 
@@ -84,6 +104,12 @@ CREATE POLICY "Public all access ev_cards"
 ON public.ev_cards FOR ALL
 USING (true)
 WITH CHECK (true);
+
+-- Orders are written/updated strictly by server-side Razorpay API routes (service_role)
+DROP POLICY IF EXISTS "Public read ev_orders" ON public.ev_orders;
+CREATE POLICY "Public read ev_orders"
+ON public.ev_orders FOR SELECT
+USING (true);
 
 DROP POLICY IF EXISTS "Public all access ev_card_guests" ON public.ev_card_guests;
 CREATE POLICY "Public all access ev_card_guests"
