@@ -71,6 +71,10 @@ const CINEMA_VIDEO_THEMES: Partial<Record<string, { videoSrc: string; posterSrc:
     videoSrc: '/assets/mughal-silk/intro-silk.mp4',
     posterSrc: '/assets/mughal-silk/intro-poster.jpg',
   },
+  'midnight-minimalist': {
+    videoSrc: '/assets/celestial-box/intro-box.mp4',
+    posterSrc: '/assets/celestial-box/intro-poster.jpg',
+  },
 };
 
 export default function EnvelopeExperience({
@@ -442,7 +446,7 @@ export default function EnvelopeExperience({
                       : invitation.theme_id === 'royal-emerald'
                       ? '/assets/mughal-silk/hero-mughal-courtyard.jpg'
                       : invitation.theme_id === 'midnight-minimalist'
-                      ? '/assets/invitecraft/hero-starlight-midnight.jpg'
+                      ? '/assets/celestial-box/hero-celestial-stage.jpg'
                       : invitation.theme_id === 'blush-floral'
                       ? '/assets/shahi-gold/hero-mountain-pavilion.jpg'
                       : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg'
@@ -450,6 +454,15 @@ export default function EnvelopeExperience({
                   alt="Wedding Card Hero Scene"
                   className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                 />
+                {invitation.theme_id === 'midnight-minimalist' && (
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(180deg, rgba(28,16,30,0.58) 0%, rgba(28,16,30,0.38) 28%, rgba(28,16,30,0.06) 52%, rgba(28,16,30,0.12) 84%, rgba(244,226,193,0.94) 100%)',
+                    }}
+                  />
+                )}
                 {(invitation.theme_id === 'pearl-veil' ||
                   invitation.theme_id === 'tuscan-sunset' ||
                   invitation.theme_id === 'royal-emerald') && (
@@ -486,7 +499,7 @@ export default function EnvelopeExperience({
                 <div
                   className={`relative z-10 px-6 text-center flex flex-col items-center ${
                     invitation.theme_id === 'midnight-minimalist'
-                      ? 'pt-36'
+                      ? 'pt-[54px]'
                       : invitation.theme_id === 'pearl-veil' ||
                         invitation.theme_id === 'tuscan-sunset' ||
                         invitation.theme_id === 'royal-emerald'

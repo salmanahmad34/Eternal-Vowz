@@ -111,23 +111,25 @@ const SIGNATURE_CARD_DESIGNS = [
   },
   {
     id: 'midnight-minimalist',
-    category: '3D Embossed Lifafa',
+    category: '3D Wax Box Reveal',
     badge: '✨ Trend 2027',
     name: 'Celestial Starlight',
     couple: 'Fatima & Hamza',
     slug: 'fatima-hamza-starlight',
     query: '',
     price: '₹79',
-    heroImg: '/assets/invitecraft/hero-starlight-midnight.jpg',
-    shortDesc: 'Starlit sapphire night sky, golden crescent & chandelier garden.',
+    heroImg: '/assets/celestial-box/hero-celestial-stage.jpg',
+    shortDesc: 'Tap anywhere as a wax-sealed emerald silk box opens into a mountaintop floral arch.',
   },
 ];
 
 const FILTER_CATEGORIES = [
   'All Designs',
-  'Frosted-Blur Veil',
-  '3D Palace Gates',
-  '3D Embossed Lifafa',
+  '3D Cinema Reveal',
+  '3D Gold Dust Reveal',
+  '3D Haveli Courtyard',
+  '3D Silk Veil Reveal',
+  '3D Wax Box Reveal',
 ];
 
 const COMPARISON_ROWS = [
