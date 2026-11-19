@@ -244,6 +244,7 @@ export default function EnvelopeExperience({
 
   const cinemaConfig = CINEMA_VIDEO_THEMES[invitation.theme_id];
   const isCinemaVideo = Boolean(cinemaConfig);
+  const isDarkPalace = invitation.theme_id === 'pearl-veil';
 
   const isFrostedBlur =
     !isCinemaVideo && cfg.opening_style === 'frosted-blur';
@@ -287,27 +288,47 @@ export default function EnvelopeExperience({
   return (
     <div
       className={`notranslate ${
-        isPreview ? 'w-full bg-[#f4e2c1]' : 'min-h-[100dvh] bg-[#f5f0e6] flex justify-center'
-      } overflow-x-hidden relative select-none`}
+        isPreview
+          ? isDarkPalace
+            ? 'w-full bg-[#1A110B]'
+            : 'w-full bg-[#f4e2c1]'
+          : isDarkPalace
+          ? 'min-h-[100dvh] bg-[#120B07] flex justify-center'
+          : 'min-h-[100dvh] bg-[#f5f0e6] flex justify-center'
+      } overflow-x-clip relative select-none`}
     >
       {/* =========================================================================
-          ORIGINAL DESKTOP WATERCOLOR FLORAL GARLAND CORNERS (Left & Right)
+          DESKTOP BACKGROUND FRAMING (Candlelit Palace Glow vs Watercolor Corners)
       ========================================================================= */}
       {!isPreview && (
         <div
           aria-hidden="true"
           className="hidden lg:block fixed inset-0 pointer-events-none z-0 overflow-hidden"
         >
-          <img
-            src="/assets/invitecraft/floral-garland-corner.jpg"
-            alt=""
-            className="absolute top-0 left-0 w-[340px] xl:w-[420px] h-auto object-contain mix-blend-multiply opacity-90"
-          />
-          <img
-            src="/assets/invitecraft/floral-garland-corner.jpg"
-            alt=""
-            className="absolute top-0 right-0 w-[340px] xl:w-[420px] h-auto object-contain scale-x-[-1] mix-blend-multiply opacity-90"
-          />
+          {isDarkPalace ? (
+            <>
+              <div
+                className="absolute inset-0 opacity-35"
+                style={{
+                  background:
+                    'radial-gradient(circle at 14% 18%, rgba(229,193,123,0.28) 0%, transparent 45%), radial-gradient(circle at 86% 18%, rgba(229,193,123,0.28) 0%, transparent 45%), radial-gradient(circle at 50% 85%, rgba(168,112,48,0.18) 0%, transparent 55%)',
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <img
+                src="/assets/invitecraft/floral-garland-corner.jpg"
+                alt=""
+                className="absolute top-0 left-0 w-[340px] xl:w-[420px] h-auto object-contain mix-blend-multiply opacity-90"
+              />
+              <img
+                src="/assets/invitecraft/floral-garland-corner.jpg"
+                alt=""
+                className="absolute top-0 right-0 w-[340px] xl:w-[420px] h-auto object-contain scale-x-[-1] mix-blend-multiply opacity-90"
+              />
+            </>
+          )}
         </div>
       )}
 
@@ -320,10 +341,14 @@ export default function EnvelopeExperience({
             <button
               type="button"
               onClick={handleReplay}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#FAF8F5]/95 backdrop-blur-sm border border-[#d8cfc0] shadow-md hover:bg-white transition-all text-xs font-serif italic text-[#2f2a24] cursor-pointer"
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full backdrop-blur-sm shadow-md transition-all text-xs font-serif italic cursor-pointer ${
+                isDarkPalace
+                  ? 'bg-[#1C120B]/92 border border-[#E5C17B]/45 hover:bg-[#2A1B10] text-[#FFF4CF]'
+                  : 'bg-[#FAF8F5]/95 border border-[#d8cfc0] hover:bg-white text-[#2f2a24]'
+              }`}
               title="Replay Opening Animation"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-[#7a5c3e]" />
+              <RotateCcw className={`w-3.5 h-3.5 ${isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7a5c3e]'}`} />
               <span>
                 {isCinemaVideo
                   ? 'Replay Scene'
@@ -340,12 +365,16 @@ export default function EnvelopeExperience({
             type="button"
             onClick={handleToggleMute}
             aria-label={isMuted ? 'Unmute music' : 'Mute music'}
-            className={`${isPreview ? 'absolute bottom-3 right-3 w-10 h-10' : 'fixed bottom-6 right-6 w-14 h-14'} z-[60] rounded-full bg-neutral-900/85 hover:bg-neutral-900 backdrop-blur-sm shadow-xl flex items-center justify-center text-white transition-transform hover:scale-105 cursor-pointer`}
+            className={`${isPreview ? 'absolute bottom-3 right-3 w-10 h-10' : 'fixed bottom-6 right-6 w-14 h-14'} z-[60] rounded-full backdrop-blur-sm shadow-xl flex items-center justify-center transition-transform hover:scale-105 cursor-pointer ${
+              isDarkPalace
+                ? 'bg-[#1C120B]/92 hover:bg-[#2A1B10] border border-[#E5C17B]/45 text-[#FFF4CF]'
+                : 'bg-neutral-900/85 hover:bg-neutral-900 text-white'
+            }`}
           >
             {isMuted ? (
               <VolumeX className="w-5 h-5 text-rose-300" />
             ) : (
-              <Volume2 className="w-5 h-5 text-white animate-pulse" />
+              <Volume2 className={`w-5 h-5 animate-pulse ${isDarkPalace ? 'text-[#E5C17B]' : 'text-white'}`} />
             )}
           </button>
         </>
@@ -356,10 +385,10 @@ export default function EnvelopeExperience({
       ========================================================================= */}
       <div
         data-invitation-phone-frame="true"
-        className={`relative overflow-hidden w-full ${
+        className={`relative overflow-x-clip w-full ${
           isPreview ? '' : 'md:max-w-[390px] mx-auto md:shadow-2xl min-h-[100dvh]'
-        } z-10 bg-[#f4e2c1]`}
-        style={{ color: '#2f2a24' }}
+        } z-10 ${isDarkPalace ? 'bg-[#1A110B]' : 'bg-[#f4e2c1]'}`}
+        style={{ color: isDarkPalace ? '#FFF4CF' : '#2f2a24' }}
       >
         <AnimatePresence mode="wait">
           {/* =====================================================================
@@ -430,7 +459,7 @@ export default function EnvelopeExperience({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, ease: 'easeOut' }}
-              className="relative w-full overflow-hidden"
+              className="relative w-full overflow-x-clip"
             >
               {/* Ambient Shimmering Golden Bokeh Particles */}
               <FloatingParticles count={isPreview ? 10 : 18} color="#E6B85C" />
@@ -463,8 +492,16 @@ export default function EnvelopeExperience({
                     }}
                   />
                 )}
-                {(invitation.theme_id === 'pearl-veil' ||
-                  invitation.theme_id === 'tuscan-sunset' ||
+                {invitation.theme_id === 'pearl-veil' && (
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(180deg, rgba(16,10,6,0.12) 0%, rgba(16,10,6,0.06) 44%, rgba(16,10,6,0.65) 66%, rgba(16,10,6,0.88) 88%, #1A110B 100%)',
+                    }}
+                  />
+                )}
+                {(invitation.theme_id === 'tuscan-sunset' ||
                   invitation.theme_id === 'royal-emerald') && (
                   <div
                     className="absolute inset-0 pointer-events-none"
@@ -668,23 +705,52 @@ export default function EnvelopeExperience({
               </div>
 
               {/* -----------------------------------------------------------------
-                  CONTINUOUS ORIGINAL VINTAGE ROSE PARCHMENT BODY
+                  CONTINUOUS SCROLL BODY (Seamless Sticky Candlelit Corridor for Pearl Veil / Rose Parchment for others)
               ----------------------------------------------------------------- */}
               <div
                 className="relative w-full"
-                style={{
-                  backgroundImage: "url('/assets/invitecraft/parchment-floral-frame.jpg')",
-                  backgroundSize: '100% auto',
-                  backgroundRepeat: 'repeat-y',
-                  backgroundPosition: 'top center',
-                }}
+                style={
+                  isDarkPalace
+                    ? { backgroundColor: '#1A110B' }
+                    : {
+                        backgroundImage: "url('/assets/invitecraft/parchment-floral-frame.jpg')",
+                        backgroundSize: '100% auto',
+                        backgroundRepeat: 'repeat-y',
+                        backgroundPosition: 'top center',
+                      }
+                }
               >
+                {/* Seamless sticky full-viewport candlelit palace backdrop (zero tiling seams) */}
+                {isDarkPalace && (
+                  <div
+                    aria-hidden="true"
+                    className={`sticky top-0 left-0 w-full pointer-events-none z-0 overflow-hidden ${
+                      isPreview ? 'h-[640px] -mb-[640px]' : 'h-[100dvh] -mb-[100dvh]'
+                    }`}
+                  >
+                    <div
+                      className="absolute inset-0 bg-cover bg-center"
+                      style={{
+                        backgroundImage: "url('/assets/pearl-veil/bg-corridor-scroll.jpg')",
+                      }}
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          'linear-gradient(90deg, rgba(16,10,6,0.12) 0%, rgba(18,11,7,0.52) 18%, rgba(18,11,7,0.58) 50%, rgba(18,11,7,0.52) 82%, rgba(16,10,6,0.12) 100%)',
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Soft Gradient Transition Seam */}
                 <div
-                  className="w-full h-10 -mt-5 relative z-10 pointer-events-none"
+                  className="w-full h-12 -mt-6 relative z-10 pointer-events-none"
                   style={{
-                    background:
-                      'linear-gradient(180deg, rgba(244,226,193,0) 0%, #f4e2c1 50%, rgba(244,226,193,0) 100%)',
+                    background: isDarkPalace
+                      ? 'linear-gradient(180deg, rgba(26,17,11,0) 0%, #1A110B 50%, rgba(26,17,11,0) 100%)'
+                      : 'linear-gradient(180deg, rgba(244,226,193,0) 0%, #f4e2c1 50%, rgba(244,226,193,0) 100%)',
                   }}
                 />
 
@@ -694,12 +760,18 @@ export default function EnvelopeExperience({
                 <section className="relative z-10 pt-4 pb-10 px-5 text-center">
                   <ScrollInkHeading
                     text="Countdown"
-                    className="font-great-vibes text-[44px] text-[#2f2a24] leading-tight"
+                    className={`font-great-vibes text-[44px] leading-tight ${
+                      isDarkPalace
+                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                        : 'text-[#2f2a24]'
+                    }`}
                   />
                   <ScrollWordReveal
                     text="Counting every moment until we celebrate together"
                     delay={0.12}
-                    className="font-serif italic text-[15px] text-[#4a4238] -mt-1 mb-6"
+                    className={`font-serif italic text-[15px] -mt-1 mb-6 ${
+                      isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                    }`}
                   />
 
                   <div className="grid grid-cols-4 gap-2.5 max-w-[335px] mx-auto">
@@ -715,12 +787,26 @@ export default function EnvelopeExperience({
                         delay={idx * 0.1}
                         className="flex flex-col items-center"
                       >
-                        <div className="w-full aspect-square rounded-xl bg-white/40 backdrop-blur-[2px] border border-white/70 shadow-xs flex items-center justify-center">
-                          <span className="font-great-vibes text-[34px] text-[#2f2a24] leading-none">
+                        <div
+                          className={`w-full aspect-square rounded-xl backdrop-blur-[3px] flex items-center justify-center ${
+                            isDarkPalace
+                              ? 'bg-[#1E130C]/82 border border-[#E5C17B]/45 shadow-[0_10px_24px_rgba(0,0,0,0.55)]'
+                              : 'bg-white/40 border border-white/70 shadow-xs'
+                          }`}
+                        >
+                          <span
+                            className={`font-great-vibes text-[34px] leading-none ${
+                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                            }`}
+                          >
                             {unit.value}
                           </span>
                         </div>
-                        <span className="font-serif italic text-[11px] tracking-[0.16em] uppercase text-[#4a4238] mt-2">
+                        <span
+                          className={`font-serif italic text-[11px] tracking-[0.16em] uppercase mt-2 ${
+                            isDarkPalace ? 'text-[#E5C17B]' : 'text-[#4a4238]'
+                          }`}
+                        >
                           {unit.label}
                         </span>
                       </ScrollRevealBlock>
@@ -735,25 +821,43 @@ export default function EnvelopeExperience({
                   <section className="relative z-10 py-9 px-4 text-center">
                     <ScrollInkHeading
                       text="The Venue"
-                      className="font-great-vibes text-[46px] text-[#2f2a24] leading-tight mb-3"
+                      className={`font-great-vibes text-[46px] leading-tight mb-3 ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
 
                     <ScrollRevealBlock
                       direction="scale"
                       delay={0.08}
-                      className="relative mx-auto w-full max-w-[345px] rounded-2xl overflow-hidden"
+                      className={`relative mx-auto w-full max-w-[345px] rounded-2xl overflow-hidden ${
+                        isDarkPalace
+                          ? 'border border-[#E5C17B]/45 shadow-[0_16px_40px_rgba(0,0,0,0.68)]'
+                          : ''
+                      }`}
                     >
                       <img
-                        src="/assets/invitecraft/venue-royal-palace.jpg"
+                        src={
+                          isDarkPalace
+                            ? '/assets/pearl-veil/venue-candlelit-palace.jpg'
+                            : '/assets/invitecraft/venue-royal-palace.jpg'
+                        }
                         alt={invitation.venue_details.venue_name}
-                        className="w-full h-auto object-contain mx-auto mix-blend-multiply"
+                        className={`w-full h-auto mx-auto ${
+                          isDarkPalace ? 'object-cover' : 'object-contain mix-blend-multiply'
+                        }`}
                       />
                     </ScrollRevealBlock>
 
                     <ScrollRevealBlock
                       direction="scale"
                       delay={0.12}
-                      className="w-11 h-11 rounded-full bg-[#fbf9f5] border-[1.5px] border-[#5c724a] flex items-center justify-center mx-auto my-3 text-[#495e38] shadow-xs"
+                      className={`w-11 h-11 rounded-full border-[1.5px] flex items-center justify-center mx-auto my-3 shadow-xs ${
+                        isDarkPalace
+                          ? 'bg-[#22150D]/92 border-[#E5C17B]/75 text-[#E5C17B] shadow-md'
+                          : 'bg-[#fbf9f5] border-[#5c724a] text-[#495e38]'
+                      }`}
                     >
                       <MapPin className="w-5 h-5" />
                     </ScrollRevealBlock>
@@ -762,21 +866,29 @@ export default function EnvelopeExperience({
                       <ScrollInkHeading
                         as="h3"
                         text={invitation.venue_details.venue_name}
-                        className="font-great-vibes text-[31px] text-[#2f2a24] leading-snug px-2"
+                        className={`font-great-vibes text-[31px] leading-snug px-2 ${
+                          isDarkPalace
+                            ? 'text-[#FFF4CF] drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]'
+                            : 'text-[#2f2a24]'
+                        }`}
                       />
                     )}
                     {invitation.venue_details.hall_name && (
                       <ScrollWordReveal
                         text={invitation.venue_details.hall_name}
                         delay={0.08}
-                        className="font-serif italic text-[14px] font-semibold text-[#6e5d4b] px-6 mt-0.5"
+                        className={`font-serif italic text-[14px] font-semibold px-6 mt-0.5 ${
+                          isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e5d4b]'
+                        }`}
                       />
                     )}
                     {invitation.venue_details.address && (
                       <ScrollWordReveal
                         text={invitation.venue_details.address}
                         delay={0.14}
-                        className="font-serif italic text-[14.5px] text-[#4a4238] px-8 leading-relaxed mt-1"
+                        className={`font-serif italic text-[14.5px] px-8 leading-relaxed mt-1 ${
+                          isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                        }`}
                       />
                     )}
 
@@ -786,20 +898,42 @@ export default function EnvelopeExperience({
                           href={invitation.venue_details.maps_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-5 mx-auto max-w-[285px] bg-[#fbf9f5] hover:bg-white text-[#2f2a24] rounded-full px-4 py-2.5 shadow-md border border-[#e6dec8] flex items-center justify-between gap-3 transition-transform hover:scale-[1.02]"
+                          className={`mt-5 mx-auto max-w-[285px] rounded-full px-4 py-2.5 shadow-md flex items-center justify-between gap-3 transition-transform hover:scale-[1.02] ${
+                            isDarkPalace
+                              ? 'bg-[#22150D]/92 hover:bg-[#2F1E13] text-[#FFF4CF] border border-[#E5C17B]/45 shadow-[0_12px_30px_rgba(0,0,0,0.55)]'
+                              : 'bg-[#fbf9f5] hover:bg-white text-[#2f2a24] border border-[#e6dec8]'
+                          }`}
                         >
-                          <div className="w-9 h-9 rounded-full bg-[#e5dec9] flex items-center justify-center shrink-0 text-[#5c4934]">
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
+                              isDarkPalace
+                                ? 'bg-[#E5C17B]/20 text-[#E5C17B]'
+                                : 'bg-[#e5dec9] text-[#5c4934]'
+                            }`}
+                          >
                             <Send className="w-4 h-4" />
                           </div>
                           <div className="text-center leading-tight flex-1">
-                            <span className="font-serif italic text-[15px] block text-[#2f2a24]">
+                            <span
+                              className={`font-serif italic text-[15px] block ${
+                                isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                              }`}
+                            >
                               Get directions
                             </span>
-                            <span className="font-serif italic text-[12px] text-[#6e6254] block">
+                            <span
+                              className={`font-serif italic text-[12px] block ${
+                                isDarkPalace ? 'text-[#D8C398]' : 'text-[#6e6254]'
+                              }`}
+                            >
                               Open in Google Maps
                             </span>
                           </div>
-                          <ExternalLink className="w-4 h-4 text-[#5c5246] shrink-0 mr-1" />
+                          <ExternalLink
+                            className={`w-4 h-4 shrink-0 mr-1 ${
+                              isDarkPalace ? 'text-[#E5C17B]' : 'text-[#5c5246]'
+                            }`}
+                          />
                         </a>
                       </ScrollRevealBlock>
                     )}
@@ -811,20 +945,29 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showTimeline && (
                   <section className="relative z-10 py-9 px-4 text-center">
-                    <ScrollOrnamentDivider />
+                    <ScrollOrnamentDivider
+                      lineColorClass={isDarkPalace ? 'bg-[#E5C17B]/70' : undefined}
+                      dotColorClass={isDarkPalace ? 'bg-[#E5C17B]' : undefined}
+                    />
 
                     <ScrollRevealBlock direction="scale">
-                      <SectionHeaderBadge type="clock" />
+                      <SectionHeaderBadge type="clock" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
 
                     <ScrollInkHeading
                       text="Wedding Itinerary"
-                      className="font-great-vibes text-[40px] text-[#2f2a24] mb-1"
+                      className={`font-great-vibes text-[40px] mb-1 ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
                     <ScrollWordReveal
                       text="What we have planned for our special day"
                       delay={0.12}
-                      className="font-serif italic text-[15px] text-[#4a4238] mb-10 px-2"
+                      className={`font-serif italic text-[15px] mb-10 px-2 ${
+                        isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                      }`}
                     />
 
                     <div className="relative max-w-[340px] mx-auto">
@@ -834,7 +977,9 @@ export default function EnvelopeExperience({
                         viewport={{ once: true, amount: 0.1 }}
                         transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
                         style={{ transformOrigin: 'top center' }}
-                        className="absolute left-1/2 top-4 bottom-4 w-[1px] -translate-x-1/2 bg-[#8c7a65]/50"
+                        className={`absolute left-1/2 top-4 bottom-4 w-[1px] -translate-x-1/2 ${
+                          isDarkPalace ? 'bg-[#E5C17B]/50' : 'bg-[#8c7a65]/50'
+                        }`}
                       />
 
                       <div className="space-y-12">
@@ -847,7 +992,11 @@ export default function EnvelopeExperience({
                                 whileInView={{ scale: 1, opacity: 1 }}
                                 viewport={{ once: true, amount: 0.4 }}
                                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                                className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#fbf9f5] border-[1.5px] border-[#5c4d3c] z-10"
+                                className={`absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full border-[1.5px] z-10 ${
+                                  isDarkPalace
+                                    ? 'bg-[#1A110B] border-[#E5C17B]'
+                                    : 'bg-[#fbf9f5] border-[#5c4d3c]'
+                                }`}
                               />
 
                               {isLeft ? (
@@ -856,26 +1005,32 @@ export default function EnvelopeExperience({
                                     direction="left"
                                     className="pr-5 flex flex-col items-center text-center"
                                   >
-                                    <TimelineIllustration index={idx} />
+                                    <TimelineIllustration index={idx} darkPalace={isDarkPalace} />
                                     <ScrollWordReveal
                                       as="span"
                                       text={item.time}
                                       delay={0.08}
-                                      className="font-serif italic text-[21px] font-semibold text-[#2f2a24] leading-tight"
+                                      className={`font-serif italic text-[21px] font-semibold leading-tight ${
+                                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#2f2a24]'
+                                      }`}
                                     />
                                     <ScrollInkHeading
                                       as="h3"
                                       text={item.title}
                                       delay={0.14}
                                       duration={0.75}
-                                      className="font-great-vibes text-[20px] tracking-wider text-[#2f2a24] mt-0.5"
+                                      className={`font-great-vibes text-[20px] tracking-wider mt-0.5 ${
+                                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                                      }`}
                                     />
                                     {item.description && (
                                       <ScrollWordReveal
                                         text={item.description}
                                         delay={0.22}
                                         stagger={0.04}
-                                        className="font-serif italic text-[13px] text-[#4a4238] leading-snug mt-1"
+                                        className={`font-serif italic text-[13px] leading-snug mt-1 ${
+                                          isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                                        }`}
                                       />
                                     )}
                                   </ScrollRevealBlock>
@@ -888,26 +1043,32 @@ export default function EnvelopeExperience({
                                     direction="right"
                                     className="pl-5 flex flex-col items-center text-center"
                                   >
-                                    <TimelineIllustration index={idx} />
+                                    <TimelineIllustration index={idx} darkPalace={isDarkPalace} />
                                     <ScrollWordReveal
                                       as="span"
                                       text={item.time}
                                       delay={0.08}
-                                      className="font-serif italic text-[21px] font-semibold text-[#2f2a24] leading-tight"
+                                      className={`font-serif italic text-[21px] font-semibold leading-tight ${
+                                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#2f2a24]'
+                                      }`}
                                     />
                                     <ScrollInkHeading
                                       as="h3"
                                       text={item.title}
                                       delay={0.14}
                                       duration={0.75}
-                                      className="font-great-vibes text-[20px] tracking-wider text-[#2f2a24] mt-0.5"
+                                      className={`font-great-vibes text-[20px] tracking-wider mt-0.5 ${
+                                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                                      }`}
                                     />
                                     {item.description && (
                                       <ScrollWordReveal
                                         text={item.description}
                                         delay={0.22}
                                         stagger={0.04}
-                                        className="font-serif italic text-[13px] text-[#4a4238] leading-snug mt-1"
+                                        className={`font-serif italic text-[13px] leading-snug mt-1 ${
+                                          isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                                        }`}
                                       />
                                     )}
                                   </ScrollRevealBlock>
@@ -926,26 +1087,50 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showDressCode && (
                   <section className="relative z-10 py-9 px-5 text-center">
-                    <ScrollOrnamentDivider className="flex items-center justify-center gap-3 mb-4 opacity-45" />
+                    <ScrollOrnamentDivider
+                      className={`flex items-center justify-center gap-3 mb-4 ${
+                        isDarkPalace ? 'opacity-80' : 'opacity-45'
+                      }`}
+                      lineColorClass={isDarkPalace ? 'bg-[#E5C17B]/70' : undefined}
+                      dotColorClass={isDarkPalace ? 'bg-[#E5C17B]' : undefined}
+                    />
 
                     <ScrollInkHeading
                       text={invitation.venue_details.dress_code || 'Modest & Royal Attire'}
-                      className="font-great-vibes text-[42px] text-[#2f2a24] mb-4"
+                      className={`font-great-vibes text-[42px] mb-4 ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
 
                     <ScrollRevealBlock
                       direction="up"
-                      className="rounded-3xl bg-[#fbf8f1]/85 backdrop-blur-xs border border-white/80 p-6 shadow-md"
+                      className={`rounded-3xl p-6 shadow-md ${
+                        isDarkPalace
+                          ? 'bg-[#1D120B]/90 backdrop-blur-sm border border-[#E5C17B]/40 shadow-[0_18px_45px_rgba(0,0,0,0.65)]'
+                          : 'bg-[#fbf8f1]/85 backdrop-blur-xs border border-white/80'
+                      }`}
                     >
                       <ScrollRevealBlock
                         direction="scale"
                         delay={0.08}
-                        className="w-60 mx-auto mb-2 rounded-2xl overflow-hidden"
+                        className={`w-60 mx-auto mb-3 rounded-2xl overflow-hidden ${
+                          isDarkPalace
+                            ? 'border border-[#E5C17B]/40 shadow-[0_12px_32px_rgba(0,0,0,0.6)]'
+                            : ''
+                        }`}
                       >
                         <img
-                          src="/assets/invitecraft/dresscode-couple-art.jpg?v=loose-abaya"
+                          src={
+                            isDarkPalace
+                              ? '/assets/pearl-veil/dresscode-palace-couple.jpg'
+                              : '/assets/invitecraft/dresscode-couple-art.jpg?v=loose-abaya'
+                          }
                           alt="Modest Loose Abaya Muslim Bride and Groom Attire Illustration"
-                          className="w-full h-auto object-contain mx-auto mix-blend-multiply"
+                          className={`w-full h-auto mx-auto ${
+                            isDarkPalace ? 'object-cover' : 'object-contain mix-blend-multiply'
+                          }`}
                         />
                       </ScrollRevealBlock>
 
@@ -953,34 +1138,48 @@ export default function EnvelopeExperience({
                         as="h3"
                         text="Modest Traditional Elegance"
                         delay={0.1}
-                        className="font-great-vibes text-[28px] text-[#2f2a24] mb-3"
+                        className={`font-great-vibes text-[28px] mb-3 ${
+                          isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                        }`}
                       />
 
-                      <div className="border-t border-[#d8cbb8]/60 pt-3 pb-4 grid grid-cols-2 gap-4 text-center">
+                      <div
+                        className={`border-t pt-3 pb-4 grid grid-cols-2 gap-4 text-center ${
+                          isDarkPalace ? 'border-[#E5C17B]/25' : 'border-[#d8cbb8]/60'
+                        }`}
+                      >
                         <div>
                           <ScrollWordReveal
                             as="span"
                             text="Ladies"
-                            className="font-serif italic text-xs uppercase tracking-widest text-[#6e6254] block"
+                            className={`font-serif italic text-xs uppercase tracking-widest block ${
+                              isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e6254]'
+                            }`}
                           />
                           <ScrollWordReveal
                             as="span"
                             text={cfg.ladies_attire || 'Modest Gown / Abaya'}
                             delay={0.12}
-                            className="font-great-vibes text-[20px] text-[#2f2a24] block"
+                            className={`font-great-vibes text-[20px] block ${
+                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                            }`}
                           />
                         </div>
                         <div>
                           <ScrollWordReveal
                             as="span"
                             text="Gentlemen"
-                            className="font-serif italic text-xs uppercase tracking-widest text-[#6e6254] block"
+                            className={`font-serif italic text-xs uppercase tracking-widest block ${
+                              isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e6254]'
+                            }`}
                           />
                           <ScrollWordReveal
                             as="span"
                             text={cfg.gents_attire || 'Sherwani / Suit'}
                             delay={0.12}
-                            className="font-serif italic text-[17px] text-[#2f2a24] block"
+                            className={`font-serif italic text-[17px] block ${
+                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                            }`}
                           />
                         </div>
                       </div>
@@ -988,7 +1187,9 @@ export default function EnvelopeExperience({
                       <ScrollWordReveal
                         text="Suggested color palette:"
                         delay={0.1}
-                        className="font-serif italic text-[17px] text-[#2f2a24] mb-3"
+                        className={`font-serif italic text-[17px] mb-3 ${
+                          isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#2f2a24]'
+                        }`}
                       />
 
                       <div className="flex items-center justify-center gap-3">
@@ -1003,7 +1204,11 @@ export default function EnvelopeExperience({
                               className="w-10 h-10 rounded-full shadow-xs border"
                               style={{ backgroundColor: s.hex, borderColor: s.border }}
                             />
-                            <span className="font-serif italic text-[10.5px] text-[#4a4238]">
+                            <span
+                              className={`font-serif italic text-[10.5px] ${
+                                isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                              }`}
+                            >
                               {s.name}
                             </span>
                           </ScrollRevealBlock>
@@ -1019,16 +1224,24 @@ export default function EnvelopeExperience({
                 {showGifts && (
                   <section className="relative z-10 py-9 px-5 text-center">
                     <ScrollRevealBlock direction="scale">
-                      <SectionHeaderBadge type="gift" />
+                      <SectionHeaderBadge type="gift" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
                     <ScrollInkHeading
                       text="Blessings & Gifts"
-                      className="font-great-vibes text-[44px] text-[#2f2a24] mb-4"
+                      className={`font-great-vibes text-[44px] mb-4 ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
 
                     <ScrollRevealBlock
                       direction="up"
-                      className="rounded-3xl bg-[#fbf9f5] p-6 shadow-md border border-[#e6dec8]"
+                      className={`rounded-3xl p-6 shadow-md ${
+                        isDarkPalace
+                          ? 'bg-[#1D120B]/90 backdrop-blur-sm border border-[#E5C17B]/40 shadow-[0_18px_45px_rgba(0,0,0,0.65)]'
+                          : 'bg-[#fbf9f5] border border-[#e6dec8]'
+                      }`}
                     >
                       <ScrollWordReveal
                         text={
@@ -1036,7 +1249,9 @@ export default function EnvelopeExperience({
                           'Your warm presence and duas are our greatest blessing. Should you wish to honor us with a gift, details are below.'
                         }
                         stagger={0.035}
-                        className="font-great-vibes text-[24px] leading-relaxed text-[#2f2a24]"
+                        className={`font-great-vibes text-[24px] leading-relaxed ${
+                          isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                        }`}
                       />
 
                       {(cfg.bank_account_holder || cfg.bank_account_number) && (
@@ -1044,7 +1259,11 @@ export default function EnvelopeExperience({
                           <button
                             type="button"
                             onClick={() => setShowDirectBank(!showDirectBank)}
-                            className="mt-5 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#d88c9a]/90 hover:bg-[#c77b89] text-[#2f2a24] font-serif italic text-sm shadow-xs transition-transform hover:scale-105 cursor-pointer"
+                            className={`mt-5 inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-serif text-sm shadow-xs transition-transform hover:scale-105 cursor-pointer ${
+                              isDarkPalace
+                                ? 'bg-gradient-to-r from-[#D5AE5C] via-[#E8C97E] to-[#C99B3B] text-[#1A110B] font-semibold'
+                                : 'bg-[#d88c9a]/90 hover:bg-[#c77b89] text-[#2f2a24] italic'
+                            }`}
                           >
                             <Gift className="w-4 h-4" />
                             <span>
@@ -1058,24 +1277,46 @@ export default function EnvelopeExperience({
                           </button>
 
                           {showDirectBank && (
-                            <div className="mt-4 pt-4 border-t border-[#e6dec8] space-y-2.5 text-left font-serif italic text-xs">
+                            <div
+                              className={`mt-4 pt-4 border-t space-y-2.5 text-left font-serif italic text-xs ${
+                                isDarkPalace ? 'border-[#E5C17B]/25' : 'border-[#e6dec8]'
+                              }`}
+                            >
                               {cfg.bank_account_holder && (
-                                <div className="p-3 rounded-xl bg-[#f5f0e6] flex items-center justify-between">
+                                <div
+                                  className={`p-3 rounded-xl flex items-center justify-between ${
+                                    isDarkPalace
+                                      ? 'bg-[#291A10] border border-[#E5C17B]/25'
+                                      : 'bg-[#f5f0e6]'
+                                  }`}
+                                >
                                   <div>
-                                    <span className="text-[10px] uppercase not-italic text-[#7a6855] block">
+                                    <span
+                                      className={`text-[10px] uppercase not-italic block ${
+                                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7a6855]'
+                                      }`}
+                                    >
                                       Account Holder
                                     </span>
-                                    <span className="text-sm text-[#2f2a24]">
+                                    <span
+                                      className={`text-sm ${
+                                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                                      }`}
+                                    >
                                       {cfg.bank_account_holder}
                                     </span>
                                   </div>
                                   <button
                                     type="button"
                                     onClick={() => handleCopy(cfg.bank_account_holder!, 'holder')}
-                                    className="p-1.5 text-[#5c5246] hover:text-[#2f2a24]"
+                                    className={`p-1.5 ${
+                                      isDarkPalace
+                                        ? 'text-[#E5C17B] hover:text-[#FFF4CF]'
+                                        : 'text-[#5c5246] hover:text-[#2f2a24]'
+                                    }`}
                                   >
                                     {copiedField === 'holder' ? (
-                                      <Check className="w-4 h-4 text-emerald-700" />
+                                      <Check className="w-4 h-4 text-emerald-500" />
                                     ) : (
                                       <Copy className="w-4 h-4" />
                                     )}
@@ -1084,22 +1325,40 @@ export default function EnvelopeExperience({
                               )}
 
                               {cfg.bank_account_number && (
-                                <div className="p-3 rounded-xl bg-[#f5f0e6] flex items-center justify-between">
+                                <div
+                                  className={`p-3 rounded-xl flex items-center justify-between ${
+                                    isDarkPalace
+                                      ? 'bg-[#291A10] border border-[#E5C17B]/25'
+                                      : 'bg-[#f5f0e6]'
+                                  }`}
+                                >
                                   <div>
-                                    <span className="text-[10px] uppercase not-italic text-[#7a6855] block">
+                                    <span
+                                      className={`text-[10px] uppercase not-italic block ${
+                                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7a6855]'
+                                      }`}
+                                    >
                                       Account / UPI / IBAN
                                     </span>
-                                    <span className="text-sm font-mono not-italic text-[#2f2a24]">
+                                    <span
+                                      className={`text-sm font-mono not-italic ${
+                                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                                      }`}
+                                    >
                                       {cfg.bank_account_number}
                                     </span>
                                   </div>
                                   <button
                                     type="button"
                                     onClick={() => handleCopy(cfg.bank_account_number!, 'iban')}
-                                    className="p-1.5 text-[#5c5246] hover:text-[#2f2a24]"
+                                    className={`p-1.5 ${
+                                      isDarkPalace
+                                        ? 'text-[#E5C17B] hover:text-[#FFF4CF]'
+                                        : 'text-[#5c5246] hover:text-[#2f2a24]'
+                                    }`}
                                   >
                                     {copiedField === 'iban' ? (
-                                      <Check className="w-4 h-4 text-emerald-700" />
+                                      <Check className="w-4 h-4 text-emerald-500" />
                                     ) : (
                                       <Copy className="w-4 h-4" />
                                     )}
@@ -1121,21 +1380,43 @@ export default function EnvelopeExperience({
                   <section className="relative z-10 py-9 px-4 text-center">
                     <ScrollRevealBlock
                       direction="up"
-                      className="relative mx-auto w-full min-h-[610px] flex flex-col items-center justify-start pt-20 pb-28 px-12"
+                      className={`relative mx-auto w-full flex flex-col items-center justify-start ${
+                        isDarkPalace
+                          ? 'rounded-[30px] bg-[#1B120C]/92 backdrop-blur-sm border-2 border-[#E5C17B]/50 shadow-[0_20px_50px_rgba(0,0,0,0.7)] py-12 px-8'
+                          : 'min-h-[610px] pt-20 pb-28 px-12'
+                      }`}
                     >
-                      <OriginalRibbonMenuFrame />
+                      {isDarkPalace ? (
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-3 rounded-[22px] border border-[#E5C17B]/25"
+                        />
+                      ) : (
+                        <OriginalRibbonMenuFrame />
+                      )}
 
                       <div className="relative z-20 space-y-5">
                         <div>
+                          {isDarkPalace && (
+                            <div className="flex items-center justify-center gap-2 mb-2 text-[#E5C17B]">
+                              <span className="h-[1px] w-10 bg-[#E5C17B]/60" />
+                              <span className="text-xs">✦</span>
+                              <span className="h-[1px] w-10 bg-[#E5C17B]/60" />
+                            </div>
+                          )}
                           <ScrollInkHeading
                             text="Royal Halal Menu"
-                            className="font-great-vibes text-[44px] text-[#2f2a24] leading-none"
+                            className={`font-great-vibes text-[44px] leading-none ${
+                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                            }`}
                           />
                           <ScrollWordReveal
                             as="span"
                             delay={0.12}
                             text="✦ 100% Certified Halal Dawat ✦"
-                            className="font-serif italic text-[11.5px] tracking-widest uppercase text-[#7a5c3e] block mt-1"
+                            className={`font-serif italic text-[11.5px] tracking-widest uppercase block mt-1 ${
+                              isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7a5c3e]'
+                            }`}
                           />
                         </div>
 
@@ -1145,19 +1426,25 @@ export default function EnvelopeExperience({
                               as="h3"
                               text="— Starter —"
                               duration={0.75}
-                              className="font-great-vibes text-[27px] text-[#6B2232]"
+                              className={`font-great-vibes text-[27px] ${
+                                isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6B2232]'
+                              }`}
                             />
                             <ScrollWordReveal
                               text={cfg.menu_starter_title}
                               delay={0.08}
-                              className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]"
+                              className={`font-serif italic text-[14.5px] font-semibold ${
+                                isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                              }`}
                             />
                             {cfg.menu_starter_desc && (
                               <ScrollWordReveal
                                 text={cfg.menu_starter_desc}
                                 delay={0.16}
                                 stagger={0.035}
-                                className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug"
+                                className={`font-serif italic text-[12.5px] leading-snug ${
+                                  isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                                }`}
                               />
                             )}
                           </div>
@@ -1169,19 +1456,25 @@ export default function EnvelopeExperience({
                               as="h3"
                               text="— Main Course —"
                               duration={0.75}
-                              className="font-great-vibes text-[27px] text-[#6B2232]"
+                              className={`font-great-vibes text-[27px] ${
+                                isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6B2232]'
+                              }`}
                             />
                             <ScrollWordReveal
                               text={cfg.menu_main_title}
                               delay={0.08}
-                              className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]"
+                              className={`font-serif italic text-[14.5px] font-semibold ${
+                                isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                              }`}
                             />
                             {cfg.menu_main_desc && (
                               <ScrollWordReveal
                                 text={cfg.menu_main_desc}
                                 delay={0.16}
                                 stagger={0.035}
-                                className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug"
+                                className={`font-serif italic text-[12.5px] leading-snug ${
+                                  isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                                }`}
                               />
                             )}
                           </div>
@@ -1193,19 +1486,25 @@ export default function EnvelopeExperience({
                               as="h3"
                               text="— Dessert —"
                               duration={0.75}
-                              className="font-great-vibes text-[27px] text-[#6B2232]"
+                              className={`font-great-vibes text-[27px] ${
+                                isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6B2232]'
+                              }`}
                             />
                             <ScrollWordReveal
                               text={cfg.menu_dessert_title}
                               delay={0.08}
-                              className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]"
+                              className={`font-serif italic text-[14.5px] font-semibold ${
+                                isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                              }`}
                             />
                             {cfg.menu_dessert_desc && (
                               <ScrollWordReveal
                                 text={cfg.menu_dessert_desc}
                                 delay={0.16}
                                 stagger={0.035}
-                                className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug"
+                                className={`font-serif italic text-[12.5px] leading-snug ${
+                                  isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                                }`}
                               />
                             )}
                           </div>
@@ -1222,45 +1521,79 @@ export default function EnvelopeExperience({
                   <section className="relative z-10 py-8 px-5 text-center">
                     <ScrollInkHeading
                       text="Blessed Union"
-                      className="font-great-vibes text-[42px] text-[#2f2a24] leading-tight"
+                      className={`font-great-vibes text-[42px] leading-tight ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
                     <ScrollWordReveal
                       text="And We created you in pairs"
                       delay={0.12}
-                      className="font-serif italic text-[14px] text-[#5c5246] mb-5"
+                      className={`font-serif italic text-[14px] mb-5 ${
+                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#5c5246]'
+                      }`}
                     />
 
                     <ScrollRevealBlock
                       direction="up"
-                      className="relative mx-auto max-w-[310px] rounded-[36px] bg-[#fbf8f1]/90 border-2 border-[#C5A059] p-5 shadow-md space-y-4"
+                      className={`relative mx-auto max-w-[310px] rounded-[36px] border-2 p-5 shadow-md space-y-4 ${
+                        isDarkPalace
+                          ? 'bg-[#1D120B]/92 backdrop-blur-sm border-[#E5C17B]/55 shadow-[0_18px_48px_rgba(0,0,0,0.68)]'
+                          : 'bg-[#fbf8f1]/90 border-[#C5A059]'
+                      }`}
                     >
                       {cfg.show_couple_portrait !== false && (
                         <ScrollRevealBlock
                           direction="scale"
                           delay={0.08}
-                          className="w-60 mx-auto rounded-2xl overflow-hidden"
+                          className={`w-60 mx-auto rounded-2xl overflow-hidden ${
+                            isDarkPalace
+                              ? 'border border-[#E5C17B]/40 shadow-[0_12px_32px_rgba(0,0,0,0.65)]'
+                              : ''
+                          }`}
                         >
                           <img
-                            src="/assets/invitecraft/couple-nikah-portrait.jpg?v=loose-abaya"
+                            src={
+                              isDarkPalace
+                                ? '/assets/pearl-veil/portrait-palace-nikah.jpg'
+                                : '/assets/invitecraft/couple-nikah-portrait.jpg?v=loose-abaya'
+                            }
                             alt="Modest Loose Abaya Muslim Bride and Groom Under Floral Arch"
-                            className="w-full h-auto object-contain mx-auto mix-blend-multiply"
+                            className={`w-full h-auto mx-auto ${
+                              isDarkPalace ? 'object-cover' : 'object-contain mix-blend-multiply'
+                            }`}
                           />
                         </ScrollRevealBlock>
                       )}
 
                       {cfg.show_story !== false && cfg.story?.trim() && (
-                        <div className="pt-2 border-t border-[#e6dec8]">
+                        <div
+                          className={`pt-2 border-t ${
+                            isDarkPalace ? 'border-[#E5C17B]/30' : 'border-[#e6dec8]'
+                          }`}
+                        >
                           <ScrollRevealBlock
                             direction="scale"
-                            className="w-8 h-8 mx-auto mb-2 rounded-full bg-[#C5A059]/15 border border-[#C5A059] flex items-center justify-center"
+                            className={`w-8 h-8 mx-auto mb-2 rounded-full border flex items-center justify-center ${
+                              isDarkPalace
+                                ? 'bg-[#E5C17B]/15 border-[#E5C17B]/65'
+                                : 'bg-[#C5A059]/15 border-[#C5A059]'
+                            }`}
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-[#9C762B]" />
+                            <Sparkles
+                              className={`w-3.5 h-3.5 ${
+                                isDarkPalace ? 'text-[#E5C17B]' : 'text-[#9C762B]'
+                              }`}
+                            />
                           </ScrollRevealBlock>
                           <ScrollWordReveal
                             text={`“${cfg.story}”`}
                             delay={0.1}
                             stagger={0.035}
-                            className="font-serif italic text-[14px] text-[#2f2a24] leading-relaxed"
+                            className={`font-serif italic text-[14px] leading-relaxed ${
+                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                            }`}
                           />
                         </div>
                       )}
@@ -1273,31 +1606,55 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showAccommodation && (
                   <section className="relative z-10 py-9 px-5 text-center">
-                    <ScrollOrnamentDivider className="flex items-center justify-center gap-3 mb-4 opacity-45" />
+                    <ScrollOrnamentDivider
+                      className={`flex items-center justify-center gap-3 mb-4 ${
+                        isDarkPalace ? 'opacity-80' : 'opacity-45'
+                      }`}
+                      lineColorClass={isDarkPalace ? 'bg-[#E5C17B]/70' : undefined}
+                      dotColorClass={isDarkPalace ? 'bg-[#E5C17B]' : undefined}
+                    />
 
                     <ScrollInkHeading
                       text="Accommodation"
-                      className="font-great-vibes text-[44px] text-[#2f2a24] leading-tight"
+                      className={`font-great-vibes text-[44px] leading-tight ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
                     <ScrollWordReveal
                       text="Curated stays for our traveling family & guests"
                       delay={0.12}
-                      className="font-serif italic text-[15px] text-[#4a4238] mb-6"
+                      className={`font-serif italic text-[15px] mb-6 ${
+                        isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                      }`}
                     />
 
                     <ScrollRevealBlock
                       direction="up"
-                      className="rounded-3xl bg-[#fbf8f1]/85 border border-[#e6dec8] p-4 shadow-md text-left"
+                      className={`rounded-3xl p-4 shadow-md text-left ${
+                        isDarkPalace
+                          ? 'bg-[#1D120B]/90 backdrop-blur-sm border border-[#E5C17B]/40 shadow-[0_18px_45px_rgba(0,0,0,0.65)]'
+                          : 'bg-[#fbf8f1]/85 border border-[#e6dec8]'
+                      }`}
                     >
                       <ScrollRevealBlock
                         direction="scale"
                         delay={0.08}
-                        className="rounded-2xl overflow-hidden mb-3"
+                        className={`rounded-2xl overflow-hidden mb-3 ${
+                          isDarkPalace ? 'border border-[#E5C17B]/35' : ''
+                        }`}
                       >
                         <img
-                          src="/assets/invitecraft/accommodation-palace-hotel.jpg"
+                          src={
+                            isDarkPalace
+                              ? '/assets/pearl-veil/venue-candlelit-palace.jpg'
+                              : '/assets/invitecraft/accommodation-palace-hotel.jpg'
+                          }
                           alt={cfg.accommodation_name || 'Partner Hotel'}
-                          className="w-full h-auto object-contain mix-blend-multiply"
+                          className={`w-full h-auto ${
+                            isDarkPalace ? 'object-cover' : 'object-contain mix-blend-multiply'
+                          }`}
                         />
                       </ScrollRevealBlock>
                       <div className="px-2 space-y-1.5">
@@ -1305,7 +1662,9 @@ export default function EnvelopeExperience({
                           <ScrollWordReveal
                             as="h3"
                             text={cfg.accommodation_name}
-                            className="font-serif font-bold text-[20px] text-[#2f2a24]"
+                            className={`font-serif font-bold text-[20px] ${
+                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                            }`}
                           />
                         )}
                         {cfg.accommodation_note && (
@@ -1313,19 +1672,27 @@ export default function EnvelopeExperience({
                             text={cfg.accommodation_note}
                             delay={0.1}
                             stagger={0.035}
-                            className="font-serif italic text-[14px] text-[#4a4238] leading-snug"
+                            className={`font-serif italic text-[14px] leading-snug ${
+                              isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                            }`}
                           />
                         )}
                         {cfg.accommodation_url && (
                           <div className="flex items-center justify-between pt-2">
-                            <span className="font-serif italic text-[14px] font-semibold text-[#7a5c3e]">
+                            <span
+                              className={`font-serif italic text-[14px] font-semibold ${
+                                isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7a5c3e]'
+                              }`}
+                            >
                               Courtesy Guest Block
                             </span>
                             <a
                               href={cfg.accommodation_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 font-serif italic text-[13.5px] text-[#2f2a24] hover:underline"
+                              className={`inline-flex items-center gap-1.5 font-serif italic text-[13.5px] hover:underline ${
+                                isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                              }`}
                             >
                               <span>View details</span>
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -1343,11 +1710,15 @@ export default function EnvelopeExperience({
                 {showFaq && (
                   <section className="relative z-10 py-9 px-5 text-center">
                     <ScrollRevealBlock direction="scale">
-                      <SectionHeaderBadge type="faq" />
+                      <SectionHeaderBadge type="faq" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
                     <ScrollInkHeading
                       text="Questions & Answers"
-                      className="font-great-vibes text-[42px] text-[#2f2a24] mb-6"
+                      className={`font-great-vibes text-[42px] mb-6 ${
+                        isDarkPalace
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
+                          : 'text-[#2f2a24]'
+                      }`}
                     />
 
                     <div className="space-y-3 text-left">
@@ -1358,20 +1729,28 @@ export default function EnvelopeExperience({
                             key={idx}
                             direction="up"
                             delay={idx * 0.08}
-                            className="rounded-xl bg-[#fbf9f5] border border-[#e6dec8] shadow-xs overflow-hidden"
+                            className={`rounded-xl shadow-xs overflow-hidden ${
+                              isDarkPalace
+                                ? 'bg-[#1D120B]/90 backdrop-blur-sm border border-[#E5C17B]/35'
+                                : 'bg-[#fbf9f5] border border-[#e6dec8]'
+                            }`}
                           >
                             <button
                               type="button"
                               onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
                               className="w-full px-4 py-3.5 flex items-center justify-between text-left gap-3 cursor-pointer"
                             >
-                              <span className="font-serif text-[14.5px] text-[#2f2a24]">
+                              <span
+                                className={`font-serif text-[14.5px] ${
+                                  isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                                }`}
+                              >
                                 {faq.q}
                               </span>
                               <ChevronDown
-                                className={`w-4 h-4 text-[#5c5246] shrink-0 transition-transform ${
-                                  isOpen ? 'rotate-180' : ''
-                                }`}
+                                className={`w-4 h-4 shrink-0 transition-transform ${
+                                  isDarkPalace ? 'text-[#E5C17B]' : 'text-[#5c5246]'
+                                } ${isOpen ? 'rotate-180' : ''}`}
                               />
                             </button>
                             <AnimatePresence>
@@ -1383,7 +1762,13 @@ export default function EnvelopeExperience({
                                   transition={{ duration: 0.25 }}
                                   className="overflow-hidden"
                                 >
-                                  <div className="px-4 pb-4 pt-1 font-serif italic text-[13.5px] text-[#5c5246] border-t border-[#f0e8d8]">
+                                  <div
+                                    className={`px-4 pb-4 pt-1 font-serif italic text-[13.5px] border-t ${
+                                      isDarkPalace
+                                        ? 'text-[#E8D7B9] border-[#E5C17B]/20'
+                                        : 'text-[#5c5246] border-[#f0e8d8]'
+                                    }`}
+                                  >
                                     {faq.a}
                                   </div>
                                 </motion.div>
@@ -1399,7 +1784,7 @@ export default function EnvelopeExperience({
                 {/* ===============================================================
                     BLOCK 10: RSVP SECTION (Shown if show_rsvp !== false)
                 =============================================================== */}
-                {showRsvp && <RsvpSection guest={guest} />}
+                {showRsvp && <RsvpSection guest={guest} darkPalace={isDarkPalace} />}
 
                 {/* ===============================================================
                     SCROLL TO RSVP INDICATOR & FOOTER
@@ -1409,16 +1794,24 @@ export default function EnvelopeExperience({
                     <button
                       type="button"
                       onClick={scrollToRsvp}
-                      className="mx-auto flex flex-col items-center gap-1.5 text-[#2f2a24] opacity-80 hover:opacity-100 cursor-pointer"
+                      className={`mx-auto flex flex-col items-center gap-1.5 opacity-85 hover:opacity-100 cursor-pointer ${
+                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
+                      }`}
                     >
                       <span className="font-sans text-[10px] tracking-[0.2em] uppercase font-semibold">
                         SCROLL TO RSVP
                       </span>
-                      <span className="w-5 h-8 rounded-full border-[1.5px] border-[#2f2a24] flex items-start justify-center p-1">
+                      <span
+                        className={`w-5 h-8 rounded-full border-[1.5px] flex items-start justify-center p-1 ${
+                          isDarkPalace ? 'border-[#E5C17B]' : 'border-[#2f2a24]'
+                        }`}
+                      >
                         <motion.span
                           animate={{ y: [0, 8, 0] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
-                          className="w-1 h-2 rounded-full bg-[#2f2a24]"
+                          className={`w-1 h-2 rounded-full ${
+                            isDarkPalace ? 'bg-[#E5C17B]' : 'bg-[#2f2a24]'
+                          }`}
                         />
                       </span>
                     </button>
@@ -1427,7 +1820,9 @@ export default function EnvelopeExperience({
                   <ScrollWordReveal
                     text="Crafted with Love ❤️ Eternal Vowz (E&V) Bespoke Wedding Suite"
                     delay={0.1}
-                    className="font-serif italic text-xs text-[#5c5246]"
+                    className={`font-serif italic text-xs ${
+                      isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
+                    }`}
                   />
                 </ScrollRevealBlock>
               </div>

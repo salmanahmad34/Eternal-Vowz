@@ -3,17 +3,26 @@
 import React from 'react';
 
 // 1. Original Halal Wedding Timeline Watercolor-Style SVG Illustrations
-export function TimelineIllustration({ index }: { index: number }) {
+export function TimelineIllustration({
+  index,
+  darkPalace = false,
+}: {
+  index: number;
+  darkPalace?: boolean;
+}) {
   const type = index % 4;
+  const strokeMain = darkPalace ? '#E5C17B' : '#8C6D46';
+  const accentRose = darkPalace ? '#F6D992' : '#E5A8B2';
+  const fillSoft = darkPalace ? '#2B1B11' : '#FFFDF9';
 
   if (type === 0) {
     // Golden Sparklers & Welcome Star Bursts
     return (
       <svg viewBox="0 0 90 90" fill="none" className="w-20 h-20 mx-auto mb-1">
-        <line x1="28" y1="78" x2="60" y2="25" stroke="#8C6D46" strokeWidth="1.8" strokeLinecap="round" />
-        <line x1="62" y1="78" x2="30" y2="25" stroke="#8C6D46" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="28" y1="78" x2="60" y2="25" stroke={strokeMain} strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="62" y1="78" x2="30" y2="25" stroke={strokeMain} strokeWidth="1.8" strokeLinecap="round" />
         {/* Golden Sparkle Rays */}
-        <g stroke="#D49B38" strokeWidth="1.4" strokeLinecap="round">
+        <g stroke={darkPalace ? '#FFE39C' : '#D49B38'} strokeWidth="1.4" strokeLinecap="round">
           <line x1="30" y1="14" x2="30" y2="34" />
           <line x1="20" y1="24" x2="40" y2="24" />
           <line x1="23" y1="17" x2="37" y2="31" />
@@ -27,8 +36,8 @@ export function TimelineIllustration({ index }: { index: number }) {
         <circle cx="30" cy="24" r="4" fill="#FCE592" />
         <circle cx="60" cy="24" r="4" fill="#FCE592" />
         <circle cx="45" cy="15" r="2" fill="#E5A93C" />
-        <circle cx="16" cy="33" r="1.8" fill="#D88C9A" />
-        <circle cx="74" cy="33" r="1.8" fill="#D88C9A" />
+        <circle cx="16" cy="33" r="1.8" fill={accentRose} />
+        <circle cx="74" cy="33" r="1.8" fill={accentRose} />
       </svg>
     );
   }
@@ -40,21 +49,21 @@ export function TimelineIllustration({ index }: { index: number }) {
         {/* Floral Arch */}
         <path
           d="M20 74 V42 C20 26, 70 26, 70 42 V74"
-          stroke="#8C6D46"
+          stroke={strokeMain}
           strokeWidth="1.6"
           strokeLinecap="round"
         />
         {/* Watercolor Roses on Arch */}
-        <circle cx="24" cy="34" r="5" fill="#E5A8B2" />
+        <circle cx="24" cy="34" r="5" fill={darkPalace ? '#FFF2D6' : '#E5A8B2'} />
         <circle cx="33" cy="27" r="4.5" fill="#F4D58D" />
-        <circle cx="45" cy="24" r="5.5" fill="#E5A8B2" />
+        <circle cx="45" cy="24" r="5.5" fill={darkPalace ? '#FFF2D6' : '#E5A8B2'} />
         <circle cx="57" cy="27" r="4.5" fill="#F4D58D" />
-        <circle cx="66" cy="34" r="5" fill="#E5A8B2" />
+        <circle cx="66" cy="34" r="5" fill={darkPalace ? '#FFF2D6' : '#E5A8B2'} />
         {/* Interlocking Golden Wedding Rings */}
-        <circle cx="39" cy="54" r="10" stroke="#C59B38" strokeWidth="2.2" fill="#FFFDF9" fillOpacity="0.4" />
-        <circle cx="51" cy="54" r="10" stroke="#C59B38" strokeWidth="2.2" fill="#FFFDF9" fillOpacity="0.4" />
+        <circle cx="39" cy="54" r="10" stroke={darkPalace ? '#F2CE74' : '#C59B38'} strokeWidth="2.2" fill={fillSoft} fillOpacity="0.4" />
+        <circle cx="51" cy="54" r="10" stroke={darkPalace ? '#F2CE74' : '#C59B38'} strokeWidth="2.2" fill={fillSoft} fillOpacity="0.4" />
         {/* Diamond Top on Left Ring */}
-        <polygon points="39,40 42,43 39,46 36,43" fill="#E5C168" stroke="#8C6D46" strokeWidth="0.8" />
+        <polygon points="39,40 42,43 39,46 36,43" fill="#E5C168" stroke={strokeMain} strokeWidth="0.8" />
       </svg>
     );
   }
@@ -66,21 +75,21 @@ export function TimelineIllustration({ index }: { index: number }) {
         {/* Royal Cloche / Domed Dawat Platter */}
         <path
           d="M22 62 C22 44, 68 44, 68 62 Z"
-          fill="#F2DCAB"
-          fillOpacity="0.8"
-          stroke="#7A654E"
+          fill={darkPalace ? '#C99E48' : '#F2DCAB'}
+          fillOpacity={darkPalace ? '0.35' : '0.8'}
+          stroke={darkPalace ? '#E5C17B' : '#7A654E'}
           strokeWidth="1.6"
         />
-        <circle cx="45" cy="45" r="3.5" fill="#D4AF37" stroke="#7A654E" strokeWidth="1.3" />
-        <ellipse cx="45" cy="63" rx="28" ry="4" fill="#EAE3D5" stroke="#7A654E" strokeWidth="1.5" />
-        <path d="M26 67 H64" stroke="#7A654E" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="45" cy="45" r="3.5" fill="#D4AF37" stroke={darkPalace ? '#FFE39C' : '#7A654E'} strokeWidth="1.3" />
+        <ellipse cx="45" cy="63" rx="28" ry="4" fill={darkPalace ? '#3B2718' : '#EAE3D5'} stroke={darkPalace ? '#E5C17B' : '#7A654E'} strokeWidth="1.5" />
+        <path d="M26 67 H64" stroke={darkPalace ? '#E5C17B' : '#7A654E'} strokeWidth="1.5" strokeLinecap="round" />
         {/* Decorative Floral Sprig & Steam */}
-        <path d="M36 36 Q38 30 35 25" stroke="#C5A059" strokeWidth="1.2" strokeLinecap="round" />
-        <path d="M45 34 Q47 28 44 22" stroke="#C5A059" strokeWidth="1.2" strokeLinecap="round" />
-        <path d="M54 36 Q56 30 53 25" stroke="#C5A059" strokeWidth="1.2" strokeLinecap="round" />
-        <circle cx="38" cy="56" r="3" fill="#E5A8B2" />
-        <circle cx="45" cy="54" r="3.5" fill="#89A878" />
-        <circle cx="52" cy="56" r="3" fill="#E5A8B2" />
+        <path d="M36 36 Q38 30 35 25" stroke="#E5C17B" strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M45 34 Q47 28 44 22" stroke="#E5C17B" strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M54 36 Q56 30 53 25" stroke="#E5C17B" strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="38" cy="56" r="3" fill={darkPalace ? '#FFF2D6' : '#E5A8B2'} />
+        <circle cx="45" cy="54" r="3.5" fill={darkPalace ? '#E5C17B' : '#89A878'} />
+        <circle cx="52" cy="56" r="3" fill={darkPalace ? '#FFF2D6' : '#E5A8B2'} />
       </svg>
     );
   }
@@ -90,38 +99,44 @@ export function TimelineIllustration({ index }: { index: number }) {
     <svg viewBox="0 0 100 90" fill="none" className="w-20 h-20 mx-auto mb-1">
       <path
         d="M20 52 C20 40, 28 36, 35 36 L65 36 C72 36, 80 40, 80 52 L84 56 L84 68 L16 68 L16 56 Z"
-        fill="#E5B5BC"
-        fillOpacity="0.75"
-        stroke="#6B484E"
+        fill={darkPalace ? '#3C2719' : '#E5B5BC'}
+        fillOpacity={darkPalace ? '0.9' : '0.75'}
+        stroke={darkPalace ? '#E5C17B' : '#6B484E'}
         strokeWidth="1.5"
       />
-      <path d="M32 36 L37 24 L63 24 L68 36 Z" fill="#FFFDF9" fillOpacity="0.7" stroke="#6B484E" strokeWidth="1.4" />
-      <circle cx="24" cy="57" r="4.5" fill="#FFF7D6" stroke="#6B484E" strokeWidth="1.4" />
-      <circle cx="76" cy="57" r="4.5" fill="#FFF7D6" stroke="#6B484E" strokeWidth="1.4" />
-      <rect x="38" y="54" width="24" height="8" rx="3" fill="#FAF6EE" stroke="#6B484E" strokeWidth="1.3" />
-      <rect x="20" y="66" width="10" height="9" rx="2" fill="#4A3F35" />
-      <rect x="70" y="66" width="10" height="9" rx="2" fill="#4A3F35" />
-      <circle cx="38" cy="54" r="3" fill="#D88C9A" />
+      <path d="M32 36 L37 24 L63 24 L68 36 Z" fill={darkPalace ? '#1F130B' : '#FFFDF9'} fillOpacity="0.8" stroke={darkPalace ? '#E5C17B' : '#6B484E'} strokeWidth="1.4" />
+      <circle cx="24" cy="57" r="4.5" fill="#FFF7D6" stroke={darkPalace ? '#E5C17B' : '#6B484E'} strokeWidth="1.4" />
+      <circle cx="76" cy="57" r="4.5" fill="#FFF7D6" stroke={darkPalace ? '#E5C17B' : '#6B484E'} strokeWidth="1.4" />
+      <rect x="38" y="54" width="24" height="8" rx="3" fill={darkPalace ? '#26180F' : '#FAF6EE'} stroke={darkPalace ? '#E5C17B' : '#6B484E'} strokeWidth="1.3" />
+      <rect x="20" y="66" width="10" height="9" rx="2" fill={darkPalace ? '#140C07' : '#4A3F35'} stroke={darkPalace ? '#E5C17B' : 'none'} strokeWidth={darkPalace ? '1' : '0'} />
+      <rect x="70" y="66" width="10" height="9" rx="2" fill={darkPalace ? '#140C07' : '#4A3F35'} stroke={darkPalace ? '#E5C17B' : 'none'} strokeWidth={darkPalace ? '1' : '0'} />
+      <circle cx="38" cy="54" r="3" fill={darkPalace ? '#FFF2D6' : '#D88C9A'} />
       <circle cx="44" cy="53" r="3.5" fill="#F4D58D" />
-      <circle cx="50" cy="54" r="3" fill="#D88C9A" />
-      <circle cx="56" cy="53" r="3.5" fill="#89A878" />
-      <circle cx="62" cy="54" r="3" fill="#D88C9A" />
+      <circle cx="50" cy="54" r="3" fill={darkPalace ? '#FFF2D6' : '#D88C9A'} />
+      <circle cx="56" cy="53" r="3.5" fill={darkPalace ? '#E5C17B' : '#89A878'} />
+      <circle cx="62" cy="54" r="3" fill={darkPalace ? '#FFF2D6' : '#D88C9A'} />
     </svg>
   );
 }
 
 // 2. Original Section Header Badges (Pocket Watch, Gift Box, Scroll FAQ)
-export function SectionHeaderBadge({ type }: { type: 'clock' | 'dress' | 'gift' | 'bellhop' | 'faq' }) {
+export function SectionHeaderBadge({
+  type,
+  darkPalace = false,
+}: {
+  type: 'clock' | 'dress' | 'gift' | 'bellhop' | 'faq';
+  darkPalace?: boolean;
+}) {
   if (type === 'clock') {
     return (
       <svg viewBox="0 0 80 80" fill="none" className="w-16 h-16 mx-auto mb-2">
-        <circle cx="40" cy="44" r="22" fill="#FDFBF7" stroke="#8C6D46" strokeWidth="1.8" />
-        <circle cx="40" cy="44" r="18" stroke="#C5A059" strokeWidth="1" strokeDasharray="2 2" />
-        <path d="M36 16 H44 M40 16 V22" stroke="#8C6D46" strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx="40" cy="14" r="4" stroke="#8C6D46" strokeWidth="1.5" />
-        <polyline points="40,32 40,44 49,49" stroke="#5C4934" strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx="23" cy="29" r="5" fill="#E5A8B2" />
-        <circle cx="57" cy="58" r="4.5" fill="#E5A8B2" />
+        <circle cx="40" cy="44" r="22" fill={darkPalace ? '#22150D' : '#FDFBF7'} stroke={darkPalace ? '#E5C17B' : '#8C6D46'} strokeWidth="1.8" />
+        <circle cx="40" cy="44" r="18" stroke={darkPalace ? '#C9A84C' : '#C5A059'} strokeWidth="1" strokeDasharray="2 2" />
+        <path d="M36 16 H44 M40 16 V22" stroke={darkPalace ? '#E5C17B' : '#8C6D46'} strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="40" cy="14" r="4" stroke={darkPalace ? '#E5C17B' : '#8C6D46'} strokeWidth="1.5" />
+        <polyline points="40,32 40,44 49,49" stroke={darkPalace ? '#FFF4CF' : '#5C4934'} strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="23" cy="29" r="5" fill={darkPalace ? '#FFF2D6' : '#E5A8B2'} />
+        <circle cx="57" cy="58" r="4.5" fill={darkPalace ? '#E5C17B' : '#E5A8B2'} />
       </svg>
     );
   }
@@ -129,16 +144,16 @@ export function SectionHeaderBadge({ type }: { type: 'clock' | 'dress' | 'gift' 
   if (type === 'gift') {
     return (
       <svg viewBox="0 0 80 80" fill="none" className="w-16 h-16 mx-auto mb-2">
-        <rect x="18" y="34" width="44" height="32" rx="3" fill="#F8EFE4" stroke="#7A5C48" strokeWidth="1.6" />
-        <rect x="15" y="26" width="50" height="9" rx="2" fill="#F2E4D4" stroke="#7A5C48" strokeWidth="1.6" />
-        <rect x="36" y="26" width="8" height="40" fill="#D88C9A" fillOpacity="0.85" />
-        <rect x="18" y="46" width="44" height="7" fill="#D88C9A" fillOpacity="0.85" />
+        <rect x="18" y="34" width="44" height="32" rx="3" fill={darkPalace ? '#24160D' : '#F8EFE4'} stroke={darkPalace ? '#E5C17B' : '#7A5C48'} strokeWidth="1.6" />
+        <rect x="15" y="26" width="50" height="9" rx="2" fill={darkPalace ? '#321F12' : '#F2E4D4'} stroke={darkPalace ? '#E5C17B' : '#7A5C48'} strokeWidth="1.6" />
+        <rect x="36" y="26" width="8" height="40" fill={darkPalace ? '#C9A84C' : '#D88C9A'} fillOpacity="0.9" />
+        <rect x="18" y="46" width="44" height="7" fill={darkPalace ? '#C9A84C' : '#D88C9A'} fillOpacity="0.9" />
         <path
           d="M40 26 C30 14, 20 20, 32 26 M40 26 C50 14, 60 20, 48 26"
-          stroke="#B56576"
+          stroke={darkPalace ? '#FFE39C' : '#B56576'}
           strokeWidth="2.2"
-          fill="#E5A8B2"
-          fillOpacity="0.6"
+          fill={darkPalace ? '#C9A84C' : '#E5A8B2'}
+          fillOpacity="0.65"
         />
       </svg>
     );
@@ -147,14 +162,14 @@ export function SectionHeaderBadge({ type }: { type: 'clock' | 'dress' | 'gift' 
   if (type === 'faq') {
     return (
       <svg viewBox="0 0 80 80" fill="none" className="w-14 h-14 mx-auto mb-2">
-        <rect x="22" y="16" width="36" height="48" rx="4" fill="#FAF3E6" stroke="#7A654E" strokeWidth="1.6" />
-        <line x1="18" y1="16" x2="62" y2="16" stroke="#5C4934" strokeWidth="3" strokeLinecap="round" />
-        <line x1="18" y1="64" x2="62" y2="64" stroke="#5C4934" strokeWidth="3" strokeLinecap="round" />
+        <rect x="22" y="16" width="36" height="48" rx="4" fill={darkPalace ? '#22150D' : '#FAF3E6'} stroke={darkPalace ? '#E5C17B' : '#7A654E'} strokeWidth="1.6" />
+        <line x1="18" y1="16" x2="62" y2="16" stroke={darkPalace ? '#E5C17B' : '#5C4934'} strokeWidth="3" strokeLinecap="round" />
+        <line x1="18" y1="64" x2="62" y2="64" stroke={darkPalace ? '#E5C17B' : '#5C4934'} strokeWidth="3" strokeLinecap="round" />
         <text
           x="40"
           y="48"
           textAnchor="middle"
-          fill="#7A654E"
+          fill={darkPalace ? '#FFF4CF' : '#7A654E'}
           className="font-serif italic font-bold"
           style={{ fontSize: '26px' }}
         >
