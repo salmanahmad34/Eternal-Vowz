@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Invitation } from '@/types/database';
 import {
   X,
@@ -12,6 +12,8 @@ import {
   CreditCard,
   AlertCircle,
   Lock,
+  Info,
+  RefreshCw,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -53,22 +55,41 @@ function loadRazorpayScript(): Promise<boolean> {
       resolve(true);
       return;
     }
+
+    // Remove any previously failed/stale script tag before reinjecting
     const existing = document.querySelector(
       'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
     );
     if (existing) {
-      existing.addEventListener('load', () => resolve(true));
-      existing.addEventListener('error', () => resolve(false));
-      return;
+      existing.remove();
     }
+
+    let settled = false;
+    const finish = (ok: boolean) => {
+      if (!settled) {
+        settled = true;
+        resolve(ok);
+      }
+    };
+
+    const timer = setTimeout(() => finish(Boolean(window.Razorpay)), 12000);
+
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
+    script.onload = () => {
+      clearTimeout(timer);
+      finish(Boolean(window.Razorpay));
+    };
+    script.onerror = () => {
+      clearTimeout(timer);
+      finish(false);
+    };
     document.body.appendChild(script);
   });
 }
+
+const IS_TEST_MODE = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').startsWith('rzp_test_');
 
 export default function RazorpayCheckoutModal({
   card,
@@ -84,8 +105,12 @@ export default function RazorpayCheckoutModal({
   const [couponError, setCouponError] = useState<string | null>(null);
 
   const [paying, setPaying] = useState(false);
+  const [verifyingStatus, setVerifyingStatus] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
+
+  const completedRef = useRef(false);
 
   useEffect(() => {
     setCustomerEmail(defaultEmail);
@@ -94,6 +119,10 @@ export default function RazorpayCheckoutModal({
     setCouponError(null);
     setPaymentError(null);
     setPaymentSuccess(null);
+    setPendingOrderId(null);
+    setPaying(false);
+    setVerifyingStatus(false);
+    completedRef.current = false;
   }, [card?.id, mode, defaultEmail]);
 
   if (!card) return null;
@@ -162,6 +191,10 @@ export default function RazorpayCheckoutModal({
   };
 
   const celebrateSuccess = async (message: string, createdCard?: Invitation) => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setPendingOrderId(null);
+    setPaymentError(null);
     setPaymentSuccess(message);
     try {
       confetti({
@@ -179,9 +212,58 @@ export default function RazorpayCheckoutModal({
     }, 1800);
   };
 
+  const checkOrderStatusFromServer = async (
+    orderId: string,
+    cardPayload?: ReturnType<typeof buildCardPayload>,
+    silentIfUnpaid = false
+  ) => {
+    if (completedRef.current) return;
+    setVerifyingStatus(true);
+    try {
+      const res = await fetch('/api/razorpay/check-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: orderId,
+          ...(isCreateNew && cardPayload ? { card_payload: cardPayload } : {}),
+        }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.paid) {
+        await celebrateSuccess(
+          isCreateNew
+            ? 'Payment confirmed! Your new 3D wedding card has been created & published for 30 days.'
+            : 'Payment confirmed! Your 3D wedding invitation is now active for 30 days.',
+          data.card || undefined
+        );
+        return;
+      }
+
+      if (data.failed && data.error_description) {
+        setPaymentError(
+          IS_TEST_MODE
+            ? `${data.error_description}. Tip: In Razorpay Test Mode, use UPI "success@razorpay" or Netbanking → Success.`
+            : data.error_description
+        );
+      } else if (!silentIfUnpaid) {
+        setPaymentError(
+          'Payment is not completed yet. Please try again or use UPI "success@razorpay" in Test Mode.'
+        );
+      }
+    } catch {
+      if (!silentIfUnpaid) {
+        setPaymentError('Could not verify payment status. Please try again.');
+      }
+    } finally {
+      setVerifyingStatus(false);
+    }
+  };
+
   const handleProceedPayment = async () => {
     setPaying(true);
     setPaymentError(null);
+    completedRef.current = false;
 
     try {
       const cardPayload = isCreateNew ? buildCardPayload() : undefined;
@@ -225,38 +307,54 @@ export default function RazorpayCheckoutModal({
         return;
       }
 
+      const createdOrderId = String(orderData.orderId || '');
+      setPendingOrderId(createdOrderId);
+
       // 3. Load Razorpay Checkout script
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded || !window.Razorpay) {
         setPaymentError(
-          'Could not load Razorpay Checkout script. Please check your internet connection.'
+          'Could not load Razorpay Checkout script. Please disable any ad-blocker and check your internet connection.'
         );
         setPaying(false);
         return;
       }
 
+      const prefillObj: Record<string, string> = {};
+      if (customerEmail.trim()) {
+        prefillObj.email = customerEmail.trim();
+      }
+
       // 4. Open Razorpay Checkout Popup
       const options: Record<string, unknown> = {
         key: orderData.keyId,
-        amount: orderData.amount,
+        amount: Number(orderData.amount),
         currency: orderData.currency || 'INR',
-        name: 'Eternal Vowz (E&V)',
-        description: `${coupleTitle} — 30-Day 3D Wedding Card`,
-        order_id: orderData.orderId,
-        prefill: {
-          email: customerEmail.trim() || undefined,
-        },
+        name: 'Eternal Vowz',
+        description: `${coupleTitle} - 30-Day Digital Wedding Card`,
+        order_id: createdOrderId,
+        ...(Object.keys(prefillObj).length > 0 ? { prefill: prefillObj } : {}),
         notes: {
           mode: isCreateNew ? 'create_new' : 'pay_existing',
           card_id: isCreateNew ? 'pending_creation' : card.id,
           coupon_code: appliedCoupon?.code || 'none',
         },
+        retry: {
+          enabled: true,
+          max_count: 3,
+        },
         theme: {
           color: '#C9A84C',
         },
         modal: {
-          ondismiss: () => {
+          escape: false,
+          confirm_close: true,
+          ondismiss: async () => {
             setPaying(false);
+            // Automatically check with Razorpay server in case UPI intent/payment already succeeded
+            if (!completedRef.current && createdOrderId) {
+              await checkOrderStatusFromServer(createdOrderId, cardPayload, true);
+            }
           },
         },
         handler: async (response: {
@@ -278,10 +376,8 @@ export default function RazorpayCheckoutModal({
             const verifyData = await verifyRes.json();
 
             if (!verifyRes.ok || !verifyData.success) {
-              setPaymentError(
-                verifyData.error ||
-                  'Payment received, but verification failed. Please contact support.'
-              );
+              // Fallback to direct server-side Razorpay order verification
+              await checkOrderStatusFromServer(createdOrderId, cardPayload, false);
               setPaying(false);
               return;
             }
@@ -294,7 +390,8 @@ export default function RazorpayCheckoutModal({
               verifyData.card || undefined
             );
           } catch {
-            setPaymentError('Error verifying payment signature. Please refresh your dashboard.');
+            // Fallback to direct server-side Razorpay order check
+            await checkOrderStatusFromServer(createdOrderId, cardPayload, false);
             setPaying(false);
           }
         },
@@ -302,8 +399,18 @@ export default function RazorpayCheckoutModal({
 
       const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', (failedResp: Record<string, unknown>) => {
-        const errObj = failedResp?.error as { description?: string } | undefined;
-        setPaymentError(errObj?.description || 'Payment failed or was cancelled.');
+        const errObj = failedResp?.error as
+          | { description?: string; reason?: string }
+          | undefined;
+        const msg =
+          errObj?.description ||
+          errObj?.reason ||
+          'Payment could not be completed.';
+        setPaymentError(
+          IS_TEST_MODE
+            ? `${msg} In Razorpay Test Mode, please use UPI "success@razorpay" or Netbanking → Success.`
+            : msg
+        );
         setPaying(false);
       });
       rzp.open();
@@ -316,7 +423,9 @@ export default function RazorpayCheckoutModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#291418]/55 backdrop-blur-xs p-4"
-      onClick={onClose}
+      onClick={() => {
+        if (!paying && !verifyingStatus) onClose();
+      }}
     >
       <div
         className="w-full max-w-md rounded-2xl bg-[#FAF7F2] border border-[#E2D7BD] shadow-2xl overflow-hidden"
@@ -340,8 +449,9 @@ export default function RazorpayCheckoutModal({
           </div>
           <button
             type="button"
+            disabled={paying || verifyingStatus}
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#8B7355] hover:text-[#291418] hover:bg-[#FAF7F2] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[#8B7355] hover:text-[#291418] hover:bg-[#FAF7F2] disabled:opacity-40 transition-colors cursor-pointer"
             aria-label="Close checkout modal"
           >
             <X className="w-4 h-4" />
@@ -349,7 +459,7 @@ export default function RazorpayCheckoutModal({
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-4">
           {paymentSuccess ? (
             <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-5 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
@@ -360,6 +470,20 @@ export default function RazorpayCheckoutModal({
             </div>
           ) : (
             <>
+              {/* Test Mode Hint Banner (only shown when rzp_test_ key is active) */}
+              {IS_TEST_MODE && (
+                <div className="rounded-xl bg-amber-50/90 border border-amber-200 px-3.5 py-2.5 text-[11px] text-amber-900 flex items-start gap-2">
+                  <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="font-semibold">Razorpay Test Mode:</strong> Use UPI ID{' '}
+                    <code className="px-1 py-0.5 rounded bg-amber-100 font-mono text-[10px]">
+                      success@razorpay
+                    </code>{' '}
+                    or <strong>Netbanking → Success</strong>. (Real UPI IDs &amp; real cards fail in Test Mode.)
+                  </div>
+                </div>
+              )}
+
               {/* Customer Email */}
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5A4636] mb-1.5">
@@ -487,13 +611,13 @@ export default function RazorpayCheckoutModal({
               <button
                 type="button"
                 onClick={handleProceedPayment}
-                disabled={paying}
+                disabled={paying || verifyingStatus}
                 className="w-full py-3.5 px-5 rounded-lg bg-[#C9A84C] hover:bg-[#B8963B] disabled:opacity-60 text-white text-xs font-bold uppercase tracking-[0.16em] transition-colors shadow-sm cursor-pointer inline-flex items-center justify-center gap-2"
               >
-                {paying ? (
+                {paying || verifyingStatus ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Processing...</span>
+                    <span>{verifyingStatus ? 'Verifying Payment...' : 'Processing...'}</span>
                   </>
                 ) : isFree ? (
                   <>
@@ -515,6 +639,27 @@ export default function RazorpayCheckoutModal({
                   </>
                 )}
               </button>
+
+              {/* Manual Fallback Verification Button if user already completed payment */}
+              {pendingOrderId && !paying && (
+                <button
+                  type="button"
+                  disabled={verifyingStatus}
+                  onClick={() =>
+                    checkOrderStatusFromServer(
+                      pendingOrderId,
+                      isCreateNew ? buildCardPayload() : undefined,
+                      false
+                    )
+                  }
+                  className="w-full py-2.5 px-4 rounded-lg bg-white hover:bg-[#F6EEDB] border border-[#E2D7BD] text-[#5A4636] text-xs font-semibold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5"
+                >
+                  <RefreshCw
+                    className={`w-3.5 h-3.5 text-[#C9A84C] ${verifyingStatus ? 'animate-spin' : ''}`}
+                  />
+                  <span>Already Paid? Verify Payment Status</span>
+                </button>
+              )}
 
               <div className="flex items-center justify-center gap-3 text-[11px] text-[#8B7355]">
                 <span className="inline-flex items-center gap-1">
