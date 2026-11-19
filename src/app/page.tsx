@@ -63,15 +63,15 @@ const MARQUEE_ROW_TWO = [
 const SIGNATURE_CARD_DESIGNS = [
   {
     id: 'pearl-veil',
-    category: 'Frosted-Blur Veil',
-    badge: '✨ New · Blur Veil',
+    category: '3D Cinema Reveal',
+    badge: '✨ 3D Cinema Reveal',
     name: 'Pearl Botanical Veil',
     couple: 'Layla & Omar',
     slug: 'layla-omar-veil',
     query: '',
     price: '₹79',
-    heroImg: '/assets/invitecraft/hero-pearl-botanical.jpg',
-    shortDesc: 'Starts fully blurred — tap to reveal an orchid glass conservatory.',
+    heroImg: '/assets/pearl-veil/hero-palace-corridor.jpg',
+    shortDesc: 'Tap anywhere to glide through a floral marble lattice into a candlelit palace hall.',
   },
   {
     id: 'blush-floral',
@@ -476,9 +476,7 @@ export default function LandingPage() {
                   <img
                     src={design.heroImg}
                     alt={design.name}
-                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${
-                      design.id === 'pearl-veil' ? 'blur-[2px] group-hover:blur-none transition-all' : ''
-                    }`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/15 pointer-events-none" />
 

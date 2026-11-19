@@ -65,6 +65,32 @@ class LuxuryAudioPlayer {
     }
   }
 
+  // Unlocks HTMLAudioElement synchronously inside a user tap gesture WITHOUT playing sound yet,
+  // so mobile Safari/Chrome allow music to start automatically once an intro animation finishes.
+  public primeForDelayedPlay() {
+    const el = this.ensureAudioElement();
+    if (!el || this.isPlaying) return;
+    try {
+      this.clearFade();
+      el.muted = true;
+      el.volume = 0;
+      const p = el.play();
+      if (p !== undefined) {
+        p.then(() => {
+          if (!this.isPlaying && this.audio) {
+            this.audio.pause();
+            this.audio.currentTime = 0;
+            this.audio.muted = this.isMuted;
+          }
+        }).catch(() => {
+          // Ignore if browser blocks silent unlock
+        });
+      }
+    } catch {
+      // Ignore audio prime errors
+    }
+  }
+
   // Starts the signature wedding MP3 immediately inside the user tap gesture with smooth volume fade-in
   public startAmbientMusic(trackId: string = 'wedding-nasheed') {
     this.currentTrack = trackId || 'wedding-nasheed';

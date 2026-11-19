@@ -31,6 +31,10 @@ yarn-error.log*
 .env.production
 !.env.example
 
+# raw source video/art assets (optimized web copies live in public/assets/)
+card video/
+Before_the_Vow.mp3
+
 # vercel
 .vercel
 
