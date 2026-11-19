@@ -496,6 +496,18 @@ const INITIAL_DEMO_GUESTS: GuestWithRsvp[] = [
   },
 ];
 
+// Helper to generate PostgreSQL-compatible UUID v4
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 // Helper to safely access browser localStorage
 function getLocalItem<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
@@ -549,7 +561,10 @@ export const DataService = {
   async getAllInvitations(): Promise<Invitation[]> {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase.from('invitations').select('*');
+        const { data, error } = await supabase
+          .from('ev_cards')
+          .select('*')
+          .order('created_at', { ascending: false });
         if (!error && data && data.length > 0) return data as Invitation[];
       } catch (e) {
         console.warn('Supabase getAllInvitations fallback:', e);
@@ -568,7 +583,7 @@ export const DataService = {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
-          .from('invitations')
+          .from('ev_cards')
           .select('*')
           .eq('slug', slug)
           .single();
@@ -585,7 +600,7 @@ export const DataService = {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
-          .from('invitations')
+          .from('ev_cards')
           .select('*')
           .eq('id', id)
           .single();
@@ -600,7 +615,7 @@ export const DataService = {
 
   async createInvitation(newCard: Omit<Invitation, 'id' | 'created_at' | 'updated_at'>): Promise<Invitation> {
     const all = await this.getAllInvitations();
-    const id = `inv-${Date.now()}`;
+    const id = generateUUID();
     const nowMs = Date.now();
     const created: Invitation = {
       ...newCard,
@@ -613,21 +628,33 @@ export const DataService = {
     const updatedList = [created, ...all];
     setLocalItem(STORAGE_KEY_INVITATIONS, updatedList);
 
-    // Automatically seed 1 sample VIP guest for this new card so user can test WhatsApp link & RSVP right away
-    await this.addGuest(id, {
-      guest_name: 'Special Guest & Family',
-      phone: '+91 98765 00000',
-      max_allowed_guests: 4,
-      group_tag: 'VIP Family',
-    });
-
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('invitations').insert(created);
+        await supabase.from('ev_cards').insert({
+          id: created.id,
+          slug: created.slug,
+          theme_id: created.theme_id,
+          title: created.title,
+          event_date: created.event_date,
+          venue_details: created.venue_details,
+          design_config: created.design_config,
+          is_published: created.is_published,
+          created_at: created.created_at,
+          expires_at: created.expires_at,
+          updated_at: created.updated_at,
+        });
       } catch (e) {
         console.warn('Supabase createInvitation fallback:', e);
       }
     }
+
+    // Automatically seed 1 sample VIP guest AFTER invitation exists in DB (satisfies FK)
+    await this.addGuest(id, {
+      guest_name: 'Special Guest & Family',
+      phone: '',
+      max_allowed_guests: 4,
+      group_tag: 'VIP Family',
+    });
 
     return created;
   },
@@ -654,7 +681,18 @@ export const DataService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('invitations').upsert(updated);
+        await supabase.from('ev_cards').upsert({
+          id: updated.id,
+          slug: updated.slug,
+          theme_id: updated.theme_id,
+          title: updated.title,
+          event_date: updated.event_date,
+          venue_details: updated.venue_details,
+          design_config: updated.design_config,
+          is_published: updated.is_published,
+          expires_at: updated.expires_at,
+          updated_at: updated.updated_at,
+        });
       } catch (e) {
         console.warn('Supabase updateInvitation fallback:', e);
       }
@@ -674,12 +712,41 @@ export const DataService = {
       STORAGE_KEY_GUESTS,
       guests.filter((g) => g.invitation_id !== id)
     );
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('ev_cards').delete().eq('id', id);
+      } catch (e) {
+        console.warn('Supabase deleteInvitation fallback:', e);
+      }
+    }
   },
 
   // =========================================================================
   // GUESTS & RSVP TRACKING
   // =========================================================================
   async getAllGuests(): Promise<GuestWithRsvp[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: guests, error } = await supabase
+          .from('ev_card_guests')
+          .select('*, ev_card_rsvps(*)')
+          .order('created_at', { ascending: false });
+        if (!error && guests) {
+          return guests.map((g: Record<string, unknown> & { ev_card_rsvps?: Record<string, unknown>[] | Record<string, unknown> }) => {
+            const rawRsvp = Array.isArray(g.ev_card_rsvps) ? g.ev_card_rsvps[0] : g.ev_card_rsvps;
+            const clean = { ...g };
+            delete clean.ev_card_rsvps;
+            return {
+              ...clean,
+              rsvp: rawRsvp || null,
+            } as unknown as GuestWithRsvp;
+          });
+        }
+      } catch (e) {
+        console.warn('Supabase getAllGuests fallback:', e);
+      }
+    }
     return getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
   },
 
@@ -687,14 +754,19 @@ export const DataService = {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data: guests, error } = await supabase
-          .from('guests')
-          .select('*, rsvps(*)')
+          .from('ev_card_guests')
+          .select('*, ev_card_rsvps(*)')
           .eq('invitation_id', invitationId);
-        if (!error && guests && guests.length > 0) {
-          return guests.map((g: Record<string, unknown> & { rsvps?: Record<string, unknown>[] }) => ({
-            ...g,
-            rsvp: g.rsvps?.[0] || null,
-          } as unknown as GuestWithRsvp));
+        if (!error && guests) {
+          return guests.map((g: Record<string, unknown> & { ev_card_rsvps?: Record<string, unknown>[] | Record<string, unknown> }) => {
+            const rawRsvp = Array.isArray(g.ev_card_rsvps) ? g.ev_card_rsvps[0] : g.ev_card_rsvps;
+            const clean = { ...g };
+            delete clean.ev_card_rsvps;
+            return {
+              ...clean,
+              rsvp: rawRsvp || null,
+            } as unknown as GuestWithRsvp;
+          });
         }
       } catch (e) {
         console.warn('Supabase getGuestsWithRsvp fallback:', e);
@@ -707,6 +779,28 @@ export const DataService = {
 
   async getGuestByToken(token: string, invitationId?: string): Promise<GuestWithRsvp | null> {
     if (!token) return null;
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('ev_card_guests')
+          .select('*, ev_card_rsvps(*)')
+          .eq('unique_token', token)
+          .maybeSingle();
+        if (!error && data) {
+          const g = data as Record<string, unknown> & { ev_card_rsvps?: Record<string, unknown>[] | Record<string, unknown> };
+          const rawRsvp = Array.isArray(g.ev_card_rsvps) ? g.ev_card_rsvps[0] : g.ev_card_rsvps;
+          const clean = { ...g };
+          delete clean.ev_card_rsvps;
+          return {
+            ...clean,
+            rsvp: rawRsvp || null,
+          } as unknown as GuestWithRsvp;
+        }
+      } catch (e) {
+        console.warn('Supabase getGuestByToken fallback:', e);
+      }
+    }
+
     const allGuests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
     return (
       allGuests.find(
@@ -718,21 +812,23 @@ export const DataService = {
   },
 
   async markLinkOpened(guestId: string): Promise<void> {
+    const openedAt = new Date().toISOString();
     const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
     const guest = guests.find((g) => g.id === guestId);
     if (guest && !guest.link_opened_at) {
-      guest.link_opened_at = new Date().toISOString();
+      guest.link_opened_at = openedAt;
       setLocalItem(STORAGE_KEY_GUESTS, guests);
+    }
 
-      if (isSupabaseConfigured && supabase) {
-        try {
-          await supabase
-            .from('guests')
-            .update({ link_opened_at: guest.link_opened_at })
-            .eq('id', guestId);
-        } catch (e) {
-          console.warn('Supabase markLinkOpened fallback:', e);
-        }
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('ev_card_guests')
+          .update({ link_opened_at: openedAt })
+          .eq('id', guestId)
+          .is('link_opened_at', null);
+      } catch (e) {
+        console.warn('Supabase markLinkOpened fallback:', e);
       }
     }
   },
@@ -745,7 +841,7 @@ export const DataService = {
     const guest = guests.find((g) => g.id === guestId);
 
     const updatedRsvp: RSVP = {
-      id: guest?.rsvp?.id || `rsvp-${Date.now()}`,
+      id: guest?.rsvp?.id || generateUUID(),
       guest_id: guestId,
       status: rsvpData.status,
       headcount: rsvpData.headcount,
@@ -761,7 +857,19 @@ export const DataService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('rsvps').upsert(updatedRsvp);
+        await supabase
+          .from('ev_card_rsvps')
+          .upsert(
+            {
+              guest_id: updatedRsvp.guest_id,
+              status: updatedRsvp.status,
+              headcount: updatedRsvp.headcount,
+              meal_choice: updatedRsvp.meal_choice || null,
+              message: updatedRsvp.message || null,
+              updated_at: updatedRsvp.updated_at,
+            },
+            { onConflict: 'guest_id' }
+          );
       } catch (e) {
         console.warn('Supabase submitRsvp fallback:', e);
       }
@@ -790,7 +898,7 @@ export const DataService = {
     const uniqueToken = `${tokenBase || 'guest'}-${Math.random().toString(36).substring(2, 6)}`;
 
     const newGuest: GuestWithRsvp = {
-      id: `guest-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      id: generateUUID(),
       invitation_id: invitationId,
       guest_name: guestData.guest_name,
       phone: guestData.phone || '',
@@ -808,7 +916,18 @@ export const DataService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('guests').insert(newGuest);
+        await supabase.from('ev_card_guests').insert({
+          id: newGuest.id,
+          invitation_id: newGuest.invitation_id,
+          guest_name: newGuest.guest_name,
+          phone: newGuest.phone || null,
+          email: newGuest.email || null,
+          unique_token: newGuest.unique_token,
+          max_allowed_guests: newGuest.max_allowed_guests,
+          group_tag: newGuest.group_tag,
+          link_opened_at: null,
+          created_at: newGuest.created_at,
+        });
       } catch (e) {
         console.warn('Supabase addGuest fallback:', e);
       }
@@ -824,7 +943,7 @@ export const DataService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('guests').delete().eq('id', guestId);
+        await supabase.from('ev_card_guests').delete().eq('id', guestId);
       } catch (e) {
         console.warn('Supabase deleteGuest fallback:', e);
       }
