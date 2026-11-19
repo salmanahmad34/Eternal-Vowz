@@ -35,12 +35,34 @@ CREATE TABLE IF NOT EXISTS public.ev_orders (
     razorpay_order_id TEXT UNIQUE NOT NULL,
     razorpay_payment_id TEXT,
     amount INTEGER NOT NULL DEFAULT 7900,
+    coupon_code TEXT,
+    discount_amount INTEGER NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'failed', 'refunded')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.ev_orders
+    ADD COLUMN IF NOT EXISTS coupon_code TEXT;
+ALTER TABLE public.ev_orders
+    ADD COLUMN IF NOT EXISTS discount_amount INTEGER NOT NULL DEFAULT 0;
+
 CREATE INDEX IF NOT EXISTS idx_ev_orders_card_id ON public.ev_orders (card_id);
 CREATE INDEX IF NOT EXISTS idx_ev_orders_razorpay_order_id ON public.ev_orders (razorpay_order_id);
+
+-- 1C. COUPON CODES TABLE
+CREATE TABLE IF NOT EXISTS public.ev_coupons (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code TEXT UNIQUE NOT NULL,
+    discount_type TEXT NOT NULL CHECK (discount_type IN ('percent', 'flat')),
+    discount_value INTEGER NOT NULL CHECK (discount_value > 0),
+    max_uses INTEGER,
+    used_count INTEGER NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ev_coupons_code ON public.ev_coupons (code);
 
 -- 2. GUESTS TABLE
 CREATE TABLE IF NOT EXISTS public.ev_card_guests (
@@ -96,6 +118,7 @@ EXECUTE FUNCTION public.ev_update_updated_at_column();
 -- 5. Row Level Security (RLS) Policies
 ALTER TABLE public.ev_cards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ev_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ev_coupons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ev_card_guests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ev_card_rsvps ENABLE ROW LEVEL SECURITY;
 
@@ -105,11 +128,16 @@ ON public.ev_cards FOR ALL
 USING (true)
 WITH CHECK (true);
 
--- Orders are written/updated strictly by server-side Razorpay API routes (service_role)
+-- Orders & Coupons are written/updated strictly by server-side Razorpay API routes
 DROP POLICY IF EXISTS "Public read ev_orders" ON public.ev_orders;
 CREATE POLICY "Public read ev_orders"
 ON public.ev_orders FOR SELECT
 USING (true);
+
+DROP POLICY IF EXISTS "Public read active ev_coupons" ON public.ev_coupons;
+CREATE POLICY "Public read active ev_coupons"
+ON public.ev_coupons FOR SELECT
+USING (is_active = true);
 
 DROP POLICY IF EXISTS "Public all access ev_card_guests" ON public.ev_card_guests;
 CREATE POLICY "Public all access ev_card_guests"
@@ -425,3 +453,11 @@ INSERT INTO public.ev_card_rsvps (
     'Royal Halal Chicken & Biryani',
     'Congratulations Zoya & Ayaan! Looking forward to celebrating with you.'
 ) ON CONFLICT (guest_id) DO NOTHING;
+
+
+-- Seed Starter Coupon Codes (Idempotent)
+INSERT INTO public.ev_coupons (code, discount_type, discount_value, max_uses, is_active) VALUES
+    ('NIKAH20', 'flat', 20, 500, true),
+    ('ETERNAL50', 'percent', 50, 200, true),
+    ('FREE100', 'percent', 100, 100, true)
+ON CONFLICT (code) DO NOTHING;

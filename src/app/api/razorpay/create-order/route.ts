@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import {
+  BASE_CARD_PRICE_PAISE,
+  incrementCouponUsage,
+  validateCouponServer,
+} from '@/lib/coupon-helper';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Server-enforced flat pricing: ₹79.00 (7900 paise) per card (valid for 30 days)
-const CARD_PRICE_PAISE = 7900;
 const CURRENCY = 'INR';
+const CARD_VALIDITY_DAYS = 30;
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -60,6 +64,13 @@ export async function POST(req: NextRequest) {
         ? body.customerEmail.trim()
         : '';
 
+    const rawCouponCode =
+      typeof body.coupon_code === 'string'
+        ? body.coupon_code.trim()
+        : typeof body.couponCode === 'string'
+        ? body.couponCode.trim()
+        : '';
+
     if (!rawCardId || !UUID_REGEX.test(rawCardId)) {
       return NextResponse.json(
         { error: 'A valid UUID card_id is required' },
@@ -71,19 +82,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid customer_email format' },
         { status: 400 }
-      );
-    }
-
-    const keyId = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').trim();
-    const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
-
-    if (isPlaceholder(keyId) || isPlaceholder(keySecret)) {
-      return NextResponse.json(
-        {
-          error:
-            'Razorpay credentials are not configured yet. Please set NEXT_PUBLIC_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env.local.',
-        },
-        { status: 503 }
       );
     }
 
@@ -127,7 +125,92 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Razorpay receipt must be <= 40 characters
+    // Server-side coupon calculation (never trust client-submitted totals)
+    let finalAmountPaise = BASE_CARD_PRICE_PAISE;
+    let discountPaise = 0;
+    let appliedCouponCode: string | null = null;
+
+    if (rawCouponCode) {
+      const couponResult = await validateCouponServer(supabaseAdmin, rawCouponCode);
+      if (!couponResult.valid) {
+        return NextResponse.json(
+          { error: couponResult.error || 'Invalid coupon code' },
+          { status: 400 }
+        );
+      }
+      finalAmountPaise = couponResult.final_paise;
+      discountPaise = couponResult.discount_paise;
+      appliedCouponCode = couponResult.code || rawCouponCode.toUpperCase();
+    }
+
+    // Case A: 100% Free Coupon Unlock (finalAmountPaise === 0)
+    if (finalAmountPaise === 0 && appliedCouponCode) {
+      const freeOrderId = `coupon_free_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+      const freshExpiresAt = new Date(
+        Date.now() + CARD_VALIDITY_DAYS * 24 * 60 * 60 * 1000
+      ).toISOString();
+
+      const { data: freeOrder, error: freeInsertError } = await supabaseAdmin
+        .from('ev_orders')
+        .insert({
+          card_id: rawCardId,
+          customer_email: rawEmail || null,
+          razorpay_order_id: freeOrderId,
+          razorpay_payment_id: `coupon_${appliedCouponCode}`,
+          amount: 0,
+          coupon_code: appliedCouponCode,
+          discount_amount: discountPaise,
+          status: 'paid',
+        })
+        .select('id, card_id, customer_email, razorpay_order_id, amount, coupon_code, discount_amount, status, created_at')
+        .single();
+
+      if (freeInsertError) {
+        console.error('[Razorpay create-order] Failed to save free coupon order:', freeInsertError.message);
+        return NextResponse.json(
+          { error: 'Failed to record free coupon activation' },
+          { status: 500 }
+        );
+      }
+
+      await supabaseAdmin
+        .from('ev_cards')
+        .update({
+          is_paid: true,
+          is_published: true,
+          expires_at: freshExpiresAt,
+        })
+        .eq('id', rawCardId);
+
+      await incrementCouponUsage(supabaseAdmin, appliedCouponCode);
+
+      return NextResponse.json({
+        success: true,
+        freeUnlock: true,
+        orderId: freeOrderId,
+        amount: 0,
+        originalAmount: BASE_CARD_PRICE_PAISE,
+        discountPaise,
+        couponCode: appliedCouponCode,
+        currency: CURRENCY,
+        order: freeOrder,
+      });
+    }
+
+    // Case B: Paid Razorpay Order (full ₹79 or discounted amount > ₹0)
+    const keyId = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').trim();
+    const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
+
+    if (isPlaceholder(keyId) || isPlaceholder(keySecret)) {
+      return NextResponse.json(
+        {
+          error:
+            'Razorpay credentials are not configured yet. Please set NEXT_PUBLIC_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env.local.',
+        },
+        { status: 503 }
+      );
+    }
+
     const shortRand = crypto.randomBytes(4).toString('hex');
     const receipt = `ev_${rawCardId.slice(0, 8)}_${Date.now().toString(36)}_${shortRand}`.slice(
       0,
@@ -142,12 +225,13 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        amount: CARD_PRICE_PAISE,
+        amount: finalAmountPaise,
         currency: CURRENCY,
         receipt,
         notes: {
           card_id: rawCardId,
           customer_email: rawEmail || 'not_provided',
+          coupon_code: appliedCouponCode || 'none',
           platform: 'Eternal Vowz',
         },
       }),
@@ -164,7 +248,6 @@ export async function POST(req: NextRequest) {
 
     const rzpOrder = (await rzpRes.json()) as RazorpayOrderResponse;
 
-    // Persist pending order in Supabase ev_orders
     const { data: insertedOrder, error: insertError } = await supabaseAdmin
       .from('ev_orders')
       .insert({
@@ -173,9 +256,11 @@ export async function POST(req: NextRequest) {
         razorpay_order_id: rzpOrder.id,
         razorpay_payment_id: null,
         amount: rzpOrder.amount,
+        coupon_code: appliedCouponCode,
+        discount_amount: discountPaise,
         status: 'pending',
       })
-      .select('id, card_id, customer_email, razorpay_order_id, amount, status, created_at')
+      .select('id, card_id, customer_email, razorpay_order_id, amount, coupon_code, discount_amount, status, created_at')
       .single();
 
     if (insertError) {
@@ -188,9 +273,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      freeUnlock: false,
       keyId,
       orderId: rzpOrder.id,
       amount: rzpOrder.amount,
+      originalAmount: BASE_CARD_PRICE_PAISE,
+      discountPaise,
+      couponCode: appliedCouponCode,
       currency: rzpOrder.currency,
       receipt: rzpOrder.receipt,
       order: insertedOrder,

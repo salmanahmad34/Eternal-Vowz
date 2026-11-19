@@ -7,6 +7,7 @@ import { DataService, INITIAL_DEMO_INVITATION } from '@/lib/data-service';
 import { THEMES } from '@/lib/themes';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
 import { EternalLogoBadge } from '@/components/layout/EternalLoader';
+import RazorpayCheckoutModal from '@/components/RazorpayCheckoutModal';
 import {
   Mail,
   Heart,
@@ -36,6 +37,7 @@ import {
   Sparkles,
   Calendar,
   Settings,
+  CreditCard,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -64,6 +66,7 @@ export default function DashboardPage() {
   const [replayTrigger, setReplayTrigger] = useState(0);
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [showMobilePreviewModal, setShowMobilePreviewModal] = useState(false);
+  const [checkoutCard, setCheckoutCard] = useState<Invitation | null>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -637,9 +640,15 @@ export default function DashboardPage() {
                               {card.design_config.couple_names.partner1} &amp;{' '}
                               {card.design_config.couple_names.partner2}
                             </h3>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
-                              Active
-                            </span>
+                            {card.is_paid ? (
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
+                                Paid &bull; Active
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider">
+                                Unpaid
+                              </span>
+                            )}
                             <span className="px-2 py-0.5 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-[#8B7355] text-[10px] font-semibold">
                               ₹79 &bull; {daysRemaining}d left
                             </span>
@@ -714,6 +723,17 @@ export default function DashboardPage() {
                           <Edit3 className="w-3.5 h-3.5 text-[#8B7355]" />
                           <span>Edit</span>
                         </button>
+
+                        {!card.is_paid && (
+                          <button
+                            type="button"
+                            onClick={() => setCheckoutCard(card)}
+                            className="px-4 py-2 rounded-md bg-[#291418] hover:bg-[#3e1f25] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                          >
+                            <CreditCard className="w-3.5 h-3.5 text-[#E6CFA0]" />
+                            <span>Pay ₹79</span>
+                          </button>
+                        )}
 
                         <button
                           type="button"
@@ -2098,6 +2118,13 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+      {/* Razorpay + Coupon Checkout Modal */}
+      <RazorpayCheckoutModal
+        card={checkoutCard}
+        defaultEmail={hostUser?.email || ''}
+        onClose={() => setCheckoutCard(null)}
+        onSuccess={loadData}
+      />
       </div>
     </div>
   );

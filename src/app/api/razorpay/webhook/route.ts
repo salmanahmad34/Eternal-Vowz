@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { incrementCouponUsage } from '@/lib/coupon-helper';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -121,7 +122,16 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // 1. Update ev_orders status -> 'paid' and store razorpay_payment_id
+      // 1. Check current order status for idempotent coupon counting
+      const { data: existingOrder } = await supabaseAdmin
+        .from('ev_orders')
+        .select('id, card_id, coupon_code, status')
+        .eq('razorpay_order_id', razorpayOrderId)
+        .maybeSingle();
+
+      const wasAlreadyPaid = existingOrder?.status === 'paid';
+
+      // 2. Update ev_orders status -> 'paid' and store razorpay_payment_id
       const orderUpdatePayload: Record<string, unknown> = {
         status: 'paid',
       };
@@ -133,7 +143,7 @@ export async function POST(req: NextRequest) {
         .from('ev_orders')
         .update(orderUpdatePayload)
         .eq('razorpay_order_id', razorpayOrderId)
-        .select('id, card_id, status')
+        .select('id, card_id, coupon_code, status')
         .maybeSingle();
 
       if (orderUpdateError) {
@@ -145,6 +155,10 @@ export async function POST(req: NextRequest) {
           { error: 'Failed to update order status' },
           { status: 500 }
         );
+      }
+
+      if (!wasAlreadyPaid && updatedOrder?.coupon_code) {
+        await incrementCouponUsage(supabaseAdmin, updatedOrder.coupon_code);
       }
 
       // 2. Resolve target card_id from ev_orders (fallback to Razorpay notes.card_id)

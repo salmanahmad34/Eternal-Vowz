@@ -104,7 +104,21 @@ export interface EvOrder {
   razorpay_order_id: string;
   razorpay_payment_id?: string | null;
   amount: number; // in paise (7900 = ₹79.00)
+  coupon_code?: string | null;
+  discount_amount?: number; // in paise
   status: OrderStatus;
+  created_at?: string;
+}
+
+export interface EvCoupon {
+  id: string;
+  code: string;
+  discount_type: 'percent' | 'flat';
+  discount_value: number;
+  max_uses?: number | null;
+  used_count: number;
+  is_active: boolean;
+  expires_at?: string | null;
   created_at?: string;
 }
 
