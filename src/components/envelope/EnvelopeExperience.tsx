@@ -63,6 +63,10 @@ const CINEMA_VIDEO_THEMES: Partial<Record<string, { videoSrc: string; posterSrc:
     videoSrc: '/assets/shahi-gold/intro-gold.mp4',
     posterSrc: '/assets/shahi-gold/intro-poster.jpg',
   },
+  'tuscan-sunset': {
+    videoSrc: '/assets/tuscan-haveli/intro-haveli.mp4',
+    posterSrc: '/assets/tuscan-haveli/intro-poster.jpg',
+  },
 };
 
 export default function EnvelopeExperience({
@@ -437,17 +441,17 @@ export default function EnvelopeExperience({
                       ? '/assets/invitecraft/hero-starlight-midnight.jpg'
                       : invitation.theme_id === 'blush-floral'
                       ? '/assets/shahi-gold/hero-mountain-pavilion.jpg'
-                      : '/assets/invitecraft/hero-palace-sunset.jpg'
+                      : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg'
                   }
                   alt="Wedding Card Hero Scene"
                   className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                 />
-                {invitation.theme_id === 'pearl-veil' && (
+                {(invitation.theme_id === 'pearl-veil' || invitation.theme_id === 'tuscan-sunset') && (
                   <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
                       background:
-                        'linear-gradient(180deg, rgba(16,10,6,0.18) 0%, rgba(16,10,6,0.08) 42%, rgba(16,10,6,0.68) 64%, rgba(16,10,6,0.88) 88%, rgba(244,226,193,0.92) 100%)',
+                        'linear-gradient(180deg, rgba(16,10,6,0.12) 0%, rgba(16,10,6,0.06) 44%, rgba(16,10,6,0.68) 65%, rgba(16,10,6,0.88) 88%, rgba(244,226,193,0.92) 100%)',
                     }}
                   />
                 )}
@@ -479,7 +483,7 @@ export default function EnvelopeExperience({
                       ? 'pt-36'
                       : invitation.theme_id === 'midnight-minimalist'
                       ? 'pt-36'
-                      : invitation.theme_id === 'pearl-veil'
+                      : invitation.theme_id === 'pearl-veil' || invitation.theme_id === 'tuscan-sunset'
                       ? 'pt-[390px]'
                       : invitation.theme_id === 'blush-floral'
                       ? 'pt-[192px]'
@@ -493,7 +497,9 @@ export default function EnvelopeExperience({
                     duration={0.85}
                     text={coupleNames.partner1 || 'ZOYA'}
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]'
                         : invitation.theme_id === 'royal-emerald'
                         ? 'text-[#0B3626] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]'
@@ -510,7 +516,9 @@ export default function EnvelopeExperience({
                     duration={0.65}
                     text="and"
                     className={`font-great-vibes text-[24px] -my-1 block ${
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'text-[#F0CF7E] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#8C5B32] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
@@ -525,7 +533,9 @@ export default function EnvelopeExperience({
                     duration={0.85}
                     text={coupleNames.partner2 || 'AYAAN'}
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]'
                         : invitation.theme_id === 'royal-emerald'
                         ? 'text-[#0B3626] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]'
@@ -543,7 +553,9 @@ export default function EnvelopeExperience({
                       stagger={0.055}
                       text={cfg.subtitle}
                       className={`font-serif text-[10px] tracking-[0.16em] uppercase mt-1.5 max-w-[250px] ${
-                        invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                        invitation.theme_id === 'midnight-minimalist' ||
+                        invitation.theme_id === 'pearl-veil' ||
+                        invitation.theme_id === 'tuscan-sunset'
                           ? 'text-[#F5E8C8] drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]'
                           : invitation.theme_id === 'blush-floral'
                           ? 'text-[#4A2E20] font-semibold drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
@@ -559,14 +571,18 @@ export default function EnvelopeExperience({
                     delay={1.15}
                     className="flex items-center justify-center gap-2.5 mt-3 mb-1.5 opacity-85"
                     lineColorClass={
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'bg-[#E5C17B]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'bg-[#8C5B32]'
                         : 'bg-[#6e5d4b]'
                     }
                     dotColorClass={
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'bg-[#E5C17B]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'bg-[#8C5B32]'
@@ -582,7 +598,9 @@ export default function EnvelopeExperience({
                     duration={0.8}
                     text={dotDate}
                     className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
@@ -600,7 +618,9 @@ export default function EnvelopeExperience({
                 >
                   <span
                     className={`text-[9px] font-sans uppercase tracking-[0.26em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] ${
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'bg-black/45 text-[#F8E7B2]'
                         : 'bg-[#FAF6EE]/75 text-[#5a4a38]'
                     }`}
@@ -611,7 +631,9 @@ export default function EnvelopeExperience({
                     animate={{ y: [0, 5, 0] }}
                     transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
                     className={`mt-1 ${
-                      invitation.theme_id === 'midnight-minimalist' || invitation.theme_id === 'pearl-veil'
+                      invitation.theme_id === 'midnight-minimalist' ||
+                      invitation.theme_id === 'pearl-veil' ||
+                      invitation.theme_id === 'tuscan-sunset'
                         ? 'text-[#F8E7B2]'
                         : 'text-[#6e5d4b]'
                     }`}

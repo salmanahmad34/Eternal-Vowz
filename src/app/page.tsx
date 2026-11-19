@@ -87,15 +87,15 @@ const SIGNATURE_CARD_DESIGNS = [
   },
   {
     id: 'tuscan-sunset',
-    category: '3D Embossed Lifafa',
+    category: '3D Haveli Courtyard',
     badge: '✨ Most Popular',
     name: 'Tuscan Sunset Rose',
     couple: 'Sophia & Alexander',
     slug: 'sophia-alexander',
     query: '?guest=vip-tariq-family',
     price: '₹79',
-    heroImg: '/assets/invitecraft/hero-palace-sunset.jpg',
-    shortDesc: 'Golden sunset terrace, fairy lights & merlot-gold 3D Lifafa.',
+    heroImg: '/assets/tuscan-haveli/hero-haveli-courtyard.jpg',
+    shortDesc: 'Tap anywhere as grand royal haveli doors swing open into a chandelier courtyard.',
   },
   {
     id: 'royal-emerald',
