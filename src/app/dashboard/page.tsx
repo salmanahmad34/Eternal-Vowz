@@ -6,7 +6,6 @@ import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem } f
 import { DataService, INITIAL_DEMO_INVITATION } from '@/lib/data-service';
 import { THEMES } from '@/lib/themes';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
-import { WeddingFooter } from '@/components/layout/WeddingSiteChrome';
 import { EternalLogoBadge } from '@/components/layout/EternalLoader';
 import {
   Mail,
@@ -489,52 +488,6 @@ export default function DashboardPage() {
       ========================================================================= */}
       {activeTab === 'overview' && (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 space-y-10">
-          {/* Post-Purchase Priority WhatsApp Support Banner (Unlocked for Host Cards) */}
-          <div className="rounded-3xl bg-white border border-[#E2D7BD] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 editorial-card-shadow">
-            <div className="flex items-start sm:items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-[#F6EEDB] text-[#C9A84C] flex items-center justify-center shrink-0">
-                <MessageSquare className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#C9A84C]">
-                    Post-Purchase Priority Support Unlocked
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-semibold">
-                    Active ₹79 Host
-                  </span>
-                </div>
-                <p className="text-xs text-[#8B7355] mt-1">
-                  Need help with your 3D Lifafa, 3D Palace Gates, Frosted Veil, or WhatsApp guest links? Chat with our concierge on WhatsApp or email{' '}
-                  <a href="mailto:mrsalman7307@gmail.com" className="text-[#291418] font-semibold underline">
-                    mrsalman7307@gmail.com
-                  </a>.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(
-                  'Hello Eternal Vowz Support (mrsalman7307@gmail.com), I need assistance with my ₹79 Digital Wedding Card.'
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center gap-2 transition-colors shadow-xs"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>Priority WhatsApp Support</span>
-              </a>
-              <a
-                href="mailto:mrsalman7307@gmail.com"
-                className="px-4 py-2.5 rounded-md bg-white hover:bg-[#F2ECE1] border border-[#E2D7BD] text-[#291418] text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
-              >
-                <Mail className="w-3.5 h-3.5 text-[#C9A84C]" />
-                <span>Email Support</span>
-              </a>
-            </div>
-          </div>
-
           {/* Section 1: WooowInvites Editorial Host Workspace */}
           <section className="space-y-6">
             {/* Workspace Header ("Your wedding invitations") */}
@@ -2136,7 +2089,7 @@ export default function DashboardPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-[#6E2E3A] hover:bg-[#58222C] text-white text-xs font-medium cursor-pointer"
+                  className="px-4 py-2 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold cursor-pointer"
                 >
                   Add &amp; Generate Link
                 </button>
@@ -2146,8 +2099,6 @@ export default function DashboardPage() {
         </div>
       )}
       </div>
-
-      <WeddingFooter />
     </div>
   );
 }
