@@ -21,6 +21,7 @@ declare global {
   interface Window {
     Razorpay?: new (options: Record<string, unknown>) => {
       open: () => void;
+      close?: () => void;
       on: (event: string, cb: (resp: Record<string, unknown>) => void) => void;
     };
   }
@@ -111,8 +112,28 @@ export default function RazorpayCheckoutModal({
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
 
   const completedRef = useRef(false);
+  const pollInFlightRef = useRef(false);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rzpInstanceRef = useRef<{ close?: () => void } | null>(null);
+
+  const stopPolling = () => {
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+  };
+
+  const closeRazorpayPopup = () => {
+    try {
+      rzpInstanceRef.current?.close?.();
+    } catch {
+      // Ignore if already closed
+    }
+    rzpInstanceRef.current = null;
+  };
 
   useEffect(() => {
+    stopPolling();
     setCustomerEmail(defaultEmail);
     setCouponInput('');
     setAppliedCoupon(null);
@@ -123,6 +144,9 @@ export default function RazorpayCheckoutModal({
     setPaying(false);
     setVerifyingStatus(false);
     completedRef.current = false;
+    return () => {
+      stopPolling();
+    };
   }, [card?.id, mode, defaultEmail]);
 
   if (!card) return null;
@@ -193,6 +217,10 @@ export default function RazorpayCheckoutModal({
   const celebrateSuccess = async (message: string, createdCard?: Invitation) => {
     if (completedRef.current) return;
     completedRef.current = true;
+    stopPolling();
+    closeRazorpayPopup();
+    setPaying(false);
+    setVerifyingStatus(false);
     setPendingOrderId(null);
     setPaymentError(null);
     setPaymentSuccess(message);
@@ -350,6 +378,8 @@ export default function RazorpayCheckoutModal({
           escape: false,
           confirm_close: true,
           ondismiss: async () => {
+            stopPolling();
+            rzpInstanceRef.current = null;
             setPaying(false);
             // Automatically check with Razorpay server in case UPI intent/payment already succeeded
             if (!completedRef.current && createdOrderId) {
@@ -362,6 +392,7 @@ export default function RazorpayCheckoutModal({
           razorpay_payment_id: string;
           razorpay_signature: string;
         }) => {
+          stopPolling();
           try {
             const verifyRes = await fetch('/api/razorpay/verify-payment', {
               method: 'POST',
@@ -398,7 +429,47 @@ export default function RazorpayCheckoutModal({
       };
 
       const rzp = new window.Razorpay(options);
+      rzpInstanceRef.current = rzp;
+
+      // Live 3-second server poll while Razorpay popup is open:
+      // Catches captured UPI Intent / QR payments immediately even if Razorpay's test UPI UI hangs!
+      stopPolling();
+      let pollCount = 0;
+      pollTimerRef.current = setInterval(async () => {
+        if (pollInFlightRef.current || completedRef.current) return;
+        pollCount += 1;
+        if (pollCount > 60) {
+          stopPolling();
+          return;
+        }
+        pollInFlightRef.current = true;
+        try {
+          const pollRes = await fetch('/api/razorpay/check-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: createdOrderId,
+              ...(isCreateNew && cardPayload ? { card_payload: cardPayload } : {}),
+            }),
+          });
+          const pollData = await pollRes.json();
+          if (pollRes.ok && pollData.paid && !completedRef.current) {
+            await celebrateSuccess(
+              isCreateNew
+                ? 'Payment captured & verified! Your new 3D wedding card is now live for 30 days.'
+                : 'Payment captured & verified! Your 3D wedding invitation is now active for 30 days.',
+              pollData.card || undefined
+            );
+          }
+        } catch {
+          // Silently retry on next tick
+        } finally {
+          pollInFlightRef.current = false;
+        }
+      }, 3000);
+
       rzp.on('payment.failed', (failedResp: Record<string, unknown>) => {
+        stopPolling();
         const errObj = failedResp?.error as
           | { description?: string; reason?: string }
           | undefined;
@@ -408,7 +479,7 @@ export default function RazorpayCheckoutModal({
           'Payment could not be completed.';
         setPaymentError(
           IS_TEST_MODE
-            ? `${msg} In Razorpay Test Mode, please use UPI "success@razorpay" or Netbanking → Success.`
+            ? `${msg} In Razorpay Test Mode, please use UPI ID "success@razorpay" (under Pay using UPI ID) or Netbanking → Success.`
             : msg
         );
         setPaying(false);
@@ -475,11 +546,12 @@ export default function RazorpayCheckoutModal({
                 <div className="rounded-xl bg-amber-50/90 border border-amber-200 px-3.5 py-2.5 text-[11px] text-amber-900 flex items-start gap-2">
                   <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-semibold">Razorpay Test Mode:</strong> Use UPI ID{' '}
+                    <strong className="font-semibold">Razorpay Test Mode:</strong> Select{' '}
+                    <strong>Pay using UPI ID</strong> and enter{' '}
                     <code className="px-1 py-0.5 rounded bg-amber-100 font-mono text-[10px]">
                       success@razorpay
                     </code>{' '}
-                    or <strong>Netbanking → Success</strong>. (Real UPI IDs &amp; real cards fail in Test Mode.)
+                    (or <strong>Netbanking → Success</strong>). Payment auto-confirms within 3 seconds.
                   </div>
                 </div>
               )}
