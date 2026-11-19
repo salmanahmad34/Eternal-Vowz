@@ -139,10 +139,10 @@ export const THEMES: Record<ThemeId, ThemeConfig> = {
 };
 
 export const MUSIC_TRACKS = [
-  { id: 'royal-harp', name: 'Royal Harp & Strings (Romantic Waltz)', mood: 'Warm, Classical & Ethereal' },
-  { id: 'acoustic-romance', name: 'Acoustic Sunset Romance (Gentle Guitar)', mood: 'Intimate, Heartfelt & Acoustic' },
-  { id: 'cinematic-piano', name: 'Cinematic Piano Reverie (Ludovico Style)', mood: 'Dramatic, Poetic & Uplifting' },
-  { id: 'candlelight-strings', name: 'Candlelight Chamber Serenade', mood: 'Aristocratic & Sophisticated' },
+  { id: 'wedding-nasheed', name: 'Eternal Vowz Signature Wedding Vocal Nasheed', mood: 'Soulful, Serene & 100% Halal' },
+  { id: 'royal-harp', name: 'Eternal Vowz Signature Wedding Vocal Nasheed (Classic)', mood: 'Warm, Classical & Ethereal' },
+  { id: 'acoustic-romance', name: 'Eternal Vowz Signature Wedding Vocal Nasheed (Intimate)', mood: 'Intimate, Heartfelt & Pure' },
+  { id: 'cinematic-piano', name: 'Eternal Vowz Signature Wedding Vocal Nasheed (Grand)', mood: 'Poetic, Uplifting & Royal' },
 ];
 
 export const MEAL_OPTIONS = [

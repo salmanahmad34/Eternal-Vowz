@@ -90,16 +90,22 @@ export default function EnvelopeExperience({
     }
   }, [replayTrigger]);
 
+  // Cleanup audio when leaving the card page
+  useEffect(() => {
+    return () => {
+      luxuryAudio.stop();
+    };
+  }, []);
+
   const handleOpenEnvelope = () => {
     if (stage !== 'closed') return;
 
     luxuryAudio.playWaxSealCrack();
     setStage('opening');
 
+    // Start signature wedding music synchronously within the user tap gesture for 100% mobile compatibility
     if (autoPlayAudio) {
-      setTimeout(() => {
-        luxuryAudio.startAmbientMusic(invitation.design_config.music_track || 'royal-harp');
-      }, 450);
+      luxuryAudio.startAmbientMusic(invitation.design_config.music_track || 'wedding-nasheed');
     }
 
     setTimeout(() => {
