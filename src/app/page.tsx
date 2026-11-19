@@ -26,6 +26,8 @@ import {
   Zap,
   Users,
   MapPin,
+  HelpCircle,
+  Share2,
 } from 'lucide-react';
 
 const DYNAMIC_HERO_PHRASES = [
@@ -182,30 +184,52 @@ const COMPARISON_ROWS = [
 
 const FAQ_ITEMS = [
   {
-    q: 'How much does each digital wedding invitation card cost?',
-    a: 'Every signature wedding invitation card on Eternal Vowz is priced at a flat ₹79 per card (one-time fee). There are no recurring subscriptions, and you can send your personalized card link to unlimited guests on WhatsApp.',
-  },
-  {
-    q: 'What makes the 5 animated card designs different from each other?',
-    a: 'Eternal Vowz offers three distinct reveal experiences across 5 unique designs: (1) Classic 3D Embossed Royal Lifafa envelopes with wax seals, (2) 3D Shahi Palace Double-Door Gates that unlock and swing open, and (3) our brand-new Frosted-Blur Veil design that starts completely blurred and melts into crystal-clear HD when tapped.',
-  },
-  {
-    q: 'How long does my wedding invitation stay live?',
+    icon: 'clock' as const,
+    bg: 'bg-[#ECFCFA]',
+    border: 'border-[#D3F5F1]',
+    q: 'How long is my wedding invitation valid?',
     a: 'Every wedding card remains active for 1 full month (30 days) from creation. After 30 days, the public guest link expires automatically to keep your family celebration private, with an option to renew anytime from your dashboard.',
   },
   {
-    q: 'What if I only want to fill in the basic details (Names, Date, and Venue)?',
-    a: 'Our Smart Conditional Card Builder only requires the main essentials — Couple Names, Event Date, and Venue. All other modules (Schedule, Dress Code, Halal Menu, Couple Story, Gift Registry, Stay Info, and FAQ) are completely optional and stay hidden unless you choose to fill them.',
+    icon: 'sparkles' as const,
+    bg: 'bg-[#EFF3FF]',
+    border: 'border-[#DCE5FF]',
+    q: 'What makes the 5 animated designs different?',
+    a: 'Eternal Vowz offers three distinct reveal experiences across 5 unique designs: (1) Classic 3D Embossed Royal Lifafa envelopes with wax seals, (2) 3D Shahi Palace Double-Door Gates that unlock and swing open, and (3) our brand-new Frosted-Blur Veil design that starts completely blurred and melts into crystal-clear HD when tapped.',
   },
   {
-    q: 'How do I reach customer support or WhatsApp concierge?',
+    icon: 'share' as const,
+    bg: 'bg-[#EEFCF3]',
+    border: 'border-[#D3F5DF]',
+    q: 'How do I share my card & what is the price?',
+    a: 'Every signature wedding invitation card on Eternal Vowz is priced at a flat ₹79 per card (one-time fee). You receive unlimited personalized guest links ("For Honored Guest & Family") to share instantly via WhatsApp, SMS, or email with live read receipts.',
+  },
+  {
+    icon: 'sliders' as const,
+    bg: 'bg-[#F7F0FD]',
+    border: 'border-[#EAD9FA]',
+    q: 'Can I fill only basic details & edit later?',
+    a: 'Yes! Our Smart Conditional Card Builder only requires the main essentials — Couple Names, Event Date, and Venue. All other modules (Schedule, Dress Code, Halal Menu, Story, Gift Registry, Stay Info) are optional and stay hidden unless enabled. You can edit anytime live!',
+  },
+  {
+    icon: 'message' as const,
+    bg: 'bg-[#FDF7EB]',
+    border: 'border-[#F3E4C6]',
+    q: 'How do I reach support or WhatsApp concierge?',
     a: 'For all pre-purchase or general inquiries, email our official support desk at mrsalman7307@gmail.com. Once you create or purchase a ₹79 card, direct Priority WhatsApp Support unlocks immediately inside your Host Dashboard.',
+  },
+  {
+    icon: 'shield' as const,
+    bg: 'bg-[#FDF0F3]',
+    border: 'border-[#F8D9E1]',
+    q: 'Is my wedding data & ₹79 payment secure?',
+    a: 'Yes. Eternal Vowz uses 256-bit SSL encryption, strict HTTP security headers, and server-side HMAC-SHA256 verification for payment and API integrations. We never sell or share guest data with third parties.',
   },
 ];
 
 export default function LandingPage() {
   const [replayTrigger, setReplayTrigger] = useState(0);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null);
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState('All Designs');
 
@@ -849,53 +873,132 @@ export default function LandingPage() {
       </section>
 
       {/* =========================================================================
-          7. FREQUENTLY ASKED QUESTIONS & CHAMPAGNE-GOLD CTA BANNER
+          7. WOOOWINVITES PASTEL 3-COLUMN FAQ GRID & CHAMPAGNE-GOLD CTA BANNER
       ========================================================================= */}
       <section id="faq" className="py-16 sm:py-24 bg-[#FAF7F2]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-xs font-medium text-[#8B7355]">
-              <span>Questions &amp; Answers</span>
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#291418]">
-              Frequently Asked Questions
-            </h2>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* WooowInvites Signature Centered FAQ Header */}
+          <div className="text-center mb-12 space-y-2.5">
+            <div className="inline-flex items-center justify-center gap-3">
+              <span className="w-8 h-8 rounded-full border border-[#6E2E3A]/40 text-[#6E2E3A] flex items-center justify-center shrink-0">
+                <HelpCircle className="w-4 h-4" />
+              </span>
+              <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-[#4A252C]">
+                Frequently Asked Questions
+              </h2>
+            </div>
+            <p className="text-sm text-[#8B7355]">
+              Tap a question to learn more
+            </p>
           </div>
 
-          <div className="space-y-3">
+          {/* 3-Column Soft Pastel Rounded Cards (Exact WooowInvites /faq Pattern) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FAQ_ITEMS.map((item, idx) => {
-              const isOpen = openFaq === idx;
+              const FaqIcon =
+                item.icon === 'clock'
+                  ? Clock
+                  : item.icon === 'sparkles'
+                  ? Sparkles
+                  : item.icon === 'share'
+                  ? Share2
+                  : item.icon === 'sliders'
+                  ? Sliders
+                  : item.icon === 'message'
+                  ? MessageCircle
+                  : ShieldCheck;
+
               return (
-                <div
+                <button
                   key={idx}
-                  className="rounded-2xl bg-white border border-[#E2D7BD] overflow-hidden transition-colors"
+                  type="button"
+                  onClick={() => setActiveFaqIndex(idx)}
+                  className={`${item.bg} ${item.border} border rounded-2xl p-6 text-left flex flex-col justify-between min-h-[196px] hover:-translate-y-1 hover:shadow-md transition-all duration-200 cursor-pointer group`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4 cursor-pointer"
-                  >
-                    <span className="font-serif text-xl font-semibold text-[#291418]">
-                      {item.q}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-[#C9A84C] shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {isOpen && (
-                    <div className="px-6 pb-5 text-sm text-[#8B7355] leading-relaxed border-t border-[#F2ECE1] pt-3.5">
-                      {item.a}
+                  <div className="space-y-3">
+                    <div className="text-[#6E2E3A]">
+                      <FaqIcon className="w-5 h-5 stroke-[1.75]" />
                     </div>
-                  )}
-                </div>
+                    <h3 className="font-serif text-xl font-bold text-[#3D1D24] leading-snug">
+                      {item.q}
+                    </h3>
+                    <p className="text-xs sm:text-[13px] text-[#7A6A5E] leading-relaxed line-clamp-2">
+                      {item.a}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 flex justify-end">
+                    <ArrowRight className="w-4 h-4 text-[#8B7355] group-hover:text-[#3D1D24] group-hover:translate-x-1 transition-all" />
+                  </div>
+                </button>
               );
             })}
           </div>
 
+          {/* Interactive Frosted Modal when a Pastel FAQ Card is Tapped */}
+          <AnimatePresence>
+            {activeFaqIndex !== null && FAQ_ITEMS[activeFaqIndex] && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setActiveFaqIndex(null)}
+                className="fixed inset-0 z-[90] bg-[#291418]/45 backdrop-blur-xs flex items-center justify-center p-4"
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.94, y: 12 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.94, y: 12 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className={`w-full max-w-lg rounded-3xl ${FAQ_ITEMS[activeFaqIndex].bg} border-2 ${FAQ_ITEMS[activeFaqIndex].border} p-6 sm:p-8 shadow-2xl space-y-4`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 border border-[#E2D7BD] text-[11px] font-semibold text-[#6E2E3A]">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      <span>Eternal Vowz FAQ</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveFaqIndex(null)}
+                      aria-label="Close FAQ dialog"
+                      className="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#291418] flex items-center justify-center border border-[#E2D7BD] cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#3D1D24] leading-snug">
+                    {FAQ_ITEMS[activeFaqIndex].q}
+                  </h3>
+
+                  <p className="text-sm sm:text-base text-[#5A4636] leading-relaxed">
+                    {FAQ_ITEMS[activeFaqIndex].a}
+                  </p>
+
+                  <div className="pt-4 border-t border-black/10 flex flex-wrap items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setActiveFaqIndex(null)}
+                      className="px-4 py-2 rounded-md bg-white hover:bg-[#FAF7F2] text-[#291418] border border-[#E2D7BD] text-xs font-semibold cursor-pointer"
+                    >
+                      Close
+                    </button>
+                    <Link
+                      href="/login"
+                      className="px-5 py-2.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                    >
+                      <span>Create Your Card @ ₹79</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Exact WooowInvites Signature Champagne-Gold Gradient CTA Banner */}
-          <div className="mt-16 rounded-3xl cta-gold-banner p-10 sm:p-14 text-center space-y-5 shadow-[0_24px_60px_-20px_rgba(201,168,76,0.55)] relative overflow-hidden">
+          <div className="mt-16 max-w-4xl mx-auto rounded-3xl cta-gold-banner p-10 sm:p-14 text-center space-y-5 shadow-[0_24px_60px_-20px_rgba(201,168,76,0.55)] relative overflow-hidden">
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/25 backdrop-blur-sm border border-white/35 text-xs text-white font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Flat ₹79 Per Card &bull; Active for 1 Month (30 Days)</span>

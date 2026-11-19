@@ -34,6 +34,9 @@ import {
   RotateCcw,
   Smartphone,
   Trash,
+  Sparkles,
+  Calendar,
+  Settings,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -47,6 +50,7 @@ export default function DashboardPage() {
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [cardSearchQuery, setCardSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'attending' | 'declined' | 'pending'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -531,195 +535,251 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Section 1: Created Cards Grid */}
-          <section className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Section 1: WooowInvites Editorial Host Workspace */}
+          <section className="space-y-6">
+            {/* Workspace Header ("Your wedding invitations") */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
-                <span className="text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold block mb-0.5">
-                  Eternal Vowz Collection &bull; ₹79 Per Card &bull; 1-Month (30-Day) Validity
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-[11px] font-medium text-[#8B7355] mb-2.5">
+                  <Sparkles className="w-3 h-3 text-[#C9A84C]" />
+                  <span>Host Workspace &bull; Flat ₹79 / Card</span>
                 </span>
-                <h1 className="font-serif text-3xl sm:text-4xl font-normal text-[#291418]">
-                  Your Wedding Invitation Cards ({invitations.length})
+                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#291418] leading-tight">
+                  Your wedding{' '}
+                  <span className="italic text-[#C9A84C]">invitations</span>
                 </h1>
-                <p className="text-xs text-[#8B7355] mt-0.5">
-                  Select any card to view its live guest RSVPs or click Edit to customize its details.
+                <p className="text-sm text-[#8B7355] mt-1">
+                  Every wedding card &amp; live guest RSVP you&apos;re managing, in one place.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleStartCreateNewCard}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold uppercase tracking-[0.14em] transition-colors cursor-pointer shadow-xs"
+                className="button-shine inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold uppercase tracking-[0.14em] transition-colors cursor-pointer shadow-sm shrink-0"
               >
                 <Plus className="w-4 h-4" />
-                <span>Create New Card @ ₹79</span>
+                <span>Create New Invitation</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {invitations.map((card) => {
-                const isSelected = card.id === selectedInvitation.id;
-                const theme = THEMES[card.theme_id] || THEMES['tuscan-sunset'];
-                const cardGuests = allGuests.filter((g) => g.invitation_id === card.id);
-                const cardOpened = cardGuests.filter((g) => Boolean(g.link_opened_at)).length;
-                const cardAttending = cardGuests
-                  .filter((g) => g.rsvp?.status === 'attending')
-                  .reduce((s, g) => s + (g.rsvp?.headcount || 0), 0);
-                const optionalCount = countActiveOptionalSections(card);
-                const isFrostedBlur =
-                  card.design_config.opening_style === 'frosted-blur' ||
-                  (card.theme_id === 'pearl-veil' && !card.design_config.opening_style);
-                const isGates =
-                  !isFrostedBlur &&
-                  (card.design_config.opening_style === 'palace-gates' ||
-                    (card.theme_id === 'blush-floral' && card.design_config.opening_style !== 'lifafa'));
-                const createdMs = card.created_at ? new Date(card.created_at).getTime() : Date.now();
-                const expiresMs = card.expires_at
-                  ? new Date(card.expires_at).getTime()
-                  : createdMs + 30 * 24 * 60 * 60 * 1000;
-                const daysRemaining = Math.max(0, Math.ceil((expiresMs - Date.now()) / (1000 * 60 * 60 * 24)));
+            {/* 3 Clean WooowInvites Workspace KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-2xl bg-white border border-[#E2D7BD]/90 p-5 flex items-center gap-4 editorial-card-shadow">
+                <div className="w-11 h-11 rounded-xl bg-[#F6EEDB] text-[#C9A84C] flex items-center justify-center shrink-0">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-2xl font-semibold text-[#291418] block leading-none">
+                    {invitations.length}
+                  </span>
+                  <span className="text-xs text-[#8B7355] block mt-1">
+                    Total invitations
+                  </span>
+                </div>
+              </div>
 
-                return (
-                  <div
-                    key={card.id}
-                    onClick={() => setSelectedInvitation(card)}
-                    className={`rounded-2xl bg-white border transition-all p-5 flex flex-col justify-between cursor-pointer ${
-                      isSelected
-                        ? 'border-[#C9A84C] ring-1 ring-[#C9A84C] editorial-card-shadow'
-                        : 'border-[#E2D7BD] hover:border-[#C9A84C]/70'
-                    }`}
-                  >
-                    <div>
-                      {/* Card Header */}
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center font-serif font-bold text-xs text-white shrink-0 border border-[#D4AF37]/40"
-                            style={{ backgroundColor: theme.previewColor }}
-                          >
-                            {card.design_config.wax_seal_initial || 'S&A'}
-                          </div>
-                          <div className="min-w-0">
-                            <h3 className="font-serif text-base font-semibold text-[#2C221E] truncate">
+              <div className="rounded-2xl bg-white border border-[#E2D7BD]/90 p-5 flex items-center gap-4 editorial-card-shadow">
+                <div className="w-11 h-11 rounded-xl bg-[#F6EEDB] text-[#C9A84C] flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-2xl font-semibold text-[#291418] block leading-none">
+                    {invitations.filter((c) => c.is_published).length}
+                  </span>
+                  <span className="text-xs text-[#8B7355] block mt-1">
+                    Active / live (30-Day)
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-white border border-[#E2D7BD]/90 p-5 flex items-center gap-4 editorial-card-shadow">
+                <div className="w-11 h-11 rounded-xl bg-[#F6EEDB] text-[#C9A84C] flex items-center justify-center shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-2xl font-semibold text-[#291418] block leading-none">
+                    {allGuests
+                      .filter((g) => g.rsvp?.status === 'attending')
+                      .reduce((sum, g) => sum + (g.rsvp?.headcount || 0), 0)}
+                  </span>
+                  <span className="text-xs text-[#8B7355] block mt-1">
+                    Confirmed RSVP guests
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Clean Search Filter Input (WooowInvites Pattern) */}
+            <div className="max-w-md relative">
+              <Search className="w-4 h-4 text-[#8B7355] absolute left-4 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={cardSearchQuery}
+                onChange={(e) => setCardSearchQuery(e.target.value)}
+                placeholder="Search by couple, reveal style, or venue..."
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-white border border-[#E2D7BD] text-sm text-[#291418] placeholder:text-[#A5947E] focus:outline-none focus:border-[#C9A84C]"
+              />
+            </div>
+
+            {/* WooowInvites Sleek Horizontal Invitation Rows */}
+            <div className="space-y-3">
+              {invitations
+                .filter((card) => {
+                  const q = cardSearchQuery.trim().toLowerCase();
+                  if (!q) return true;
+                  return (
+                    `${card.design_config.couple_names.partner1} ${card.design_config.couple_names.partner2}`
+                      .toLowerCase()
+                      .includes(q) ||
+                    card.title.toLowerCase().includes(q) ||
+                    card.venue_details.venue_name.toLowerCase().includes(q) ||
+                    card.slug.toLowerCase().includes(q)
+                  );
+                })
+                .map((card) => {
+                  const isSelected = card.id === selectedInvitation.id;
+                  const theme = THEMES[card.theme_id] || THEMES['tuscan-sunset'];
+                  const cardGuests = allGuests.filter((g) => g.invitation_id === card.id);
+                  const cardOpened = cardGuests.filter((g) => Boolean(g.link_opened_at)).length;
+                  const cardAttending = cardGuests
+                    .filter((g) => g.rsvp?.status === 'attending')
+                    .reduce((s, g) => s + (g.rsvp?.headcount || 0), 0);
+                  const optionalCount = countActiveOptionalSections(card);
+                  const isFrostedBlur =
+                    card.design_config.opening_style === 'frosted-blur' ||
+                    (card.theme_id === 'pearl-veil' && !card.design_config.opening_style);
+                  const isGates =
+                    !isFrostedBlur &&
+                    (card.design_config.opening_style === 'palace-gates' ||
+                      (card.theme_id === 'blush-floral' && card.design_config.opening_style !== 'lifafa'));
+                  const createdMs = card.created_at ? new Date(card.created_at).getTime() : Date.now();
+                  const expiresMs = card.expires_at
+                    ? new Date(card.expires_at).getTime()
+                    : createdMs + 30 * 24 * 60 * 60 * 1000;
+                  const daysRemaining = Math.max(0, Math.ceil((expiresMs - Date.now()) / (1000 * 60 * 60 * 24)));
+
+                  return (
+                    <div
+                      key={card.id}
+                      onClick={() => setSelectedInvitation(card)}
+                      className={`rounded-2xl bg-white border px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-[#C9A84C] ring-1 ring-[#C9A84C] shadow-[0_10px_30px_-12px_rgba(201,168,76,0.35)]'
+                          : 'border-[#E2D7BD]/90 hover:border-[#C9A84C]/70 hover:shadow-xs'
+                      }`}
+                    >
+                      {/* Left: Crest + Couple Name + Active Badge + Event Subline */}
+                      <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                        <div
+                          className="w-11 h-11 rounded-xl flex items-center justify-center font-serif font-bold text-xs text-white shrink-0 border border-[#D4AF37]/40 shadow-2xs"
+                          style={{ backgroundColor: theme.previewColor }}
+                        >
+                          {card.design_config.wax_seal_initial || 'E&V'}
+                        </div>
+
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-serif text-xl font-semibold text-[#291418] leading-none">
                               {card.design_config.couple_names.partner1} &amp;{' '}
                               {card.design_config.couple_names.partner2}
                             </h3>
-                            <span className="text-xs text-[#7A6A5E]">
-                              {new Date(card.event_date).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })}
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
+                              Active
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-[#8B7355] text-[10px] font-semibold">
+                              ₹79 &bull; {daysRemaining}d left
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FAF7F2] border border-[#E2D7BD] text-[#5A4636] text-[10px] font-medium">
+                              {isFrostedBlur ? (
+                                <>
+                                  <Eye className="w-3 h-3 text-[#C9A84C]" />
+                                  <span>Frosted-Blur Veil</span>
+                                </>
+                              ) : isGates ? (
+                                <>
+                                  <DoorOpen className="w-3 h-3 text-[#C9A84C]" />
+                                  <span>3D Palace Gates</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Mail className="w-3 h-3 text-[#C9A84C]" />
+                                  <span>3D Royal Lifafa</span>
+                                </>
+                              )}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#8B7355]">
+                            <span className="inline-flex items-center gap-1">
+                              <Calendar className="w-3.5 h-3.5 text-[#C9A84C]" />
+                              <span>
+                                {new Date(card.event_date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                            </span>
+                            <span className="inline-flex items-center gap-1 truncate max-w-[240px]">
+                              <MapPin className="w-3.5 h-3.5 text-[#C9A84C] shrink-0" />
+                              <span className="truncate">{card.venue_details.venue_name}</span>
+                            </span>
+                            <span>&bull;</span>
+                            <span>
+                              {cardGuests.length} invited &middot; {cardOpened} opened &middot;{' '}
+                              <strong className="text-emerald-700 font-semibold">{cardAttending} attending</strong>
+                            </span>
+                            <span className="hidden xl:inline text-[#A5947E]">
+                              ({optionalCount} optional blocks)
                             </span>
                           </div>
                         </div>
-
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${
-                            isSelected
-                              ? 'bg-[#C9A84C] text-white'
-                              : 'bg-[#F6EEDB] text-[#8B7355] border border-[#E2D7BD]'
-                          }`}
-                        >
-                          {isSelected ? 'Active • ₹79' : '₹79 / Card'}
-                        </span>
                       </div>
 
-                      {/* Animation Type & 30-Day Validity Badges */}
-                      <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E2D7BD] text-[10px] font-semibold text-[#5A4636]">
-                          {isFrostedBlur ? (
-                            <>
-                              <Eye className="w-3 h-3" />
-                              <span>Frosted-Blur Veil</span>
-                            </>
-                          ) : isGates ? (
-                            <>
-                              <DoorOpen className="w-3 h-3" />
-                              <span>3D Palace Gates</span>
-                            </>
-                          ) : (
-                            <>
-                              <Mail className="w-3 h-3" />
-                              <span>3D Royal Lifafa</span>
-                            </>
-                          )}
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[10px] font-medium text-emerald-800">
-                          <Clock className="w-3 h-3" />
-                          <span>{daysRemaining}d left (1 Month)</span>
-                        </span>
-                      </div>
-
-                      <div className="space-y-1 mb-4">
-                        <div className="text-xs font-medium text-neutral-800 truncate">
-                          {card.title}
-                        </div>
-                        <p className="text-xs text-neutral-500 flex items-center gap-1 truncate">
-                          <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                          <span className="truncate">{card.venue_details.venue_name}</span>
-                        </p>
-                        <p className="text-[11px] text-neutral-500">
-                          Main details + {optionalCount} optional sections
-                        </p>
-                      </div>
-
-                      {/* Mini Stats */}
-                      <div className="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-neutral-50 border border-neutral-200/80 text-center mb-4">
-                        <div>
-                          <span className="text-[10px] text-neutral-500 block">Invited</span>
-                          <span className="text-sm font-semibold text-neutral-900">
-                            {cardGuests.length}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-neutral-500 block">Opened</span>
-                          <span className="text-sm font-semibold text-neutral-900">
-                            {cardOpened}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-neutral-500 block">Attending</span>
-                          <span className="text-sm font-semibold text-emerald-700">
-                            {cardAttending}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div
-                      className="pt-3 border-t border-neutral-100 flex items-center justify-between gap-2"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleEditExistingCard(card)}
-                          className="px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                          <span>Edit</span>
-                        </button>
-
+                      {/* Right: WooowInvites Action Row (Preview · Edit · Gold Manage) */}
+                      <div
+                        className="flex flex-wrap items-center gap-2 shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <Link
                           href={`/invite/${card.slug}${
                             cardGuests[0] ? `?guest=${cardGuests[0].unique_token}` : ''
                           }`}
                           target="_blank"
-                          className="px-2.5 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-medium inline-flex items-center gap-1 transition-colors"
+                          className="px-3.5 py-2 rounded-md bg-white hover:bg-[#FAF7F2] border border-[#E2D7BD] text-[#5A4636] text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
                         >
+                          <ExternalLink className="w-3.5 h-3.5 text-[#8B7355]" />
                           <span>Preview</span>
-                          <ExternalLink className="w-3 h-3 text-neutral-500" />
                         </Link>
-                      </div>
 
-                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleEditExistingCard(card)}
+                          className="px-3.5 py-2 rounded-md bg-white hover:bg-[#FAF7F2] border border-[#E2D7BD] text-[#291418] text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-[#8B7355]" />
+                          <span>Edit</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedInvitation(card);
+                            const el = document.getElementById('rsvp-manager');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="px-4 py-2 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                        >
+                          <Settings className="w-3.5 h-3.5" />
+                          <span>{isSelected ? 'Managing RSVPs' : 'Manage'}</span>
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => handleCopyLink(getCardPublicUrl(card), card.id)}
-                          className="p-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-100 text-neutral-600 transition-colors cursor-pointer"
-                          title="Copy Card Link"
+                          className="p-2 rounded-md border border-[#E2D7BD] bg-white hover:bg-[#FAF7F2] text-[#8B7355] hover:text-[#291418] transition-colors cursor-pointer"
+                          title="Copy Public Card Link"
                         >
                           {copiedId === card.id ? (
                             <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -732,7 +792,7 @@ export default function DashboardPage() {
                           <button
                             type="button"
                             onClick={() => handleDeleteCard(card.id)}
-                            className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
+                            className="p-2 rounded-md hover:bg-rose-50 text-[#A5947E] hover:text-rose-600 transition-colors cursor-pointer"
                             title="Delete Card"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -740,38 +800,26 @@ export default function DashboardPage() {
                         )}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-
-              {/* Create New Card Tile */}
-              <button
-                type="button"
-                onClick={handleStartCreateNewCard}
-                className="rounded-xl border border-dashed border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 p-6 flex flex-col items-center justify-center text-center min-h-[210px] transition-colors cursor-pointer"
-              >
-                <div className="w-10 h-10 rounded-lg bg-neutral-100 border border-neutral-200 text-neutral-900 flex items-center justify-center mb-2.5">
-                  <Plus className="w-5 h-5" />
-                </div>
-                <div className="text-sm font-semibold text-neutral-900">
-                  Create New Wedding Card
-                </div>
-                <p className="text-xs text-neutral-500 max-w-xs mt-1">
-                  Fill only the main details — optional sections adjust automatically.
-                </p>
-              </button>
+                  );
+                })}
             </div>
           </section>
 
           {/* Section 2: RSVP Tracker for Selected Card */}
-          <section className="space-y-5 pt-6 border-t border-neutral-200">
+          <section id="rsvp-manager" className="space-y-5 pt-8 border-t border-[#E2D7BD]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold tracking-tight text-neutral-900">
-                  Guest List &amp; RSVPs — {selectedInvitation.design_config.couple_names.partner1} &amp;{' '}
-                  {selectedInvitation.design_config.couple_names.partner2}
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold block mb-0.5">
+                  Selected Invitation &bull; Live RSVP Manager
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#291418]">
+                  Guest List &amp; RSVPs &mdash;{' '}
+                  <span className="italic text-[#C9A84C]">
+                    {selectedInvitation.design_config.couple_names.partner1} &amp;{' '}
+                    {selectedInvitation.design_config.couple_names.partner2}
+                  </span>
                 </h2>
-                <p className="text-xs text-neutral-500 mt-0.5">
+                <p className="text-xs text-[#8B7355] mt-0.5">
                   Track read receipts, confirmed attendance, and share personalized WhatsApp links.
                 </p>
               </div>
@@ -780,7 +828,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(true)}
-                  className="px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Guest</span>
@@ -789,9 +837,9 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={handleExportCSV}
-                  className="px-3.5 py-2 rounded-lg bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2.5 rounded-md bg-white hover:bg-[#F6EEDB] border border-[#E2D7BD] text-[#291418] text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Download className="w-3.5 h-3.5 text-neutral-500" />
+                  <Download className="w-3.5 h-3.5 text-[#C9A84C]" />
                   <span>Export CSV</span>
                 </button>
               </div>
@@ -799,25 +847,25 @@ export default function DashboardPage() {
 
             {/* 4 Clean Summary Metric Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 border border-neutral-200">
+              <div className="bg-white rounded-2xl p-4 border border-[#E2D7BD]">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-neutral-500">Invited Parties</span>
-                  <Users className="w-4 h-4 text-neutral-400" />
+                  <span className="text-xs font-medium text-[#8B7355]">Invited Parties</span>
+                  <Users className="w-4 h-4 text-[#C9A84C]" />
                 </div>
-                <div className="text-2xl font-semibold text-neutral-900">{totalInvitedParties}</div>
+                <div className="text-2xl font-semibold text-[#291418]">{totalInvitedParties}</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 border border-neutral-200">
+              <div className="bg-white rounded-2xl p-4 border border-[#E2D7BD]">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-neutral-500">Links Opened</span>
-                  <Eye className="w-4 h-4 text-neutral-400" />
+                  <span className="text-xs font-medium text-[#8B7355]">Links Opened</span>
+                  <Eye className="w-4 h-4 text-[#C9A84C]" />
                 </div>
-                <div className="text-2xl font-semibold text-neutral-900">{linksOpenedCount}</div>
+                <div className="text-2xl font-semibold text-[#291418]">{linksOpenedCount}</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 border border-neutral-200">
+              <div className="bg-white rounded-2xl p-4 border border-[#E2D7BD]">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-neutral-500">Confirmed Headcount</span>
+                  <span className="text-xs font-medium text-[#8B7355]">Confirmed Headcount</span>
                   <Check className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div className="text-2xl font-semibold text-emerald-700">
@@ -825,13 +873,13 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 border border-neutral-200">
+              <div className="bg-white rounded-2xl p-4 border border-[#E2D7BD]">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-neutral-500">Declined / Pending</span>
-                  <Clock className="w-4 h-4 text-neutral-400" />
+                  <span className="text-xs font-medium text-[#8B7355]">Declined / Pending</span>
+                  <Clock className="w-4 h-4 text-[#C9A84C]" />
                 </div>
-                <div className="text-2xl font-semibold text-neutral-900">
-                  {declinedCount} <span className="text-sm font-normal text-neutral-400">/ {pendingCount}</span>
+                <div className="text-2xl font-semibold text-[#291418]">
+                  {declinedCount} <span className="text-sm font-normal text-[#8B7355]">/ {pendingCount}</span>
                 </div>
               </div>
             </div>
