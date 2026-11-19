@@ -94,26 +94,26 @@ export default function DashboardPage() {
   const handleStartCreateNewCard = () => {
     const newBlankCard: Invitation = {
       id: `draft-${Date.now()}`,
-      slug: `nikah-${Math.random().toString(36).substring(2, 7)}`,
+      slug: `wedding-${Math.random().toString(36).substring(2, 7)}`,
       theme_id: 'royal-emerald',
-      title: 'Blessed Nikah & Walima Celebration',
+      title: '',
       event_date: '2027-11-20T18:00:00Z',
       venue_details: {
-        venue_name: 'Royal Heritage Palace Lawn',
-        hall_name: 'Grand Darbar Hall',
-        address: '120 Palace Road, Civil Lines',
-        maps_url: 'https://maps.google.com',
-        city: 'Mumbai',
+        venue_name: '',
+        hall_name: '',
+        address: '',
+        maps_url: '',
+        city: '',
         dress_code: 'Modest & Traditional Attire',
       },
       design_config: {
         couple_names: {
-          partner1: 'FATIMA',
-          partner2: 'HAMZA',
+          partner1: '',
+          partner2: '',
         },
-        subtitle: 'BISMILLAHIR RAHMANIR RAHIM • TOGETHER WITH THEIR FAMILIES',
-        wax_seal_initial: 'F&H',
-        music_track: 'royal-harp',
+        subtitle: 'TOGETHER WITH THEIR FAMILIES INVITE YOU',
+        wax_seal_initial: 'E&V',
+        music_track: 'wedding-nasheed',
         accent_color: '#D4AF37',
         font_style: 'cormorant',
         show_timeline: true,
@@ -122,7 +122,7 @@ export default function DashboardPage() {
             id: '1',
             time: '18:00',
             title: 'NIKAH',
-            location: 'Royal Courtyard',
+            location: 'Main Ceremony Hall',
             description: 'Blessed Nikah ceremony & collective Dua',
           },
           {
@@ -139,7 +139,7 @@ export default function DashboardPage() {
         show_story: true,
         show_couple_portrait: true,
         story:
-          'Alhamdulillah, with the blessings of our parents, we invite you and your family to grace our wedding ceremony with your prayers and presence.',
+          'With the blessings of our parents, we warmly invite you and your family to grace our wedding celebration with your prayers and presence.',
         show_menu: false,
         menu_starter_title: 'Zafrani Seekh Kebab & Paneer Tikka',
         menu_starter_desc: 'Charcoal-grilled halal kebabs with mint chutney',
@@ -409,6 +409,24 @@ export default function DashboardPage() {
       ...draftCard,
       design_config: { ...draftCard.design_config, faqs: list },
     });
+  };
+
+  const previewDraftCard: Invitation = {
+    ...draftCard,
+    title: draftCard.title?.trim() || 'Wedding Celebration',
+    venue_details: {
+      ...draftCard.venue_details,
+      venue_name: draftCard.venue_details.venue_name?.trim() || 'Your Wedding Venue',
+      address: draftCard.venue_details.address?.trim() || 'Venue Address',
+    },
+    design_config: {
+      ...draftCard.design_config,
+      couple_names: {
+        partner1: draftCard.design_config.couple_names.partner1?.trim() || 'BRIDE',
+        partner2: draftCard.design_config.couple_names.partner2?.trim() || 'GROOM',
+      },
+      wax_seal_initial: draftCard.design_config.wax_seal_initial?.trim() || 'E&V',
+    },
   };
 
   return (
@@ -1111,19 +1129,24 @@ export default function DashboardPage() {
                       type="text"
                       required
                       value={draftCard.design_config.couple_names.partner1}
+                      placeholder="Enter Bride Name"
                       onChange={(e) => {
                         const p1 = e.target.value;
                         const p2 = draftCard.design_config.couple_names.partner2;
+                        const initial =
+                          p1.trim() || p2.trim()
+                            ? `${p1.trim()?.[0]?.toUpperCase() || 'E'}&${p2.trim()?.[0]?.toUpperCase() || 'V'}`
+                            : 'E&V';
                         setDraftCard({
                           ...draftCard,
                           design_config: {
                             ...draftCard.design_config,
                             couple_names: { partner1: p1, partner2: p2 },
-                            wax_seal_initial: `${p1?.[0] || 'Z'}&${p2?.[0] || 'A'}`,
+                            wax_seal_initial: initial,
                           },
                         });
                       }}
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900"
                     />
                   </div>
 
@@ -1135,19 +1158,24 @@ export default function DashboardPage() {
                       type="text"
                       required
                       value={draftCard.design_config.couple_names.partner2}
+                      placeholder="Enter Groom Name"
                       onChange={(e) => {
                         const p1 = draftCard.design_config.couple_names.partner1;
                         const p2 = e.target.value;
+                        const initial =
+                          p1.trim() || p2.trim()
+                            ? `${p1.trim()?.[0]?.toUpperCase() || 'E'}&${p2.trim()?.[0]?.toUpperCase() || 'V'}`
+                            : 'E&V';
                         setDraftCard({
                           ...draftCard,
                           design_config: {
                             ...draftCard.design_config,
                             couple_names: { partner1: p1, partner2: p2 },
-                            wax_seal_initial: `${p1?.[0] || 'Z'}&${p2?.[0] || 'A'}`,
+                            wax_seal_initial: initial,
                           },
                         });
                       }}
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900"
                     />
                   </div>
                 </div>
@@ -1161,8 +1189,9 @@ export default function DashboardPage() {
                       type="text"
                       required
                       value={draftCard.title}
+                      placeholder="e.g., Nikah & Walima Celebration"
                       onChange={(e) => setDraftCard({ ...draftCard, title: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900"
                     />
                   </div>
 
@@ -1211,6 +1240,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       value={draftCard.venue_details.venue_name}
+                      placeholder="Enter Venue Name"
                       onChange={(e) =>
                         setDraftCard({
                           ...draftCard,
@@ -1220,7 +1250,7 @@ export default function DashboardPage() {
                           },
                         })
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900"
                     />
                   </div>
 
@@ -1231,13 +1261,14 @@ export default function DashboardPage() {
                     <input
                       type="text"
                       value={draftCard.venue_details.maps_url}
+                      placeholder="https://maps.google.com/..."
                       onChange={(e) =>
                         setDraftCard({
                           ...draftCard,
                           venue_details: { ...draftCard.venue_details, maps_url: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900"
                     />
                   </div>
 
@@ -1249,13 +1280,14 @@ export default function DashboardPage() {
                       type="text"
                       required
                       value={draftCard.venue_details.address}
+                      placeholder="Enter full venue address"
                       onChange={(e) =>
                         setDraftCard({
                           ...draftCard,
                           venue_details: { ...draftCard.venue_details, address: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-neutral-300 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900"
                     />
                   </div>
                 </div>
@@ -1993,7 +2025,7 @@ export default function DashboardPage() {
                   <div className="w-24 h-1.5 rounded-full bg-[#3D2E28] mx-auto mb-2" />
                   <div className="w-full h-[640px] rounded-[32px] overflow-y-auto overflow-x-hidden bg-[#f4e2c1] relative">
                     <EnvelopeExperience
-                      invitation={draftCard}
+                      invitation={previewDraftCard}
                       isPreview={true}
                       replayTrigger={replayTrigger}
                     />
@@ -2029,7 +2061,7 @@ export default function DashboardPage() {
           </div>
           <div className="w-full max-w-[380px] h-[82vh] rounded-[32px] border-4 border-neutral-800 overflow-y-auto overflow-x-hidden bg-[#f4e2c1]">
             <EnvelopeExperience
-              invitation={draftCard}
+              invitation={previewDraftCard}
               isPreview={true}
               replayTrigger={replayTrigger}
             />

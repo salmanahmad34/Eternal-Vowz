@@ -540,8 +540,8 @@ export const DataService = {
   loginHost(name: string, email: string, phone?: string): HostUser {
     const user: HostUser = {
       id: `host-${Date.now()}`,
-      name: name.trim() || 'Ayaan & Zoya (Host)',
-      email: email.trim() || 'host@invitecraft.com',
+      name: name.trim() || 'Host',
+      email: email.trim() || 'host@eternalvowz.com',
       phone: phone?.trim() || '',
       created_at: new Date().toISOString(),
     };

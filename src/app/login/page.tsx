@@ -17,17 +17,17 @@ import {
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [name, setName] = useState('Ayaan & Zoya');
-  const [email, setEmail] = useState('mrsalman7307@gmail.com');
-  const [password, setPassword] = useState('••••••••');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     DataService.loginHost(
-      mode === 'signup' ? name : name || 'Host',
-      email,
+      name.trim() || 'Host',
+      email.trim(),
       ''
     );
     setTimeout(() => {
@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   const handleQuickDemoLogin = () => {
     setIsLoading(true);
-    DataService.loginHost('Ayaan & Zoya', 'mrsalman7307@gmail.com', '');
+    DataService.loginHost('Demo Host', 'demo@eternalvowz.com', '');
     setTimeout(() => {
       router.push('/dashboard');
     }, 250);
@@ -116,7 +116,7 @@ export default function LoginPage() {
             <div className="flex-grow border-t border-[#E2D7BD]" />
           </div>
 
-          <form onSubmit={handleAuthSubmit} className="space-y-4">
+          <form onSubmit={handleAuthSubmit} autoComplete="off" className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-[#5A4636] mb-1">
                 Couple / Host Name
@@ -126,9 +126,10 @@ export default function LoginPage() {
                 <input
                   type="text"
                   required
+                  autoComplete="off"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Ayaan & Zoya"
+                  placeholder="Enter your name or couple name"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#E2D7BD] text-sm text-[#291418] focus:outline-none focus:border-[#C9A84C] focus:bg-white"
                 />
               </div>
@@ -143,9 +144,10 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
+                  autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder="Enter your email address"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#E2D7BD] text-sm text-[#291418] focus:outline-none focus:border-[#C9A84C] focus:bg-white"
                 />
               </div>
@@ -160,9 +162,10 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#E2D7BD] text-sm text-[#291418] focus:outline-none focus:border-[#C9A84C] focus:bg-white"
                 />
               </div>
