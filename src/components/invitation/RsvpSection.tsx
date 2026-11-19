@@ -5,6 +5,12 @@ import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { GuestWithRsvp, RsvpStatus } from '@/types/database';
 import { DataService } from '@/lib/data-service';
+import {
+  ScrollInkHeading,
+  ScrollWordReveal,
+  ScrollOrnamentDivider,
+  ScrollRevealBlock,
+} from './ScrollRevealText';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -117,26 +123,31 @@ export default function RsvpSection({
 
   return (
     <div className="w-full py-10 px-3 relative" id="rsvp">
-      {/* Section Header */}
+      {/* Section Header — Scroll Animated */}
       <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-3 mb-4 opacity-50">
-          <div className="h-[1px] w-14 bg-[#7a6855]" />
-          <div className="w-1.5 h-1.5 rounded-full bg-[#7a6855]" />
-          <div className="h-[1px] w-14 bg-[#7a6855]" />
-        </div>
-        <h2 className="font-display text-[26px] tracking-[0.08em] text-[#2f2a24] uppercase font-normal">
-          RSVP
-        </h2>
-        <p className="font-serif italic text-[14px] text-[#4a4238] mt-1">
-          We can&apos;t wait!
-        </p>
-        <p className="font-great-vibes text-[22px] text-[#2f2a24] mt-1">
-          Please reply by July 20th, 2026
-        </p>
+        <ScrollOrnamentDivider className="flex items-center justify-center gap-3 mb-4 opacity-50" />
+        <ScrollInkHeading
+          text="RSVP"
+          className="font-display text-[26px] tracking-[0.08em] text-[#2f2a24] uppercase font-normal"
+        />
+        <ScrollWordReveal
+          text="We can't wait!"
+          delay={0.1}
+          className="font-serif italic text-[14px] text-[#4a4238] mt-1"
+        />
+        <ScrollWordReveal
+          text="Please kindly confirm your presence below"
+          delay={0.2}
+          className="font-great-vibes text-[22px] text-[#2f2a24] mt-1"
+        />
       </div>
 
       {/* Main Cream Parchment RSVP Card with Original Watercolor Floral Corners */}
-      <div className="relative bg-[#fbf9f5] rounded-2xl p-6 sm:p-7 shadow-lg border border-[#e6dec8] text-left text-[#2f2a24] overflow-hidden">
+      <ScrollRevealBlock
+        direction="up"
+        delay={0.08}
+        className="relative bg-[#fbf9f5] rounded-2xl p-6 sm:p-7 shadow-lg border border-[#e6dec8] text-left text-[#2f2a24] overflow-hidden"
+      >
         {/* Top-Right Original Watercolor Floral Bouquet */}
         <img
           src="/assets/invitecraft/floral-garland-corner.jpg"
@@ -416,7 +427,7 @@ export default function RsvpSection({
             </div>
           </form>
         )}
-      </div>
+      </ScrollRevealBlock>
     </div>
   );
 }

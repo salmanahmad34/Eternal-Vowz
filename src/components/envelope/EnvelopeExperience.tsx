@@ -10,6 +10,12 @@ import FrostedBlurReveal from './FrostedBlurReveal';
 import FloatingParticles from './FloatingParticles';
 import RsvpSection from '../invitation/RsvpSection';
 import {
+  ScrollInkHeading,
+  ScrollWordReveal,
+  ScrollOrnamentDivider,
+  ScrollRevealBlock,
+} from '../invitation/ScrollRevealText';
+import {
   TimelineIllustration,
   SectionHeaderBadge,
   OriginalRibbonMenuFrame,
@@ -409,7 +415,7 @@ export default function EnvelopeExperience({
                   }}
                 />
 
-                {/* Couple Names & Wedding Date Overlay */}
+                {/* Couple Names & Wedding Date Overlay — Sequential Ink & Word Reveal on Open */}
                 <div
                   className={`relative z-10 px-6 text-center flex flex-col items-center ${
                     invitation.theme_id === 'royal-emerald'
@@ -421,7 +427,12 @@ export default function EnvelopeExperience({
                       : 'pt-12'
                   }`}
                 >
-                  <h1
+                  <ScrollInkHeading
+                    as="h1"
+                    immediate
+                    delay={0.15}
+                    duration={0.85}
+                    text={coupleNames.partner1 || 'ZOYA'}
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
                       invitation.theme_id === 'midnight-minimalist'
                         ? 'text-[#F8E7B2] drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]'
@@ -429,21 +440,27 @@ export default function EnvelopeExperience({
                         ? 'text-[#0B3626] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]'
                         : 'text-[#2f2a24]'
                     }`}
-                  >
-                    {coupleNames.partner1 || 'ZOYA'}
-                  </h1>
+                  />
 
-                  <span
-                    className={`font-great-vibes text-[24px] -my-1 ${
+                  <ScrollInkHeading
+                    as="span"
+                    immediate
+                    delay={0.45}
+                    duration={0.65}
+                    text="and"
+                    className={`font-great-vibes text-[24px] -my-1 block ${
                       invitation.theme_id === 'midnight-minimalist'
                         ? 'text-[#E5C17B]'
                         : 'text-[#7a5c3e]'
                     }`}
-                  >
-                    and
-                  </span>
+                  />
 
-                  <h1
+                  <ScrollInkHeading
+                    as="h1"
+                    immediate
+                    delay={0.62}
+                    duration={0.85}
+                    text={coupleNames.partner2 || 'AYAAN'}
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
                       invitation.theme_id === 'midnight-minimalist'
                         ? 'text-[#F8E7B2] drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]'
@@ -451,64 +468,84 @@ export default function EnvelopeExperience({
                         ? 'text-[#0B3626] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]'
                         : 'text-[#2f2a24]'
                     }`}
-                  >
-                    {coupleNames.partner2 || 'AYAAN'}
-                  </h1>
+                  />
 
                   {cfg.subtitle && (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
+                    <ScrollWordReveal
+                      as="p"
+                      immediate
+                      delay={0.95}
+                      stagger={0.055}
+                      text={cfg.subtitle}
                       className={`font-serif text-[10px] tracking-[0.16em] uppercase mt-1.5 max-w-[230px] ${
                         invitation.theme_id === 'midnight-minimalist'
                           ? 'text-[#E8DFCA] drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]'
                           : 'text-[#5a5044]'
                       }`}
-                    >
-                      {cfg.subtitle}
-                    </motion.p>
+                    />
                   )}
 
                   {/* Diamond Ornamental Line */}
-                  <div className="flex items-center justify-center gap-2.5 mt-3 mb-1.5 opacity-75">
-                    <div
-                      className={`h-[1px] w-12 ${
-                        invitation.theme_id === 'midnight-minimalist'
-                          ? 'bg-[#E5C17B]'
-                          : 'bg-[#6e5d4b]'
-                      }`}
-                    />
-                    <div
-                      className={`w-1.5 h-1.5 rotate-45 ${
-                        invitation.theme_id === 'midnight-minimalist'
-                          ? 'bg-[#E5C17B]'
-                          : 'bg-[#8c6d46]'
-                      }`}
-                    />
-                    <div
-                      className={`h-[1px] w-12 ${
-                        invitation.theme_id === 'midnight-minimalist'
-                          ? 'bg-[#E5C17B]'
-                          : 'bg-[#6e5d4b]'
-                      }`}
-                    />
-                  </div>
+                  <ScrollOrnamentDivider
+                    immediate
+                    diamond
+                    delay={1.15}
+                    className="flex items-center justify-center gap-2.5 mt-3 mb-1.5 opacity-80"
+                    lineColorClass={
+                      invitation.theme_id === 'midnight-minimalist'
+                        ? 'bg-[#E5C17B]'
+                        : 'bg-[#6e5d4b]'
+                    }
+                    dotColorClass={
+                      invitation.theme_id === 'midnight-minimalist'
+                        ? 'bg-[#E5C17B]'
+                        : 'bg-[#8c6d46]'
+                    }
+                  />
 
                   {/* Date in 24.10.2027 format */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.75 }}
+                  <ScrollInkHeading
+                    as="div"
+                    immediate
+                    delay={1.3}
+                    duration={0.8}
+                    text={dotDate}
                     className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
                       invitation.theme_id === 'midnight-minimalist'
                         ? 'text-[#FFF6D6] drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]'
                         : 'text-[#2f2a24]'
                     }`}
-                  >
-                    {dotDate}
-                  </motion.div>
+                  />
                 </div>
+
+                {/* Gentle Bottom Scroll Cue on Hero */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.65, duration: 0.7 }}
+                  className="absolute bottom-5 inset-x-0 z-20 flex flex-col items-center pointer-events-none"
+                >
+                  <span
+                    className={`text-[9px] font-sans uppercase tracking-[0.26em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] ${
+                      invitation.theme_id === 'midnight-minimalist'
+                        ? 'bg-black/35 text-[#F8E7B2]'
+                        : 'bg-[#FAF6EE]/75 text-[#5a4a38]'
+                    }`}
+                  >
+                    Scroll to Read Invitation
+                  </span>
+                  <motion.div
+                    animate={{ y: [0, 5, 0] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                    className={`mt-1 ${
+                      invitation.theme_id === 'midnight-minimalist'
+                        ? 'text-[#F8E7B2]'
+                        : 'text-[#6e5d4b]'
+                    }`}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </motion.div>
+                </motion.div>
               </div>
 
               {/* -----------------------------------------------------------------
@@ -533,15 +570,18 @@ export default function EnvelopeExperience({
                 />
 
                 {/* ===============================================================
-                    BLOCK 1: LIVE COUNTDOWN (Always Shown)
+                    BLOCK 1: LIVE COUNTDOWN (Always Shown — Scroll Animated)
                 =============================================================== */}
                 <section className="relative z-10 pt-4 pb-10 px-5 text-center">
-                  <h2 className="font-great-vibes text-[44px] text-[#2f2a24] leading-tight">
-                    Countdown
-                  </h2>
-                  <p className="font-serif italic text-[15px] text-[#4a4238] -mt-1 mb-6">
-                    Counting every moment until we celebrate together
-                  </p>
+                  <ScrollInkHeading
+                    text="Countdown"
+                    className="font-great-vibes text-[44px] text-[#2f2a24] leading-tight"
+                  />
+                  <ScrollWordReveal
+                    text="Counting every moment until we celebrate together"
+                    delay={0.12}
+                    className="font-serif italic text-[15px] text-[#4a4238] -mt-1 mb-6"
+                  />
 
                   <div className="grid grid-cols-4 gap-2.5 max-w-[335px] mx-auto">
                     {[
@@ -549,8 +589,13 @@ export default function EnvelopeExperience({
                       { value: timeLeft.hours, label: 'HOURS' },
                       { value: timeLeft.minutes, label: 'MINUTES' },
                       { value: timeLeft.seconds, label: 'SECONDS' },
-                    ].map((unit) => (
-                      <div key={unit.label} className="flex flex-col items-center">
+                    ].map((unit, idx) => (
+                      <ScrollRevealBlock
+                        key={unit.label}
+                        direction="scale"
+                        delay={idx * 0.1}
+                        className="flex flex-col items-center"
+                      >
                         <div className="w-full aspect-square rounded-xl bg-white/40 backdrop-blur-[2px] border border-white/70 shadow-xs flex items-center justify-center">
                           <span className="font-great-vibes text-[34px] text-[#2f2a24] leading-none">
                             {unit.value}
@@ -559,7 +604,7 @@ export default function EnvelopeExperience({
                         <span className="font-serif italic text-[11px] tracking-[0.16em] uppercase text-[#4a4238] mt-2">
                           {unit.label}
                         </span>
-                      </div>
+                      </ScrollRevealBlock>
                     ))}
                   </div>
                 </section>
@@ -569,58 +614,75 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {hasVenue && (
                   <section className="relative z-10 py-9 px-4 text-center">
-                    <h2 className="font-great-vibes text-[46px] text-[#2f2a24] leading-tight mb-3">
-                      The Venue
-                    </h2>
+                    <ScrollInkHeading
+                      text="The Venue"
+                      className="font-great-vibes text-[46px] text-[#2f2a24] leading-tight mb-3"
+                    />
 
-                    <div className="relative mx-auto w-full max-w-[345px] rounded-2xl overflow-hidden">
+                    <ScrollRevealBlock
+                      direction="scale"
+                      delay={0.08}
+                      className="relative mx-auto w-full max-w-[345px] rounded-2xl overflow-hidden"
+                    >
                       <img
                         src="/assets/invitecraft/venue-royal-palace.jpg"
                         alt={invitation.venue_details.venue_name}
                         className="w-full h-auto object-contain mx-auto mix-blend-multiply"
                       />
-                    </div>
+                    </ScrollRevealBlock>
 
-                    <div className="w-11 h-11 rounded-full bg-[#fbf9f5] border-[1.5px] border-[#5c724a] flex items-center justify-center mx-auto my-3 text-[#495e38] shadow-xs">
+                    <ScrollRevealBlock
+                      direction="scale"
+                      delay={0.12}
+                      className="w-11 h-11 rounded-full bg-[#fbf9f5] border-[1.5px] border-[#5c724a] flex items-center justify-center mx-auto my-3 text-[#495e38] shadow-xs"
+                    >
                       <MapPin className="w-5 h-5" />
-                    </div>
+                    </ScrollRevealBlock>
 
                     {invitation.venue_details.venue_name && (
-                      <h3 className="font-great-vibes text-[31px] text-[#2f2a24] leading-snug px-2">
-                        {invitation.venue_details.venue_name}
-                      </h3>
+                      <ScrollInkHeading
+                        as="h3"
+                        text={invitation.venue_details.venue_name}
+                        className="font-great-vibes text-[31px] text-[#2f2a24] leading-snug px-2"
+                      />
                     )}
                     {invitation.venue_details.hall_name && (
-                      <p className="font-serif italic text-[14px] font-semibold text-[#6e5d4b] px-6 mt-0.5">
-                        {invitation.venue_details.hall_name}
-                      </p>
+                      <ScrollWordReveal
+                        text={invitation.venue_details.hall_name}
+                        delay={0.08}
+                        className="font-serif italic text-[14px] font-semibold text-[#6e5d4b] px-6 mt-0.5"
+                      />
                     )}
                     {invitation.venue_details.address && (
-                      <p className="font-serif italic text-[14.5px] text-[#4a4238] px-8 leading-relaxed mt-1">
-                        {invitation.venue_details.address}
-                      </p>
+                      <ScrollWordReveal
+                        text={invitation.venue_details.address}
+                        delay={0.14}
+                        className="font-serif italic text-[14.5px] text-[#4a4238] px-8 leading-relaxed mt-1"
+                      />
                     )}
 
                     {invitation.venue_details.maps_url && (
-                      <a
-                        href={invitation.venue_details.maps_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-5 mx-auto max-w-[285px] bg-[#fbf9f5] hover:bg-white text-[#2f2a24] rounded-full px-4 py-2.5 shadow-md border border-[#e6dec8] flex items-center justify-between gap-3 transition-transform hover:scale-[1.02]"
-                      >
-                        <div className="w-9 h-9 rounded-full bg-[#e5dec9] flex items-center justify-center shrink-0 text-[#5c4934]">
-                          <Send className="w-4 h-4" />
-                        </div>
-                        <div className="text-center leading-tight flex-1">
-                          <span className="font-serif italic text-[15px] block text-[#2f2a24]">
-                            Get directions
-                          </span>
-                          <span className="font-serif italic text-[12px] text-[#6e6254] block">
-                            Open in Google Maps
-                          </span>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-[#5c5246] shrink-0 mr-1" />
-                      </a>
+                      <ScrollRevealBlock direction="up" delay={0.16}>
+                        <a
+                          href={invitation.venue_details.maps_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-5 mx-auto max-w-[285px] bg-[#fbf9f5] hover:bg-white text-[#2f2a24] rounded-full px-4 py-2.5 shadow-md border border-[#e6dec8] flex items-center justify-between gap-3 transition-transform hover:scale-[1.02]"
+                        >
+                          <div className="w-9 h-9 rounded-full bg-[#e5dec9] flex items-center justify-center shrink-0 text-[#5c4934]">
+                            <Send className="w-4 h-4" />
+                          </div>
+                          <div className="text-center leading-tight flex-1">
+                            <span className="font-serif italic text-[15px] block text-[#2f2a24]">
+                              Get directions
+                            </span>
+                            <span className="font-serif italic text-[12px] text-[#6e6254] block">
+                              Open in Google Maps
+                            </span>
+                          </div>
+                          <ExternalLink className="w-4 h-4 text-[#5c5246] shrink-0 mr-1" />
+                        </a>
+                      </ScrollRevealBlock>
                     )}
                   </section>
                 )}
@@ -630,66 +692,106 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showTimeline && (
                   <section className="relative z-10 py-9 px-4 text-center">
-                    <div className="flex items-center justify-center gap-3 mb-5 opacity-45">
-                      <div className="h-[1px] w-14 bg-[#7a6855]" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#7a6855]" />
-                      <div className="h-[1px] w-14 bg-[#7a6855]" />
-                    </div>
+                    <ScrollOrnamentDivider />
 
-                    <SectionHeaderBadge type="clock" />
+                    <ScrollRevealBlock direction="scale">
+                      <SectionHeaderBadge type="clock" />
+                    </ScrollRevealBlock>
 
-                    <h2 className="font-great-vibes text-[40px] text-[#2f2a24] mb-1">
-                      Wedding Itinerary
-                    </h2>
-                    <p className="font-serif italic text-[15px] text-[#4a4238] mb-10 px-2">
-                      What we have planned for our special day
-                    </p>
+                    <ScrollInkHeading
+                      text="Wedding Itinerary"
+                      className="font-great-vibes text-[40px] text-[#2f2a24] mb-1"
+                    />
+                    <ScrollWordReveal
+                      text="What we have planned for our special day"
+                      delay={0.12}
+                      className="font-serif italic text-[15px] text-[#4a4238] mb-10 px-2"
+                    />
 
                     <div className="relative max-w-[340px] mx-auto">
-                      <div className="absolute left-1/2 top-4 bottom-4 w-[1px] -translate-x-1/2 bg-[#8c7a65]/50" />
+                      <motion.div
+                        initial={{ scaleY: 0 }}
+                        whileInView={{ scaleY: 1 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ transformOrigin: 'top center' }}
+                        className="absolute left-1/2 top-4 bottom-4 w-[1px] -translate-x-1/2 bg-[#8c7a65]/50"
+                      />
 
                       <div className="space-y-12">
                         {scheduleItems.map((item, idx) => {
                           const isLeft = idx % 2 === 0;
                           return (
                             <div key={idx} className="relative grid grid-cols-2 items-center">
-                              <div className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#fbf9f5] border-[1.5px] border-[#5c4d3c] z-10" />
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                viewport={{ once: true, amount: 0.4 }}
+                                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                                className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#fbf9f5] border-[1.5px] border-[#5c4d3c] z-10"
+                              />
 
                               {isLeft ? (
                                 <>
-                                  <div className="pr-5 flex flex-col items-center text-center">
+                                  <ScrollRevealBlock
+                                    direction="left"
+                                    className="pr-5 flex flex-col items-center text-center"
+                                  >
                                     <TimelineIllustration index={idx} />
-                                    <span className="font-serif italic text-[21px] font-semibold text-[#2f2a24] leading-tight">
-                                      {item.time}
-                                    </span>
-                                    <h3 className="font-great-vibes text-[20px] tracking-wider text-[#2f2a24] mt-0.5">
-                                      {item.title}
-                                    </h3>
+                                    <ScrollWordReveal
+                                      as="span"
+                                      text={item.time}
+                                      delay={0.08}
+                                      className="font-serif italic text-[21px] font-semibold text-[#2f2a24] leading-tight"
+                                    />
+                                    <ScrollInkHeading
+                                      as="h3"
+                                      text={item.title}
+                                      delay={0.14}
+                                      duration={0.75}
+                                      className="font-great-vibes text-[20px] tracking-wider text-[#2f2a24] mt-0.5"
+                                    />
                                     {item.description && (
-                                      <p className="font-serif italic text-[13px] text-[#4a4238] leading-snug mt-1">
-                                        {item.description}
-                                      </p>
+                                      <ScrollWordReveal
+                                        text={item.description}
+                                        delay={0.22}
+                                        stagger={0.04}
+                                        className="font-serif italic text-[13px] text-[#4a4238] leading-snug mt-1"
+                                      />
                                     )}
-                                  </div>
+                                  </ScrollRevealBlock>
                                   <div />
                                 </>
                               ) : (
                                 <>
                                   <div />
-                                  <div className="pl-5 flex flex-col items-center text-center">
+                                  <ScrollRevealBlock
+                                    direction="right"
+                                    className="pl-5 flex flex-col items-center text-center"
+                                  >
                                     <TimelineIllustration index={idx} />
-                                    <span className="font-serif italic text-[21px] font-semibold text-[#2f2a24] leading-tight">
-                                      {item.time}
-                                    </span>
-                                    <h3 className="font-great-vibes text-[20px] tracking-wider text-[#2f2a24] mt-0.5">
-                                      {item.title}
-                                    </h3>
+                                    <ScrollWordReveal
+                                      as="span"
+                                      text={item.time}
+                                      delay={0.08}
+                                      className="font-serif italic text-[21px] font-semibold text-[#2f2a24] leading-tight"
+                                    />
+                                    <ScrollInkHeading
+                                      as="h3"
+                                      text={item.title}
+                                      delay={0.14}
+                                      duration={0.75}
+                                      className="font-great-vibes text-[20px] tracking-wider text-[#2f2a24] mt-0.5"
+                                    />
                                     {item.description && (
-                                      <p className="font-serif italic text-[13px] text-[#4a4238] leading-snug mt-1">
-                                        {item.description}
-                                      </p>
+                                      <ScrollWordReveal
+                                        text={item.description}
+                                        delay={0.22}
+                                        stagger={0.04}
+                                        className="font-serif italic text-[13px] text-[#4a4238] leading-snug mt-1"
+                                      />
                                     )}
-                                  </div>
+                                  </ScrollRevealBlock>
                                 </>
                               )}
                             </div>
@@ -705,55 +807,79 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showDressCode && (
                   <section className="relative z-10 py-9 px-5 text-center">
-                    <div className="flex items-center justify-center gap-3 mb-4 opacity-45">
-                      <div className="h-[1px] w-14 bg-[#7a6855]" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#7a6855]" />
-                      <div className="h-[1px] w-14 bg-[#7a6855]" />
-                    </div>
+                    <ScrollOrnamentDivider className="flex items-center justify-center gap-3 mb-4 opacity-45" />
 
-                    <h2 className="font-great-vibes text-[42px] text-[#2f2a24] mb-4">
-                      {invitation.venue_details.dress_code || 'Modest & Royal Attire'}
-                    </h2>
+                    <ScrollInkHeading
+                      text={invitation.venue_details.dress_code || 'Modest & Royal Attire'}
+                      className="font-great-vibes text-[42px] text-[#2f2a24] mb-4"
+                    />
 
-                    <div className="rounded-3xl bg-[#fbf8f1]/85 backdrop-blur-xs border border-white/80 p-6 shadow-md">
-                      <div className="w-60 mx-auto mb-2 rounded-2xl overflow-hidden">
+                    <ScrollRevealBlock
+                      direction="up"
+                      className="rounded-3xl bg-[#fbf8f1]/85 backdrop-blur-xs border border-white/80 p-6 shadow-md"
+                    >
+                      <ScrollRevealBlock
+                        direction="scale"
+                        delay={0.08}
+                        className="w-60 mx-auto mb-2 rounded-2xl overflow-hidden"
+                      >
                         <img
                           src="/assets/invitecraft/dresscode-couple-art.jpg?v=loose-abaya"
                           alt="Modest Loose Abaya Muslim Bride and Groom Attire Illustration"
                           className="w-full h-auto object-contain mx-auto mix-blend-multiply"
                         />
-                      </div>
+                      </ScrollRevealBlock>
 
-                      <h3 className="font-great-vibes text-[28px] text-[#2f2a24] mb-3">
-                        Modest Traditional Elegance
-                      </h3>
+                      <ScrollInkHeading
+                        as="h3"
+                        text="Modest Traditional Elegance"
+                        delay={0.1}
+                        className="font-great-vibes text-[28px] text-[#2f2a24] mb-3"
+                      />
 
                       <div className="border-t border-[#d8cbb8]/60 pt-3 pb-4 grid grid-cols-2 gap-4 text-center">
                         <div>
-                          <span className="font-serif italic text-xs uppercase tracking-widest text-[#6e6254] block">
-                            Ladies
-                          </span>
-                          <span className="font-great-vibes text-[20px] text-[#2f2a24]">
-                            {cfg.ladies_attire || 'Modest Gown / Abaya'}
-                          </span>
+                          <ScrollWordReveal
+                            as="span"
+                            text="Ladies"
+                            className="font-serif italic text-xs uppercase tracking-widest text-[#6e6254] block"
+                          />
+                          <ScrollWordReveal
+                            as="span"
+                            text={cfg.ladies_attire || 'Modest Gown / Abaya'}
+                            delay={0.12}
+                            className="font-great-vibes text-[20px] text-[#2f2a24] block"
+                          />
                         </div>
                         <div>
-                          <span className="font-serif italic text-xs uppercase tracking-widest text-[#6e6254] block">
-                            Gentlemen
-                          </span>
-                          <span className="font-serif italic text-[17px] text-[#2f2a24]">
-                            {cfg.gents_attire || 'Sherwani / Suit'}
-                          </span>
+                          <ScrollWordReveal
+                            as="span"
+                            text="Gentlemen"
+                            className="font-serif italic text-xs uppercase tracking-widest text-[#6e6254] block"
+                          />
+                          <ScrollWordReveal
+                            as="span"
+                            text={cfg.gents_attire || 'Sherwani / Suit'}
+                            delay={0.12}
+                            className="font-serif italic text-[17px] text-[#2f2a24] block"
+                          />
                         </div>
                       </div>
 
-                      <p className="font-serif italic text-[17px] text-[#2f2a24] mb-3">
-                        Suggested color palette:
-                      </p>
+                      <ScrollWordReveal
+                        text="Suggested color palette:"
+                        delay={0.1}
+                        className="font-serif italic text-[17px] text-[#2f2a24] mb-3"
+                      />
 
                       <div className="flex items-center justify-center gap-3">
-                        {DRESS_SWATCHES.map((s) => (
-                          <div key={s.name} className="flex flex-col items-center gap-1">
+                        {DRESS_SWATCHES.map((s, idx) => (
+                          <ScrollRevealBlock
+                            key={s.name}
+                            direction="scale"
+                            delay={idx * 0.08}
+                            className="flex flex-col items-center gap-1"
+                          >
                             <div
                               className="w-10 h-10 rounded-full shadow-xs border"
                               style={{ backgroundColor: s.hex, borderColor: s.border }}
@@ -761,10 +887,10 @@ export default function EnvelopeExperience({
                             <span className="font-serif italic text-[10.5px] text-[#4a4238]">
                               {s.name}
                             </span>
-                          </div>
+                          </ScrollRevealBlock>
                         ))}
                       </div>
-                    </div>
+                    </ScrollRevealBlock>
                   </section>
                 )}
 
@@ -773,16 +899,26 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showGifts && (
                   <section className="relative z-10 py-9 px-5 text-center">
-                    <SectionHeaderBadge type="gift" />
-                    <h2 className="font-great-vibes text-[44px] text-[#2f2a24] mb-4">
-                      Blessings &amp; Gifts
-                    </h2>
+                    <ScrollRevealBlock direction="scale">
+                      <SectionHeaderBadge type="gift" />
+                    </ScrollRevealBlock>
+                    <ScrollInkHeading
+                      text="Blessings & Gifts"
+                      className="font-great-vibes text-[44px] text-[#2f2a24] mb-4"
+                    />
 
-                    <div className="rounded-3xl bg-[#fbf9f5] p-6 shadow-md border border-[#e6dec8]">
-                      <p className="font-great-vibes text-[24px] leading-relaxed text-[#2f2a24]">
-                        {cfg.gift_note ||
-                          'Your warm presence and duas are our greatest blessing. Should you wish to honor us with a gift, details are below.'}
-                      </p>
+                    <ScrollRevealBlock
+                      direction="up"
+                      className="rounded-3xl bg-[#fbf9f5] p-6 shadow-md border border-[#e6dec8]"
+                    >
+                      <ScrollWordReveal
+                        text={
+                          cfg.gift_note ||
+                          'Your warm presence and duas are our greatest blessing. Should you wish to honor us with a gift, details are below.'
+                        }
+                        stagger={0.035}
+                        className="font-great-vibes text-[24px] leading-relaxed text-[#2f2a24]"
+                      />
 
                       {(cfg.bank_account_holder || cfg.bank_account_number) && (
                         <>
@@ -855,7 +991,7 @@ export default function EnvelopeExperience({
                           )}
                         </>
                       )}
-                    </div>
+                    </ScrollRevealBlock>
                   </section>
                 )}
 
@@ -864,68 +1000,99 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showMenu && (
                   <section className="relative z-10 py-9 px-4 text-center">
-                    <div className="relative mx-auto w-full min-h-[610px] flex flex-col items-center justify-start pt-20 pb-28 px-12">
+                    <ScrollRevealBlock
+                      direction="up"
+                      className="relative mx-auto w-full min-h-[610px] flex flex-col items-center justify-start pt-20 pb-28 px-12"
+                    >
                       <OriginalRibbonMenuFrame />
 
                       <div className="relative z-20 space-y-5">
                         <div>
-                          <h2 className="font-great-vibes text-[44px] text-[#2f2a24] leading-none">
-                            Royal Halal Menu
-                          </h2>
-                          <span className="font-serif italic text-[11.5px] tracking-widest uppercase text-[#7a5c3e] block mt-1">
-                            ✦ 100% Certified Halal Dawat ✦
-                          </span>
+                          <ScrollInkHeading
+                            text="Royal Halal Menu"
+                            className="font-great-vibes text-[44px] text-[#2f2a24] leading-none"
+                          />
+                          <ScrollWordReveal
+                            as="span"
+                            delay={0.12}
+                            text="✦ 100% Certified Halal Dawat ✦"
+                            className="font-serif italic text-[11.5px] tracking-widest uppercase text-[#7a5c3e] block mt-1"
+                          />
                         </div>
 
                         {cfg.menu_starter_title && (
                           <div className="space-y-1">
-                            <h3 className="font-great-vibes text-[27px] text-[#6B2232]">
-                              — Starter —
-                            </h3>
-                            <p className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]">
-                              {cfg.menu_starter_title}
-                            </p>
+                            <ScrollInkHeading
+                              as="h3"
+                              text="— Starter —"
+                              duration={0.75}
+                              className="font-great-vibes text-[27px] text-[#6B2232]"
+                            />
+                            <ScrollWordReveal
+                              text={cfg.menu_starter_title}
+                              delay={0.08}
+                              className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]"
+                            />
                             {cfg.menu_starter_desc && (
-                              <p className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug">
-                                {cfg.menu_starter_desc}
-                              </p>
+                              <ScrollWordReveal
+                                text={cfg.menu_starter_desc}
+                                delay={0.16}
+                                stagger={0.035}
+                                className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug"
+                              />
                             )}
                           </div>
                         )}
 
                         {cfg.menu_main_title && (
                           <div className="space-y-1">
-                            <h3 className="font-great-vibes text-[27px] text-[#6B2232]">
-                              — Main Course —
-                            </h3>
-                            <p className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]">
-                              {cfg.menu_main_title}
-                            </p>
+                            <ScrollInkHeading
+                              as="h3"
+                              text="— Main Course —"
+                              duration={0.75}
+                              className="font-great-vibes text-[27px] text-[#6B2232]"
+                            />
+                            <ScrollWordReveal
+                              text={cfg.menu_main_title}
+                              delay={0.08}
+                              className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]"
+                            />
                             {cfg.menu_main_desc && (
-                              <p className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug">
-                                {cfg.menu_main_desc}
-                              </p>
+                              <ScrollWordReveal
+                                text={cfg.menu_main_desc}
+                                delay={0.16}
+                                stagger={0.035}
+                                className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug"
+                              />
                             )}
                           </div>
                         )}
 
                         {cfg.menu_dessert_title && (
                           <div className="space-y-1">
-                            <h3 className="font-great-vibes text-[27px] text-[#6B2232]">
-                              — Dessert —
-                            </h3>
-                            <p className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]">
-                              {cfg.menu_dessert_title}
-                            </p>
+                            <ScrollInkHeading
+                              as="h3"
+                              text="— Dessert —"
+                              duration={0.75}
+                              className="font-great-vibes text-[27px] text-[#6B2232]"
+                            />
+                            <ScrollWordReveal
+                              text={cfg.menu_dessert_title}
+                              delay={0.08}
+                              className="font-serif italic text-[14.5px] font-semibold text-[#2f2a24]"
+                            />
                             {cfg.menu_dessert_desc && (
-                              <p className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug">
-                                {cfg.menu_dessert_desc}
-                              </p>
+                              <ScrollWordReveal
+                                text={cfg.menu_dessert_desc}
+                                delay={0.16}
+                                stagger={0.035}
+                                className="font-serif italic text-[12.5px] text-[#4a4238] leading-snug"
+                              />
                             )}
                           </div>
                         )}
                       </div>
-                    </div>
+                    </ScrollRevealBlock>
                   </section>
                 )}
 
@@ -934,35 +1101,51 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showStoryOrPortrait && (
                   <section className="relative z-10 py-8 px-5 text-center">
-                    <h2 className="font-great-vibes text-[42px] text-[#2f2a24] leading-tight">
-                      Blessed Union
-                    </h2>
-                    <p className="font-serif italic text-[14px] text-[#5c5246] mb-5">
-                      And We created you in pairs
-                    </p>
+                    <ScrollInkHeading
+                      text="Blessed Union"
+                      className="font-great-vibes text-[42px] text-[#2f2a24] leading-tight"
+                    />
+                    <ScrollWordReveal
+                      text="And We created you in pairs"
+                      delay={0.12}
+                      className="font-serif italic text-[14px] text-[#5c5246] mb-5"
+                    />
 
-                    <div className="relative mx-auto max-w-[310px] rounded-[36px] bg-[#fbf8f1]/90 border-2 border-[#C5A059] p-5 shadow-md space-y-4">
+                    <ScrollRevealBlock
+                      direction="up"
+                      className="relative mx-auto max-w-[310px] rounded-[36px] bg-[#fbf8f1]/90 border-2 border-[#C5A059] p-5 shadow-md space-y-4"
+                    >
                       {cfg.show_couple_portrait !== false && (
-                        <div className="w-60 mx-auto rounded-2xl overflow-hidden">
+                        <ScrollRevealBlock
+                          direction="scale"
+                          delay={0.08}
+                          className="w-60 mx-auto rounded-2xl overflow-hidden"
+                        >
                           <img
                             src="/assets/invitecraft/couple-nikah-portrait.jpg?v=loose-abaya"
                             alt="Modest Loose Abaya Muslim Bride and Groom Under Floral Arch"
                             className="w-full h-auto object-contain mx-auto mix-blend-multiply"
                           />
-                        </div>
+                        </ScrollRevealBlock>
                       )}
 
                       {cfg.show_story !== false && cfg.story?.trim() && (
                         <div className="pt-2 border-t border-[#e6dec8]">
-                          <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-[#C5A059]/15 border border-[#C5A059] flex items-center justify-center">
+                          <ScrollRevealBlock
+                            direction="scale"
+                            className="w-8 h-8 mx-auto mb-2 rounded-full bg-[#C5A059]/15 border border-[#C5A059] flex items-center justify-center"
+                          >
                             <Sparkles className="w-3.5 h-3.5 text-[#9C762B]" />
-                          </div>
-                          <p className="font-serif italic text-[14px] text-[#2f2a24] leading-relaxed">
-                            &ldquo;{cfg.story}&rdquo;
-                          </p>
+                          </ScrollRevealBlock>
+                          <ScrollWordReveal
+                            text={`“${cfg.story}”`}
+                            delay={0.1}
+                            stagger={0.035}
+                            className="font-serif italic text-[14px] text-[#2f2a24] leading-relaxed"
+                          />
                         </div>
                       )}
-                    </div>
+                    </ScrollRevealBlock>
                   </section>
                 )}
 
@@ -971,37 +1154,48 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showAccommodation && (
                   <section className="relative z-10 py-9 px-5 text-center">
-                    <div className="flex items-center justify-center gap-3 mb-4 opacity-45">
-                      <div className="h-[1px] w-14 bg-[#7a6855]" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#7a6855]" />
-                      <div className="h-[1px] w-14 bg-[#7a6855]" />
-                    </div>
+                    <ScrollOrnamentDivider className="flex items-center justify-center gap-3 mb-4 opacity-45" />
 
-                    <h2 className="font-great-vibes text-[44px] text-[#2f2a24] leading-tight">
-                      Accommodation
-                    </h2>
-                    <p className="font-serif italic text-[15px] text-[#4a4238] mb-6">
-                      Curated stays for our traveling family &amp; guests
-                    </p>
+                    <ScrollInkHeading
+                      text="Accommodation"
+                      className="font-great-vibes text-[44px] text-[#2f2a24] leading-tight"
+                    />
+                    <ScrollWordReveal
+                      text="Curated stays for our traveling family & guests"
+                      delay={0.12}
+                      className="font-serif italic text-[15px] text-[#4a4238] mb-6"
+                    />
 
-                    <div className="rounded-3xl bg-[#fbf8f1]/85 border border-[#e6dec8] p-4 shadow-md text-left">
-                      <div className="rounded-2xl overflow-hidden mb-3">
+                    <ScrollRevealBlock
+                      direction="up"
+                      className="rounded-3xl bg-[#fbf8f1]/85 border border-[#e6dec8] p-4 shadow-md text-left"
+                    >
+                      <ScrollRevealBlock
+                        direction="scale"
+                        delay={0.08}
+                        className="rounded-2xl overflow-hidden mb-3"
+                      >
                         <img
                           src="/assets/invitecraft/accommodation-palace-hotel.jpg"
                           alt={cfg.accommodation_name || 'Partner Hotel'}
                           className="w-full h-auto object-contain mix-blend-multiply"
                         />
-                      </div>
+                      </ScrollRevealBlock>
                       <div className="px-2 space-y-1.5">
                         {cfg.accommodation_name && (
-                          <h3 className="font-serif font-bold text-[20px] text-[#2f2a24]">
-                            {cfg.accommodation_name}
-                          </h3>
+                          <ScrollWordReveal
+                            as="h3"
+                            text={cfg.accommodation_name}
+                            className="font-serif font-bold text-[20px] text-[#2f2a24]"
+                          />
                         )}
                         {cfg.accommodation_note && (
-                          <p className="font-serif italic text-[14px] text-[#4a4238] leading-snug">
-                            {cfg.accommodation_note}
-                          </p>
+                          <ScrollWordReveal
+                            text={cfg.accommodation_note}
+                            delay={0.1}
+                            stagger={0.035}
+                            className="font-serif italic text-[14px] text-[#4a4238] leading-snug"
+                          />
                         )}
                         {cfg.accommodation_url && (
                           <div className="flex items-center justify-between pt-2">
@@ -1020,7 +1214,7 @@ export default function EnvelopeExperience({
                           </div>
                         )}
                       </div>
-                    </div>
+                    </ScrollRevealBlock>
                   </section>
                 )}
 
@@ -1029,17 +1223,22 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 {showFaq && (
                   <section className="relative z-10 py-9 px-5 text-center">
-                    <SectionHeaderBadge type="faq" />
-                    <h2 className="font-great-vibes text-[42px] text-[#2f2a24] mb-6">
-                      Questions &amp; Answers
-                    </h2>
+                    <ScrollRevealBlock direction="scale">
+                      <SectionHeaderBadge type="faq" />
+                    </ScrollRevealBlock>
+                    <ScrollInkHeading
+                      text="Questions & Answers"
+                      className="font-great-vibes text-[42px] text-[#2f2a24] mb-6"
+                    />
 
                     <div className="space-y-3 text-left">
                       {faqItems.map((faq, idx) => {
                         const isOpen = openFaqIdx === idx;
                         return (
-                          <div
+                          <ScrollRevealBlock
                             key={idx}
+                            direction="up"
+                            delay={idx * 0.08}
                             className="rounded-xl bg-[#fbf9f5] border border-[#e6dec8] shadow-xs overflow-hidden"
                           >
                             <button
@@ -1071,7 +1270,7 @@ export default function EnvelopeExperience({
                                 </motion.div>
                               )}
                             </AnimatePresence>
-                          </div>
+                          </ScrollRevealBlock>
                         );
                       })}
                     </div>
@@ -1086,7 +1285,7 @@ export default function EnvelopeExperience({
                 {/* ===============================================================
                     SCROLL TO RSVP INDICATOR & FOOTER
                 =============================================================== */}
-                <div className="pb-14 pt-4 text-center space-y-4 relative z-10">
+                <ScrollRevealBlock direction="up" className="pb-14 pt-4 text-center space-y-4 relative z-10">
                   {showRsvp && (
                     <button
                       type="button"
@@ -1106,10 +1305,12 @@ export default function EnvelopeExperience({
                     </button>
                   )}
 
-                  <p className="font-serif italic text-xs text-[#5c5246]">
-                    Crafted with Love ❤️ Eternal Vowz (E&amp;V) Bespoke Wedding Suite
-                  </p>
-                </div>
+                  <ScrollWordReveal
+                    text="Crafted with Love ❤️ Eternal Vowz (E&V) Bespoke Wedding Suite"
+                    delay={0.1}
+                    className="font-serif italic text-xs text-[#5c5246]"
+                  />
+                </ScrollRevealBlock>
               </div>
             </motion.div>
           )}
