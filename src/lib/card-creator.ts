@@ -75,20 +75,5 @@ export async function createPaidCardInDb(
     );
   }
 
-  // Seed 1 default VIP sample guest so the host immediately has a personalized link
-  const guestToken = `vip-guest-${crypto.randomBytes(3).toString('hex')}`;
-  await supabaseAdmin.from('ev_card_guests').insert({
-    id: crypto.randomUUID(),
-    invitation_id: cardId,
-    guest_name: 'Special Guest & Family',
-    phone: null,
-    email: null,
-    unique_token: guestToken,
-    max_allowed_guests: 4,
-    group_tag: 'VIP Family',
-    link_opened_at: null,
-    created_at: nowIso,
-  });
-
   return createdCard as Invitation;
 }

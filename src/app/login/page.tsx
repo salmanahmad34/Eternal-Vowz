@@ -11,7 +11,6 @@ import {
   User,
   ArrowRight,
   Check,
-  Sparkles,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -33,14 +32,6 @@ export default function LoginPage() {
     setTimeout(() => {
       router.push('/dashboard');
     }, 300);
-  };
-
-  const handleQuickDemoLogin = () => {
-    setIsLoading(true);
-    DataService.loginHost('Demo Host', 'demo@eternalvowz.com', '');
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 250);
   };
 
   return (
@@ -92,28 +83,6 @@ export default function LoginPage() {
                 ? 'Manage your 3D Lifafa, Shahi Palace Gate & Frosted Veil cards and live RSVPs.'
                 : 'Craft your royal 3D wedding card in minutes — ₹79 per card (1-month validity).'}
             </p>
-          </div>
-
-          {/* 1-Click Quick Demo Login */}
-          <button
-            type="button"
-            onClick={handleQuickDemoLogin}
-            disabled={isLoading}
-            className="w-full mb-5 py-3 px-4 rounded-xl bg-[#FAF7F2] hover:bg-[#F2ECE1] border border-[#E2D7BD] text-[#291418] text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer"
-          >
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#C9A84C] shrink-0" />
-              <span>1-Click Instant Demo Host Access (5 Sample Cards)</span>
-            </span>
-            <ArrowRight className="w-3.5 h-3.5 text-[#C9A84C] shrink-0" />
-          </button>
-
-          <div className="relative flex py-2 items-center mb-5">
-            <div className="flex-grow border-t border-[#E2D7BD]" />
-            <span className="flex-shrink mx-3 text-[10px] uppercase tracking-widest text-[#8B7355] font-medium">
-              or continue with email
-            </span>
-            <div className="flex-grow border-t border-[#E2D7BD]" />
           </div>
 
           <form onSubmit={handleAuthSubmit} autoComplete="off" className="space-y-4">

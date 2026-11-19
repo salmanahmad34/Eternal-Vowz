@@ -556,7 +556,7 @@ export const DataService = {
   },
 
   // =========================================================================
-  // INVITATION CARDS CRUD
+  // INVITATION CARDS CRUD (REAL DATA ONLY — NO FAKE DASHBOARD FALLBACKS)
   // =========================================================================
   async getAllInvitations(): Promise<Invitation[]> {
     if (isSupabaseConfigured && supabase) {
@@ -565,18 +565,12 @@ export const DataService = {
           .from('ev_cards')
           .select('*')
           .order('created_at', { ascending: false });
-        if (!error && data && data.length > 0) return data as Invitation[];
+        if (!error && Array.isArray(data)) return data as Invitation[];
       } catch (e) {
         console.warn('Supabase getAllInvitations fallback:', e);
       }
     }
-    return getLocalItem<Invitation[]>(STORAGE_KEY_INVITATIONS, [
-      INITIAL_DEMO_INVITATION,
-      SECOND_DEMO_INVITATION,
-      THIRD_DEMO_INVITATION,
-      FOURTH_DEMO_INVITATION,
-      FIFTH_DEMO_INVITATION,
-    ]);
+    return getLocalItem<Invitation[]>(STORAGE_KEY_INVITATIONS, []);
   },
 
   async getInvitationBySlug(slug: string): Promise<Invitation | null> {
@@ -586,14 +580,25 @@ export const DataService = {
           .from('ev_cards')
           .select('*')
           .eq('slug', slug)
-          .single();
+          .maybeSingle();
         if (!error && data) return data as Invitation;
       } catch (e) {
         console.warn('Supabase getInvitationBySlug fallback:', e);
       }
     }
     const all = await this.getAllInvitations();
-    return all.find((inv) => inv.slug === slug) || INITIAL_DEMO_INVITATION;
+    const realMatch = all.find((inv) => inv.slug === slug);
+    if (realMatch) return realMatch;
+
+    // Allow Landing Page "Try Sample" preview links (/invite/layla-omar-veil, etc.) to keep working
+    const demoSamples = [
+      INITIAL_DEMO_INVITATION,
+      SECOND_DEMO_INVITATION,
+      THIRD_DEMO_INVITATION,
+      FOURTH_DEMO_INVITATION,
+      FIFTH_DEMO_INVITATION,
+    ];
+    return demoSamples.find((inv) => inv.slug === slug) || null;
   },
 
   async getInvitationById(id: string): Promise<Invitation | null> {
@@ -603,14 +608,24 @@ export const DataService = {
           .from('ev_cards')
           .select('*')
           .eq('id', id)
-          .single();
+          .maybeSingle();
         if (!error && data) return data as Invitation;
       } catch (e) {
         console.warn('Supabase getInvitationById fallback:', e);
       }
     }
     const all = await this.getAllInvitations();
-    return all.find((inv) => inv.id === id) || INITIAL_DEMO_INVITATION;
+    const realMatch = all.find((inv) => inv.id === id);
+    if (realMatch) return realMatch;
+
+    const demoSamples = [
+      INITIAL_DEMO_INVITATION,
+      SECOND_DEMO_INVITATION,
+      THIRD_DEMO_INVITATION,
+      FOURTH_DEMO_INVITATION,
+      FIFTH_DEMO_INVITATION,
+    ];
+    return demoSamples.find((inv) => inv.id === id) || null;
   },
 
   async createInvitation(newCard: Omit<Invitation, 'id' | 'created_at' | 'updated_at'>): Promise<Invitation> {
@@ -647,14 +662,6 @@ export const DataService = {
         console.warn('Supabase createInvitation fallback:', e);
       }
     }
-
-    // Automatically seed 1 sample VIP guest AFTER invitation exists in DB (satisfies FK)
-    await this.addGuest(id, {
-      guest_name: 'Special Guest & Family',
-      phone: '',
-      max_allowed_guests: 4,
-      group_tag: 'VIP Family',
-    });
 
     return created;
   },
@@ -703,11 +710,10 @@ export const DataService = {
 
   async deleteInvitation(id: string): Promise<void> {
     const all = await this.getAllInvitations();
-    if (all.length <= 1) return; // Keep at least 1 card
     const filtered = all.filter((inv) => inv.id !== id);
     setLocalItem(STORAGE_KEY_INVITATIONS, filtered);
 
-    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
     setLocalItem(
       STORAGE_KEY_GUESTS,
       guests.filter((g) => g.invitation_id !== id)
@@ -747,7 +753,7 @@ export const DataService = {
         console.warn('Supabase getAllGuests fallback:', e);
       }
     }
-    return getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    return getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
   },
 
   async getGuestsWithRsvp(invitationId: string): Promise<GuestWithRsvp[]> {
@@ -773,7 +779,7 @@ export const DataService = {
       }
     }
 
-    const localGuests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const localGuests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
     return localGuests.filter((g) => g.invitation_id === invitationId);
   },
 
@@ -801,7 +807,7 @@ export const DataService = {
       }
     }
 
-    const allGuests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const allGuests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
     return (
       allGuests.find(
         (g) => g.unique_token === token && (!invitationId || g.invitation_id === invitationId)
@@ -813,7 +819,7 @@ export const DataService = {
 
   async markLinkOpened(guestId: string): Promise<void> {
     const openedAt = new Date().toISOString();
-    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
     const guest = guests.find((g) => g.id === guestId);
     if (guest && !guest.link_opened_at) {
       guest.link_opened_at = openedAt;
@@ -837,7 +843,7 @@ export const DataService = {
     guestId: string,
     rsvpData: { status: RsvpStatus; headcount: number; meal_choice?: string; message?: string }
   ): Promise<RSVP> {
-    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
     const guest = guests.find((g) => g.id === guestId);
 
     const updatedRsvp: RSVP = {
@@ -888,7 +894,7 @@ export const DataService = {
       group_tag?: string;
     }
   ): Promise<GuestWithRsvp> {
-    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
 
     const tokenBase = guestData.guest_name
       .toLowerCase()
@@ -937,7 +943,7 @@ export const DataService = {
   },
 
   async deleteGuest(guestId: string): Promise<void> {
-    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, INITIAL_DEMO_GUESTS);
+    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
     const filtered = guests.filter((g) => g.id !== guestId);
     setLocalItem(STORAGE_KEY_GUESTS, filtered);
 

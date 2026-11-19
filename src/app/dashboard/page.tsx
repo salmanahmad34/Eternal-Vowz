@@ -44,7 +44,7 @@ export default function DashboardPage() {
   const [hostUser, setHostUser] = useState<HostUser | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [allGuests, setAllGuests] = useState<GuestWithRsvp[]>([]);
-  const [selectedInvitation, setSelectedInvitation] = useState<Invitation>(INITIAL_DEMO_INVITATION);
+  const [selectedInvitation, setSelectedInvitation] = useState<Invitation | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'builder'>('overview');
@@ -82,6 +82,8 @@ export default function DashboardPage() {
     if (cards.length > 0) {
       const current = cards.find((c) => c.id === selectedInvitation?.id) || cards[0];
       setSelectedInvitation(current);
+    } else {
+      setSelectedInvitation(null);
     }
     setLoading(false);
   };
@@ -217,7 +219,9 @@ export default function DashboardPage() {
     await loadData();
   };
 
-  const selectedCardGuests = allGuests.filter((g) => g.invitation_id === selectedInvitation.id);
+  const selectedCardGuests = selectedInvitation
+    ? allGuests.filter((g) => g.invitation_id === selectedInvitation.id)
+    : [];
 
   const totalInvitedParties = selectedCardGuests.length;
   const linksOpenedCount = selectedCardGuests.filter((g) => Boolean(g.link_opened_at)).length;
@@ -237,7 +241,8 @@ export default function DashboardPage() {
     mealCounts[meal] = (mealCounts[meal] || 0) + (g.rsvp?.headcount || 1);
   });
 
-  const getGuestInviteUrl = (guest: GuestWithRsvp, card: Invitation = selectedInvitation) => {
+  const getGuestInviteUrl = (guest: GuestWithRsvp, card: Invitation | null = selectedInvitation) => {
+    if (!card) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
     return `${origin}/invite/${card.slug}?guest=${guest.unique_token}`;
   };
@@ -253,7 +258,8 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleShareWhatsApp = (guest: GuestWithRsvp, card: Invitation = selectedInvitation) => {
+  const handleShareWhatsApp = (guest: GuestWithRsvp, card: Invitation | null = selectedInvitation) => {
+    if (!card) return;
     const url = getGuestInviteUrl(guest, card);
     const couple = `${card.design_config.couple_names.partner1} & ${card.design_config.couple_names.partner2}`;
     const message =
@@ -267,7 +273,7 @@ export default function DashboardPage() {
 
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newGuestName.trim()) return;
+    if (!selectedInvitation || !newGuestName.trim()) return;
 
     await DataService.addGuest(selectedInvitation.id, {
       guest_name: newGuestName.trim(),
@@ -291,6 +297,7 @@ export default function DashboardPage() {
   };
 
   const handleExportCSV = () => {
+    if (!selectedInvitation) return;
     const headers = [
       'Guest Name',
       'Group Tag',
@@ -585,19 +592,47 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Clean Search Filter Input (WooowInvites Pattern) */}
-            <div className="max-w-md relative">
-              <Search className="w-4 h-4 text-[#8B7355] absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={cardSearchQuery}
-                onChange={(e) => setCardSearchQuery(e.target.value)}
-                placeholder="Search by couple, reveal style, or venue..."
-                className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-white border border-[#E2D7BD] text-sm text-[#291418] placeholder:text-[#A5947E] focus:outline-none focus:border-[#C9A84C]"
-              />
-            </div>
+            {/* Clean Search Filter Input (Only when user has created cards) */}
+            {invitations.length > 0 && (
+              <div className="max-w-md relative">
+                <Search className="w-4 h-4 text-[#8B7355] absolute left-4 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={cardSearchQuery}
+                  onChange={(e) => setCardSearchQuery(e.target.value)}
+                  placeholder="Search by couple, reveal style, or venue..."
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-white border border-[#E2D7BD] text-sm text-[#291418] placeholder:text-[#A5947E] focus:outline-none focus:border-[#C9A84C]"
+                />
+              </div>
+            )}
 
-            {/* WooowInvites Sleek Horizontal Invitation Rows */}
+            {/* Empty State when no real cards exist yet */}
+            {!loading && invitations.length === 0 ? (
+              <div className="rounded-2xl bg-white border border-dashed border-[#E2D7BD] p-10 sm:p-14 text-center space-y-4 editorial-card-shadow">
+                <div className="w-14 h-14 rounded-2xl bg-[#F6EEDB] text-[#C9A84C] flex items-center justify-center mx-auto">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div className="space-y-1.5 max-w-md mx-auto">
+                  <h3 className="font-serif text-2xl sm:text-3xl font-normal text-[#291418]">
+                    No wedding invitations yet
+                  </h3>
+                  <p className="text-sm text-[#8B7355]">
+                    Create your first bespoke 3D wedding card — customize your names, venue, and theme, then publish for flat ₹79 (valid 30 days).
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleStartCreateNewCard}
+                    className="button-shine inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold uppercase tracking-[0.14em] transition-colors cursor-pointer shadow-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create Your First Wedding Card</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+            /* WooowInvites Sleek Horizontal Invitation Rows */
             <div className="space-y-3">
               {invitations
                 .filter((card) => {
@@ -613,7 +648,7 @@ export default function DashboardPage() {
                   );
                 })
                 .map((card) => {
-                  const isSelected = card.id === selectedInvitation.id;
+                  const isSelected = card.id === selectedInvitation?.id;
                   const theme = THEMES[card.theme_id] || THEMES['tuscan-sunset'];
                   const cardGuests = allGuests.filter((g) => g.invitation_id === card.id);
                   const cardOpened = cardGuests.filter((g) => Boolean(g.link_opened_at)).length;
@@ -783,24 +818,24 @@ export default function DashboardPage() {
                           )}
                         </button>
 
-                        {invitations.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteCard(card.id)}
-                            className="p-2 rounded-md hover:bg-rose-50 text-[#A5947E] hover:text-rose-600 transition-colors cursor-pointer"
-                            title="Delete Card"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCard(card.id)}
+                          className="p-2 rounded-md hover:bg-rose-50 text-[#A5947E] hover:text-rose-600 transition-colors cursor-pointer"
+                          title="Delete Card"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   );
                 })}
             </div>
+            )}
           </section>
 
           {/* Section 2: RSVP Tracker for Selected Card */}
+          {selectedInvitation && (
           <section id="rsvp-manager" className="space-y-5 pt-8 border-t border-[#E2D7BD]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
@@ -1059,6 +1094,7 @@ export default function DashboardPage() {
               )}
             </div>
           </section>
+          )}
         </main>
       )}
 
