@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { incrementCouponUsage } from '@/lib/coupon-helper';
+import { CardCreatePayload, createPaidCardInDb } from '@/lib/card-creator';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,10 @@ export async function POST(req: NextRequest) {
       typeof body.razorpay_payment_id === 'string' ? body.razorpay_payment_id.trim() : '';
     const razorpaySignature =
       typeof body.razorpay_signature === 'string' ? body.razorpay_signature.trim() : '';
+    const cardPayload =
+      body.card_payload && typeof body.card_payload === 'object'
+        ? (body.card_payload as CardCreatePayload)
+        : null;
 
     if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
       return NextResponse.json(
@@ -55,6 +60,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Cryptographically verify Razorpay payment signature BEFORE creating/activating any card
     if (
       !verifyCheckoutSignature(
         razorpayOrderId,
@@ -77,7 +83,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fetch existing order first for idempotency
+    // Fetch existing order for idempotency
     const { data: existingOrder } = await supabaseAdmin
       .from('ev_orders')
       .select('id, card_id, coupon_code, status')
@@ -85,13 +91,40 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     const wasAlreadyPaid = existingOrder?.status === 'paid';
+    let targetCardId = existingOrder?.card_id || null;
+    let createdCard = null;
+
+    // If this was a pre-publish new card order (card_id was null), create the card ONLY NOW!
+    if (!targetCardId && cardPayload) {
+      createdCard = await createPaidCardInDb(supabaseAdmin, cardPayload);
+      targetCardId = createdCard.id;
+    } else if (targetCardId) {
+      const freshExpiresAt = new Date(
+        Date.now() + CARD_VALIDITY_DAYS * 24 * 60 * 60 * 1000
+      ).toISOString();
+
+      await supabaseAdmin
+        .from('ev_cards')
+        .update({
+          is_paid: true,
+          is_published: true,
+          expires_at: freshExpiresAt,
+        })
+        .eq('id', targetCardId);
+    }
+
+    // Update ev_orders row -> status = 'paid', link card_id, store razorpay_payment_id
+    const orderUpdatePayload: Record<string, unknown> = {
+      status: 'paid',
+      razorpay_payment_id: razorpayPaymentId,
+    };
+    if (targetCardId) {
+      orderUpdatePayload.card_id = targetCardId;
+    }
 
     const { data: updatedOrder, error: orderUpdateError } = await supabaseAdmin
       .from('ev_orders')
-      .update({
-        status: 'paid',
-        razorpay_payment_id: razorpayPaymentId,
-      })
+      .update(orderUpdatePayload)
       .eq('razorpay_order_id', razorpayOrderId)
       .select('id, card_id, coupon_code, amount, status')
       .maybeSingle();
@@ -108,28 +141,13 @@ export async function POST(req: NextRequest) {
       await incrementCouponUsage(supabaseAdmin, updatedOrder.coupon_code);
     }
 
-    const targetCardId = updatedOrder?.card_id || existingOrder?.card_id || null;
-    if (targetCardId) {
-      const freshExpiresAt = new Date(
-        Date.now() + CARD_VALIDITY_DAYS * 24 * 60 * 60 * 1000
-      ).toISOString();
-
-      await supabaseAdmin
-        .from('ev_cards')
-        .update({
-          is_paid: true,
-          is_published: true,
-          expires_at: freshExpiresAt,
-        })
-        .eq('id', targetCardId);
-    }
-
     return NextResponse.json({
       success: true,
       verified: true,
       razorpay_order_id: razorpayOrderId,
       razorpay_payment_id: razorpayPaymentId,
       card_id: targetCardId,
+      card: createdCard,
       status: 'paid',
     });
   } catch (err) {

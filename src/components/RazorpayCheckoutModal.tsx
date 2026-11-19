@@ -37,9 +37,10 @@ interface AppliedCoupon {
 
 interface RazorpayCheckoutModalProps {
   card: Invitation | null;
+  mode?: 'pay-existing' | 'create-new';
   defaultEmail?: string;
   onClose: () => void;
-  onSuccess: () => Promise<void> | void;
+  onSuccess: (createdCard?: Invitation) => Promise<void> | void;
 }
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -71,6 +72,7 @@ function loadRazorpayScript(): Promise<boolean> {
 
 export default function RazorpayCheckoutModal({
   card,
+  mode = 'pay-existing',
   defaultEmail = '',
   onClose,
   onSuccess,
@@ -92,15 +94,27 @@ export default function RazorpayCheckoutModal({
     setCouponError(null);
     setPaymentError(null);
     setPaymentSuccess(null);
-  }, [card?.id, defaultEmail]);
+  }, [card?.id, mode, defaultEmail]);
 
   if (!card) return null;
 
+  const isCreateNew = mode === 'create-new';
   const coupleTitle = `${card.design_config.couple_names.partner1} & ${card.design_config.couple_names.partner2}`;
   const baseInr = 79;
   const discountInr = appliedCoupon ? appliedCoupon.discount_inr : 0;
   const finalInr = appliedCoupon ? appliedCoupon.final_inr : baseInr;
   const isFree = appliedCoupon?.is_free === true;
+
+  const buildCardPayload = () => ({
+    slug: card.slug,
+    theme_id: card.theme_id,
+    title:
+      card.title ||
+      `Wedding of ${card.design_config.couple_names.partner1} & ${card.design_config.couple_names.partner2}`,
+    event_date: card.event_date,
+    venue_details: card.venue_details,
+    design_config: card.design_config,
+  });
 
   const handleApplyCoupon = async () => {
     const trimmed = couponInput.trim().toUpperCase();
@@ -147,7 +161,7 @@ export default function RazorpayCheckoutModal({
     setCouponError(null);
   };
 
-  const celebrateSuccess = async (message: string) => {
+  const celebrateSuccess = async (message: string, createdCard?: Invitation) => {
     setPaymentSuccess(message);
     try {
       confetti({
@@ -159,7 +173,7 @@ export default function RazorpayCheckoutModal({
     } catch {
       // Ignore confetti error in headless environments
     }
-    await onSuccess();
+    await onSuccess(createdCard);
     setTimeout(() => {
       onClose();
     }, 1800);
@@ -170,15 +184,26 @@ export default function RazorpayCheckoutModal({
     setPaymentError(null);
 
     try {
+      const cardPayload = isCreateNew ? buildCardPayload() : undefined;
+
       // 1. Create order on server (re-validates coupon securely server-side)
       const orderRes = await fetch('/api/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          card_id: card.id,
-          customer_email: customerEmail.trim(),
-          coupon_code: appliedCoupon?.code || '',
-        }),
+        body: JSON.stringify(
+          isCreateNew
+            ? {
+                create_new: true,
+                card_payload: cardPayload,
+                customer_email: customerEmail.trim(),
+                coupon_code: appliedCoupon?.code || '',
+              }
+            : {
+                card_id: card.id,
+                customer_email: customerEmail.trim(),
+                coupon_code: appliedCoupon?.code || '',
+              }
+        ),
       });
       const orderData = await orderRes.json();
 
@@ -188,11 +213,14 @@ export default function RazorpayCheckoutModal({
         return;
       }
 
-      // 2. If 100% free coupon unlocked the card immediately
+      // 2. If 100% free coupon unlocked / published the card immediately
       if (orderData.freeUnlock) {
         setPaying(false);
         await celebrateSuccess(
-          `Unlocked free with coupon ${orderData.couponCode}! Your 30-day card is now active.`
+          isCreateNew
+            ? `Published free with coupon ${orderData.couponCode}! Your 3D wedding card is now live for 30 days.`
+            : `Unlocked free with coupon ${orderData.couponCode}! Your 30-day card is now active.`,
+          orderData.card || undefined
         );
         return;
       }
@@ -219,7 +247,8 @@ export default function RazorpayCheckoutModal({
           email: customerEmail.trim() || undefined,
         },
         notes: {
-          card_id: card.id,
+          mode: isCreateNew ? 'create_new' : 'pay_existing',
+          card_id: isCreateNew ? 'pending_creation' : card.id,
           coupon_code: appliedCoupon?.code || 'none',
         },
         theme: {
@@ -243,6 +272,7 @@ export default function RazorpayCheckoutModal({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
+                ...(isCreateNew ? { card_payload: cardPayload } : {}),
               }),
             });
             const verifyData = await verifyRes.json();
@@ -258,7 +288,10 @@ export default function RazorpayCheckoutModal({
 
             setPaying(false);
             await celebrateSuccess(
-              'Payment verified! Your 3D wedding invitation is now active for 30 days.'
+              isCreateNew
+                ? 'Payment verified! Your new 3D wedding card has been created & published for 30 days.'
+                : 'Payment verified! Your 3D wedding invitation is now active for 30 days.',
+              verifyData.card || undefined
             );
           } catch {
             setPaymentError('Error verifying payment signature. Please refresh your dashboard.');
@@ -294,13 +327,15 @@ export default function RazorpayCheckoutModal({
           <div>
             <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#C9A84C]">
               <Sparkles className="w-3.5 h-3.5" />
-              30-Day Card Activation
+              {isCreateNew ? 'Pay to Publish Card • 30-Day Pass' : '30-Day Card Activation'}
             </span>
             <h3 className="font-serif text-2xl font-semibold text-[#291418] mt-1 leading-tight">
               {coupleTitle}
             </h3>
             <p className="text-xs text-[#8B7355] mt-0.5">
-              One-time activation &bull; Unlimited WhatsApp guest links &amp; RSVPs
+              {isCreateNew
+                ? 'Your card will be created & published immediately after payment succeeds.'
+                : 'One-time activation • Unlimited WhatsApp guest links & RSVPs'}
             </p>
           </div>
           <button
@@ -319,7 +354,7 @@ export default function RazorpayCheckoutModal({
             <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-5 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
               <h4 className="font-serif text-xl font-semibold text-emerald-900">
-                Card Activated!
+                {isCreateNew ? 'Card Published!' : 'Card Activated!'}
               </h4>
               <p className="text-xs text-emerald-800">{paymentSuccess}</p>
             </div>
@@ -448,7 +483,7 @@ export default function RazorpayCheckoutModal({
                 </div>
               )}
 
-              {/* Pay / Unlock Button */}
+              {/* Pay / Publish Button */}
               <button
                 type="button"
                 onClick={handleProceedPayment}
@@ -463,12 +498,20 @@ export default function RazorpayCheckoutModal({
                 ) : isFree ? (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    <span>Unlock Free with {appliedCoupon?.code}</span>
+                    <span>
+                      {isCreateNew
+                        ? `Publish Free with ${appliedCoupon?.code}`
+                        : `Unlock Free with ${appliedCoupon?.code}`}
+                    </span>
                   </>
                 ) : (
                   <>
                     <CreditCard className="w-4 h-4" />
-                    <span>Pay ₹{finalInr} Securely via Razorpay</span>
+                    <span>
+                      {isCreateNew
+                        ? `Pay ₹${finalInr} & Publish Card`
+                        : `Pay ₹${finalInr} Securely via Razorpay`}
+                    </span>
                   </>
                 )}
               </button>

@@ -6,6 +6,7 @@ import {
   incrementCouponUsage,
   validateCouponServer,
 } from '@/lib/coupon-helper';
+import { CardCreatePayload, createPaidCardInDb } from '@/lib/card-creator';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,6 +51,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const isCreateNew = body.create_new === true || body.mode === 'create-new';
+    const cardPayload =
+      body.card_payload && typeof body.card_payload === 'object'
+        ? (body.card_payload as CardCreatePayload)
+        : null;
+
     const rawCardId =
       typeof body.card_id === 'string'
         ? body.card_id.trim()
@@ -71,7 +78,14 @@ export async function POST(req: NextRequest) {
         ? body.couponCode.trim()
         : '';
 
-    if (!rawCardId || !UUID_REGEX.test(rawCardId)) {
+    if (isCreateNew) {
+      if (!cardPayload || !cardPayload.design_config) {
+        return NextResponse.json(
+          { error: 'Valid card_payload is required to publish a new card' },
+          { status: 400 }
+        );
+      }
+    } else if (!rawCardId || !UUID_REGEX.test(rawCardId)) {
       return NextResponse.json(
         { error: 'A valid UUID card_id is required' },
         { status: 400 }
@@ -96,33 +110,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify that the target card exists in ev_cards
-    const { data: card, error: cardError } = await supabaseAdmin
-      .from('ev_cards')
-      .select('id, title, is_paid')
-      .eq('id', rawCardId)
-      .maybeSingle();
+    // If paying for an existing card, verify it exists and isn't already paid
+    if (!isCreateNew) {
+      const { data: card, error: cardError } = await supabaseAdmin
+        .from('ev_cards')
+        .select('id, title, is_paid')
+        .eq('id', rawCardId)
+        .maybeSingle();
 
-    if (cardError) {
-      console.error('[Razorpay create-order] Failed to query ev_cards:', cardError.message);
-      return NextResponse.json(
-        { error: 'Failed to verify invitation card' },
-        { status: 500 }
-      );
-    }
+      if (cardError) {
+        console.error('[Razorpay create-order] Failed to query ev_cards:', cardError.message);
+        return NextResponse.json(
+          { error: 'Failed to verify invitation card' },
+          { status: 500 }
+        );
+      }
 
-    if (!card) {
-      return NextResponse.json(
-        { error: 'Invitation card not found' },
-        { status: 404 }
-      );
-    }
+      if (!card) {
+        return NextResponse.json(
+          { error: 'Invitation card not found' },
+          { status: 404 }
+        );
+      }
 
-    if (card.is_paid) {
-      return NextResponse.json(
-        { error: 'This invitation card is already paid and active' },
-        { status: 409 }
-      );
+      if (card.is_paid) {
+        return NextResponse.json(
+          { error: 'This invitation card is already paid and active' },
+          { status: 409 }
+        );
+      }
     }
 
     // Server-side coupon calculation (never trust client-submitted totals)
@@ -146,14 +162,30 @@ export async function POST(req: NextRequest) {
     // Case A: 100% Free Coupon Unlock (finalAmountPaise === 0)
     if (finalAmountPaise === 0 && appliedCouponCode) {
       const freeOrderId = `coupon_free_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-      const freshExpiresAt = new Date(
-        Date.now() + CARD_VALIDITY_DAYS * 24 * 60 * 60 * 1000
-      ).toISOString();
+      let targetCardId = rawCardId;
+      let createdCard = null;
+
+      if (isCreateNew && cardPayload) {
+        createdCard = await createPaidCardInDb(supabaseAdmin, cardPayload);
+        targetCardId = createdCard.id;
+      } else {
+        const freshExpiresAt = new Date(
+          Date.now() + CARD_VALIDITY_DAYS * 24 * 60 * 60 * 1000
+        ).toISOString();
+        await supabaseAdmin
+          .from('ev_cards')
+          .update({
+            is_paid: true,
+            is_published: true,
+            expires_at: freshExpiresAt,
+          })
+          .eq('id', rawCardId);
+      }
 
       const { data: freeOrder, error: freeInsertError } = await supabaseAdmin
         .from('ev_orders')
         .insert({
-          card_id: rawCardId,
+          card_id: targetCardId,
           customer_email: rawEmail || null,
           razorpay_order_id: freeOrderId,
           razorpay_payment_id: `coupon_${appliedCouponCode}`,
@@ -173,15 +205,6 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      await supabaseAdmin
-        .from('ev_cards')
-        .update({
-          is_paid: true,
-          is_published: true,
-          expires_at: freshExpiresAt,
-        })
-        .eq('id', rawCardId);
-
       await incrementCouponUsage(supabaseAdmin, appliedCouponCode);
 
       return NextResponse.json({
@@ -193,11 +216,13 @@ export async function POST(req: NextRequest) {
         discountPaise,
         couponCode: appliedCouponCode,
         currency: CURRENCY,
+        card: createdCard,
         order: freeOrder,
       });
     }
 
     // Case B: Paid Razorpay Order (full ₹79 or discounted amount > ₹0)
+    // NOTE: In create_new mode, NO card is inserted in ev_cards until payment succeeds!
     const keyId = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').trim();
     const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
 
@@ -212,7 +237,8 @@ export async function POST(req: NextRequest) {
     }
 
     const shortRand = crypto.randomBytes(4).toString('hex');
-    const receipt = `ev_${rawCardId.slice(0, 8)}_${Date.now().toString(36)}_${shortRand}`.slice(
+    const receiptPrefix = isCreateNew ? 'ev_new' : `ev_${rawCardId.slice(0, 8)}`;
+    const receipt = `${receiptPrefix}_${Date.now().toString(36)}_${shortRand}`.slice(
       0,
       40
     );
@@ -229,7 +255,8 @@ export async function POST(req: NextRequest) {
         currency: CURRENCY,
         receipt,
         notes: {
-          card_id: rawCardId,
+          mode: isCreateNew ? 'create_new' : 'pay_existing',
+          card_id: isCreateNew ? 'pending_creation' : rawCardId,
           customer_email: rawEmail || 'not_provided',
           coupon_code: appliedCouponCode || 'none',
           platform: 'Eternal Vowz',
@@ -251,7 +278,7 @@ export async function POST(req: NextRequest) {
     const { data: insertedOrder, error: insertError } = await supabaseAdmin
       .from('ev_orders')
       .insert({
-        card_id: rawCardId,
+        card_id: isCreateNew ? null : rawCardId,
         customer_email: rawEmail || null,
         razorpay_order_id: rzpOrder.id,
         razorpay_payment_id: null,
