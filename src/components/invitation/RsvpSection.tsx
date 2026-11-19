@@ -118,7 +118,7 @@ export default function RsvpSection({
         delay={0.06}
         className={`relative rounded-2xl p-5 text-left overflow-hidden ${
           darkPalace
-            ? 'bg-[#1B120C]/92 backdrop-blur-sm shadow-[0_18px_48px_rgba(0,0,0,0.68)] border border-[#E5C17B]/40 text-[#FFF4CF]'
+            ? 'bg-[#1B120C]/90 backdrop-blur-sm shadow-[0_18px_48px_rgba(0,0,0,0.68)] border border-[#E5C17B]/40 text-[#FFF4CF]'
             : 'bg-[#fbf9f5] shadow-lg border border-[#e6dec8] text-[#2f2a24]'
         }`}
       >
@@ -126,7 +126,7 @@ export default function RsvpSection({
           <>
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-2 rounded-xl border border-[#E5C17B]/18 z-0"
+              className="pointer-events-none absolute inset-2 rounded-xl border border-[#E5C17B]/20 z-0"
             />
             <div
               aria-hidden="true"

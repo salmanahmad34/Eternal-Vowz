@@ -343,7 +343,7 @@ export default function EnvelopeExperience({
               onClick={handleReplay}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full backdrop-blur-sm shadow-md transition-all text-xs font-serif italic cursor-pointer ${
                 isDarkPalace
-                  ? 'bg-[#1C120B]/92 border border-[#E5C17B]/45 hover:bg-[#2A1B10] text-[#FFF4CF]'
+                  ? 'bg-[#1C120B]/90 border border-[#E5C17B]/45 hover:bg-[#2A1B10] text-[#FFF4CF]'
                   : 'bg-[#FAF8F5]/95 border border-[#d8cfc0] hover:bg-white text-[#2f2a24]'
               }`}
               title="Replay Opening Animation"
@@ -367,7 +367,7 @@ export default function EnvelopeExperience({
             aria-label={isMuted ? 'Unmute music' : 'Mute music'}
             className={`${isPreview ? 'absolute bottom-3 right-3 w-10 h-10' : 'fixed bottom-6 right-6 w-14 h-14'} z-[60] rounded-full backdrop-blur-sm shadow-xl flex items-center justify-center transition-transform hover:scale-105 cursor-pointer ${
               isDarkPalace
-                ? 'bg-[#1C120B]/92 hover:bg-[#2A1B10] border border-[#E5C17B]/45 text-[#FFF4CF]'
+                ? 'bg-[#1C120B]/90 hover:bg-[#2A1B10] border border-[#E5C17B]/45 text-[#FFF4CF]'
                 : 'bg-neutral-900/85 hover:bg-neutral-900 text-white'
             }`}
           >
@@ -755,12 +755,12 @@ export default function EnvelopeExperience({
                 />
 
                 {/* ===============================================================
-                    BLOCK 1: LIVE COUNTDOWN (Always Shown — Scroll Animated)
+                    BLOCK 1: LIVE COUNTDOWN (Always Shown — Clear Typography)
                 =============================================================== */}
-                <section className="relative z-10 pt-4 pb-10 px-5 text-center">
+                <section className="relative z-10 pt-5 pb-10 px-5 text-center">
                   <ScrollInkHeading
                     text="Countdown"
-                    className={`font-great-vibes text-[44px] leading-tight ${
+                    className={`font-serif font-semibold tracking-[0.06em] uppercase text-[24px] leading-tight ${
                       isDarkPalace
                         ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
                         : 'text-[#2f2a24]'
@@ -769,17 +769,17 @@ export default function EnvelopeExperience({
                   <ScrollWordReveal
                     text="Counting every moment until we celebrate together"
                     delay={0.12}
-                    className={`font-serif italic text-[15px] -mt-1 mb-6 ${
-                      isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                    className={`font-sans text-[12.5px] tracking-wide mt-1.5 mb-6 ${
+                      isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#5a4e42]'
                     }`}
                   />
 
-                  <div className="grid grid-cols-4 gap-2.5 max-w-[335px] mx-auto">
+                  <div className="grid grid-cols-4 gap-2.5 max-w-[340px] mx-auto">
                     {[
-                      { value: timeLeft.days, label: 'DAYS' },
-                      { value: timeLeft.hours, label: 'HOURS' },
-                      { value: timeLeft.minutes, label: 'MINUTES' },
-                      { value: timeLeft.seconds, label: 'SECONDS' },
+                      { value: String(timeLeft.days).padStart(2, '0'), label: 'DAYS' },
+                      { value: String(timeLeft.hours).padStart(2, '0'), label: 'HOURS' },
+                      { value: String(timeLeft.minutes).padStart(2, '0'), label: 'MINUTES' },
+                      { value: String(timeLeft.seconds).padStart(2, '0'), label: 'SECONDS' },
                     ].map((unit, idx) => (
                       <ScrollRevealBlock
                         key={unit.label}
@@ -788,14 +788,14 @@ export default function EnvelopeExperience({
                         className="flex flex-col items-center"
                       >
                         <div
-                          className={`w-full aspect-square rounded-xl backdrop-blur-[3px] flex items-center justify-center ${
+                          className={`w-full aspect-square rounded-xl backdrop-blur-[4px] flex items-center justify-center ${
                             isDarkPalace
-                              ? 'bg-[#1E130C]/82 border border-[#E5C17B]/45 shadow-[0_10px_24px_rgba(0,0,0,0.55)]'
-                              : 'bg-white/40 border border-white/70 shadow-xs'
+                              ? 'bg-[#1E130C]/90 border border-[#E5C17B]/50 shadow-[0_10px_24px_rgba(0,0,0,0.55)]'
+                              : 'bg-[#fbf9f5]/95 border border-[#e2d6c0] shadow-sm'
                           }`}
                         >
                           <span
-                            className={`font-great-vibes text-[34px] leading-none ${
+                            className={`font-serif font-bold tabular-nums text-[28px] tracking-tight leading-none ${
                               isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
                             }`}
                           >
@@ -803,8 +803,8 @@ export default function EnvelopeExperience({
                           </span>
                         </div>
                         <span
-                          className={`font-serif italic text-[11px] tracking-[0.16em] uppercase mt-2 ${
-                            isDarkPalace ? 'text-[#E5C17B]' : 'text-[#4a4238]'
+                          className={`font-sans font-semibold text-[10px] tracking-[0.16em] uppercase mt-2 ${
+                            isDarkPalace ? 'text-[#E5C17B]' : 'text-[#5a4e42]'
                           }`}
                         >
                           {unit.label}
@@ -855,7 +855,7 @@ export default function EnvelopeExperience({
                       delay={0.12}
                       className={`w-11 h-11 rounded-full border-[1.5px] flex items-center justify-center mx-auto my-3 shadow-xs ${
                         isDarkPalace
-                          ? 'bg-[#22150D]/92 border-[#E5C17B]/75 text-[#E5C17B] shadow-md'
+                          ? 'bg-[#22150D]/90 border-[#E5C17B]/75 text-[#E5C17B] shadow-md'
                           : 'bg-[#fbf9f5] border-[#5c724a] text-[#495e38]'
                       }`}
                     >
@@ -900,7 +900,7 @@ export default function EnvelopeExperience({
                           rel="noopener noreferrer"
                           className={`mt-5 mx-auto max-w-[285px] rounded-full px-4 py-2.5 shadow-md flex items-center justify-between gap-3 transition-transform hover:scale-[1.02] ${
                             isDarkPalace
-                              ? 'bg-[#22150D]/92 hover:bg-[#2F1E13] text-[#FFF4CF] border border-[#E5C17B]/45 shadow-[0_12px_30px_rgba(0,0,0,0.55)]'
+                              ? 'bg-[#22150D]/90 hover:bg-[#2F1E13] text-[#FFF4CF] border border-[#E5C17B]/45 shadow-[0_12px_30px_rgba(0,0,0,0.55)]'
                               : 'bg-[#fbf9f5] hover:bg-white text-[#2f2a24] border border-[#e6dec8]'
                           }`}
                         >
@@ -941,7 +941,7 @@ export default function EnvelopeExperience({
                 )}
 
                 {/* ===============================================================
-                    BLOCK 3: SCHEDULE TIMELINE (Optional — Only if filled & enabled)
+                    BLOCK 3: SCHEDULE TIMELINE (Clear, High-Readability Luxury Cards)
                 =============================================================== */}
                 {showTimeline && (
                   <section className="relative z-10 py-9 px-4 text-center">
@@ -956,7 +956,7 @@ export default function EnvelopeExperience({
 
                     <ScrollInkHeading
                       text="Wedding Itinerary"
-                      className={`font-great-vibes text-[40px] mb-1 ${
+                      className={`font-serif font-semibold tracking-[0.05em] uppercase text-[23px] mb-1 ${
                         isDarkPalace
                           ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
                           : 'text-[#2f2a24]'
@@ -965,118 +965,110 @@ export default function EnvelopeExperience({
                     <ScrollWordReveal
                       text="What we have planned for our special day"
                       delay={0.12}
-                      className={`font-serif italic text-[15px] mb-10 px-2 ${
-                        isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
+                      className={`font-sans text-[12.5px] mb-7 px-2 ${
+                        isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#5a4e42]'
                       }`}
                     />
 
-                    <div className="relative max-w-[340px] mx-auto">
+                    <div className="relative max-w-[348px] mx-auto pl-6">
+                      {/* Vertical Timeline Rail */}
                       <motion.div
                         initial={{ scaleY: 0 }}
                         whileInView={{ scaleY: 1 }}
                         viewport={{ once: true, amount: 0.1 }}
-                        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
                         style={{ transformOrigin: 'top center' }}
-                        className={`absolute left-1/2 top-4 bottom-4 w-[1px] -translate-x-1/2 ${
-                          isDarkPalace ? 'bg-[#E5C17B]/50' : 'bg-[#8c7a65]/50'
+                        className={`absolute left-[11px] top-6 bottom-6 w-[1.5px] ${
+                          isDarkPalace ? 'bg-[#E5C17B]/55' : 'bg-[#a68f74]/55'
                         }`}
                       />
 
-                      <div className="space-y-12">
-                        {scheduleItems.map((item, idx) => {
-                          const isLeft = idx % 2 === 0;
-                          return (
-                            <div key={idx} className="relative grid grid-cols-2 items-center">
-                              <motion.div
-                                initial={{ scale: 0, opacity: 0 }}
-                                whileInView={{ scale: 1, opacity: 1 }}
-                                viewport={{ once: true, amount: 0.4 }}
-                                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                                className={`absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full border-[1.5px] z-10 ${
-                                  isDarkPalace
-                                    ? 'bg-[#1A110B] border-[#E5C17B]'
-                                    : 'bg-[#fbf9f5] border-[#5c4d3c]'
-                                }`}
-                              />
+                      <div className="space-y-4">
+                        {scheduleItems.map((item, idx) => (
+                          <div key={idx} className="relative">
+                            {/* Timeline Node Dot */}
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              whileInView={{ scale: 1, opacity: 1 }}
+                              viewport={{ once: true, amount: 0.4 }}
+                              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                              className={`absolute -left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 z-10 ${
+                                isDarkPalace
+                                  ? 'bg-[#1A110B] border-[#E5C17B] shadow-[0_0_8px_rgba(229,193,123,0.65)]'
+                                  : 'bg-[#fbf9f5] border-[#6E2E3A]'
+                              }`}
+                            />
 
-                              {isLeft ? (
-                                <>
-                                  <ScrollRevealBlock
-                                    direction="left"
-                                    className="pr-5 flex flex-col items-center text-center"
-                                  >
-                                    <TimelineIllustration index={idx} darkPalace={isDarkPalace} />
-                                    <ScrollWordReveal
-                                      as="span"
-                                      text={item.time}
-                                      delay={0.08}
-                                      className={`font-serif italic text-[21px] font-semibold leading-tight ${
-                                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#2f2a24]'
-                                      }`}
-                                    />
-                                    <ScrollInkHeading
-                                      as="h3"
-                                      text={item.title}
-                                      delay={0.14}
-                                      duration={0.75}
-                                      className={`font-great-vibes text-[20px] tracking-wider mt-0.5 ${
-                                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
-                                      }`}
-                                    />
-                                    {item.description && (
-                                      <ScrollWordReveal
-                                        text={item.description}
-                                        delay={0.22}
-                                        stagger={0.04}
-                                        className={`font-serif italic text-[13px] leading-snug mt-1 ${
-                                          isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
-                                        }`}
-                                      />
-                                    )}
-                                  </ScrollRevealBlock>
-                                  <div />
-                                </>
-                              ) : (
-                                <>
-                                  <div />
-                                  <ScrollRevealBlock
-                                    direction="right"
-                                    className="pl-5 flex flex-col items-center text-center"
-                                  >
-                                    <TimelineIllustration index={idx} darkPalace={isDarkPalace} />
-                                    <ScrollWordReveal
-                                      as="span"
-                                      text={item.time}
-                                      delay={0.08}
-                                      className={`font-serif italic text-[21px] font-semibold leading-tight ${
-                                        isDarkPalace ? 'text-[#E5C17B]' : 'text-[#2f2a24]'
-                                      }`}
-                                    />
-                                    <ScrollInkHeading
-                                      as="h3"
-                                      text={item.title}
-                                      delay={0.14}
-                                      duration={0.75}
-                                      className={`font-great-vibes text-[20px] tracking-wider mt-0.5 ${
-                                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
-                                      }`}
-                                    />
-                                    {item.description && (
-                                      <ScrollWordReveal
-                                        text={item.description}
-                                        delay={0.22}
-                                        stagger={0.04}
-                                        className={`font-serif italic text-[13px] leading-snug mt-1 ${
-                                          isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4a4238]'
-                                        }`}
-                                      />
-                                    )}
-                                  </ScrollRevealBlock>
-                                </>
-                              )}
-                            </div>
-                          );
-                        })}
+                            {/* Clean Readable Event Card */}
+                            <ScrollRevealBlock
+                              direction="up"
+                              delay={idx * 0.08}
+                              className={`rounded-2xl p-3.5 flex items-center gap-3 text-left transition-colors ${
+                                isDarkPalace
+                                  ? 'bg-[#1D120B]/90 backdrop-blur-sm border border-[#E5C17B]/40 shadow-[0_12px_30px_rgba(0,0,0,0.55)]'
+                                  : 'bg-[#fbf9f5]/95 backdrop-blur-sm border border-[#e3d7c3] shadow-sm'
+                              }`}
+                            >
+                              <div
+                                className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${
+                                  isDarkPalace
+                                    ? 'bg-[#2A1A10] border border-[#E5C17B]/25'
+                                    : 'bg-[#f4ece0] border border-[#e6dec8]'
+                                }`}
+                              >
+                                <TimelineIllustration
+                                  index={idx}
+                                  darkPalace={isDarkPalace}
+                                  className="w-12 h-12"
+                                />
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <span
+                                  className={`inline-block px-2.5 py-0.5 rounded-full font-sans font-bold text-[11px] tracking-[0.08em] uppercase ${
+                                    isDarkPalace
+                                      ? 'bg-[#E5C17B]/20 text-[#F5D88F] border border-[#E5C17B]/35'
+                                      : 'bg-[#6E2E3A]/10 text-[#6E2E3A] border border-[#6E2E3A]/20'
+                                  }`}
+                                >
+                                  {item.time}
+                                </span>
+
+                                <ScrollInkHeading
+                                  as="h3"
+                                  text={item.title}
+                                  delay={0.08}
+                                  duration={0.65}
+                                  className={`font-serif font-bold text-[15.5px] tracking-[0.03em] leading-snug mt-1.5 ${
+                                    isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2B221B]'
+                                  }`}
+                                />
+
+                                {item.location && (
+                                  <ScrollWordReveal
+                                    text={item.location}
+                                    delay={0.14}
+                                    stagger={0.03}
+                                    className={`font-sans text-[11px] font-medium mt-0.5 ${
+                                      isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7a5c3e]'
+                                    }`}
+                                  />
+                                )}
+
+                                {item.description && (
+                                  <ScrollWordReveal
+                                    text={item.description}
+                                    delay={0.18}
+                                    stagger={0.03}
+                                    className={`font-sans text-[12px] leading-relaxed mt-1 ${
+                                      isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#4e4338]'
+                                    }`}
+                                  />
+                                )}
+                              </div>
+                            </ScrollRevealBlock>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </section>
@@ -1152,7 +1144,7 @@ export default function EnvelopeExperience({
                           <ScrollWordReveal
                             as="span"
                             text="Ladies"
-                            className={`font-serif italic text-xs uppercase tracking-widest block ${
+                            className={`font-sans font-semibold text-[10.5px] uppercase tracking-[0.16em] block mb-1 ${
                               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e6254]'
                             }`}
                           />
@@ -1160,7 +1152,7 @@ export default function EnvelopeExperience({
                             as="span"
                             text={cfg.ladies_attire || 'Modest Gown / Abaya'}
                             delay={0.12}
-                            className={`font-great-vibes text-[20px] block ${
+                            className={`font-serif font-medium text-[15px] leading-snug block ${
                               isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
                             }`}
                           />
@@ -1169,7 +1161,7 @@ export default function EnvelopeExperience({
                           <ScrollWordReveal
                             as="span"
                             text="Gentlemen"
-                            className={`font-serif italic text-xs uppercase tracking-widest block ${
+                            className={`font-sans font-semibold text-[10.5px] uppercase tracking-[0.16em] block mb-1 ${
                               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e6254]'
                             }`}
                           />
@@ -1177,7 +1169,7 @@ export default function EnvelopeExperience({
                             as="span"
                             text={cfg.gents_attire || 'Sherwani / Suit'}
                             delay={0.12}
-                            className={`font-serif italic text-[17px] block ${
+                            className={`font-serif font-medium text-[15px] leading-snug block ${
                               isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
                             }`}
                           />
@@ -1249,7 +1241,7 @@ export default function EnvelopeExperience({
                           'Your warm presence and duas are our greatest blessing. Should you wish to honor us with a gift, details are below.'
                         }
                         stagger={0.035}
-                        className={`font-great-vibes text-[24px] leading-relaxed ${
+                        className={`font-serif text-[15.5px] leading-relaxed ${
                           isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
                         }`}
                       />
@@ -1382,7 +1374,7 @@ export default function EnvelopeExperience({
                       direction="up"
                       className={`relative mx-auto w-full flex flex-col items-center justify-start ${
                         isDarkPalace
-                          ? 'rounded-[30px] bg-[#1B120C]/92 backdrop-blur-sm border-2 border-[#E5C17B]/50 shadow-[0_20px_50px_rgba(0,0,0,0.7)] py-12 px-8'
+                          ? 'rounded-[30px] bg-[#1B120C]/90 backdrop-blur-sm border-2 border-[#E5C17B]/50 shadow-[0_20px_50px_rgba(0,0,0,0.7)] py-12 px-8'
                           : 'min-h-[610px] pt-20 pb-28 px-12'
                       }`}
                     >
@@ -1539,7 +1531,7 @@ export default function EnvelopeExperience({
                       direction="up"
                       className={`relative mx-auto max-w-[310px] rounded-[36px] border-2 p-5 shadow-md space-y-4 ${
                         isDarkPalace
-                          ? 'bg-[#1D120B]/92 backdrop-blur-sm border-[#E5C17B]/55 shadow-[0_18px_48px_rgba(0,0,0,0.68)]'
+                          ? 'bg-[#1D120B]/90 backdrop-blur-sm border-[#E5C17B]/55 shadow-[0_18px_48px_rgba(0,0,0,0.68)]'
                           : 'bg-[#fbf8f1]/90 border-[#C5A059]'
                       }`}
                     >

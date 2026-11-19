@@ -6,9 +6,11 @@ import React from 'react';
 export function TimelineIllustration({
   index,
   darkPalace = false,
+  className = 'w-14 h-14 shrink-0',
 }: {
   index: number;
   darkPalace?: boolean;
+  className?: string;
 }) {
   const type = index % 4;
   const strokeMain = darkPalace ? '#E5C17B' : '#8C6D46';
@@ -18,7 +20,7 @@ export function TimelineIllustration({
   if (type === 0) {
     // Golden Sparklers & Welcome Star Bursts
     return (
-      <svg viewBox="0 0 90 90" fill="none" className="w-20 h-20 mx-auto mb-1">
+      <svg viewBox="0 0 90 90" fill="none" className={className}>
         <line x1="28" y1="78" x2="60" y2="25" stroke={strokeMain} strokeWidth="1.8" strokeLinecap="round" />
         <line x1="62" y1="78" x2="30" y2="25" stroke={strokeMain} strokeWidth="1.8" strokeLinecap="round" />
         {/* Golden Sparkle Rays */}
@@ -45,7 +47,7 @@ export function TimelineIllustration({
   if (type === 1) {
     // Blessed Nikah Floral Arch & Interlocking Golden Rings
     return (
-      <svg viewBox="0 0 90 90" fill="none" className="w-20 h-20 mx-auto mb-1">
+      <svg viewBox="0 0 90 90" fill="none" className={className}>
         {/* Floral Arch */}
         <path
           d="M20 74 V42 C20 26, 70 26, 70 42 V74"
@@ -71,7 +73,7 @@ export function TimelineIllustration({
   if (type === 2) {
     // Royal Dawat / Walima Feast — Golden Kahwa / Rosewater Carafe & Domed Platter
     return (
-      <svg viewBox="0 0 90 90" fill="none" className="w-20 h-20 mx-auto mb-1">
+      <svg viewBox="0 0 90 90" fill="none" className={className}>
         {/* Royal Cloche / Domed Dawat Platter */}
         <path
           d="M22 62 C22 44, 68 44, 68 62 Z"
@@ -96,7 +98,7 @@ export function TimelineIllustration({
 
   // Vintage Royal Getaway Car with Floral Garland
   return (
-    <svg viewBox="0 0 100 90" fill="none" className="w-20 h-20 mx-auto mb-1">
+    <svg viewBox="0 0 100 90" fill="none" className={className}>
       <path
         d="M20 52 C20 40, 28 36, 35 36 L65 36 C72 36, 80 40, 80 52 L84 56 L84 68 L16 68 L16 56 Z"
         fill={darkPalace ? '#3C2719' : '#E5B5BC'}
