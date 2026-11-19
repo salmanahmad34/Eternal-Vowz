@@ -99,15 +99,15 @@ const SIGNATURE_CARD_DESIGNS = [
   },
   {
     id: 'royal-emerald',
-    category: '3D Embossed Lifafa',
+    category: '3D Silk Veil Reveal',
     badge: '✨ Royal Nikah',
     name: 'Royal Mughal Arch',
     couple: 'Zoya & Ayaan',
     slug: 'zoya-ayaan-nikah',
     query: '?guest=guest-zaid-khan',
     price: '₹79',
-    heroImg: '/assets/invitecraft/hero-mughal-emerald.jpg',
-    shortDesc: 'Carved Mughal archway, brass Fanoos lanterns & emerald Lifafa.',
+    heroImg: '/assets/mughal-silk/hero-mughal-courtyard.jpg',
+    shortDesc: 'Tap anywhere as gold-embroidered silk veils part to reveal a candlelit Mughal palace.',
   },
   {
     id: 'midnight-minimalist',

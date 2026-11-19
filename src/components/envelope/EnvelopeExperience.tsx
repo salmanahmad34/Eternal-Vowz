@@ -67,6 +67,10 @@ const CINEMA_VIDEO_THEMES: Partial<Record<string, { videoSrc: string; posterSrc:
     videoSrc: '/assets/tuscan-haveli/intro-haveli.mp4',
     posterSrc: '/assets/tuscan-haveli/intro-poster.jpg',
   },
+  'royal-emerald': {
+    videoSrc: '/assets/mughal-silk/intro-silk.mp4',
+    posterSrc: '/assets/mughal-silk/intro-poster.jpg',
+  },
 };
 
 export default function EnvelopeExperience({
@@ -436,7 +440,7 @@ export default function EnvelopeExperience({
                     invitation.theme_id === 'pearl-veil'
                       ? '/assets/pearl-veil/hero-palace-corridor.jpg'
                       : invitation.theme_id === 'royal-emerald'
-                      ? '/assets/invitecraft/hero-mughal-emerald.jpg'
+                      ? '/assets/mughal-silk/hero-mughal-courtyard.jpg'
                       : invitation.theme_id === 'midnight-minimalist'
                       ? '/assets/invitecraft/hero-starlight-midnight.jpg'
                       : invitation.theme_id === 'blush-floral'
@@ -446,12 +450,14 @@ export default function EnvelopeExperience({
                   alt="Wedding Card Hero Scene"
                   className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                 />
-                {(invitation.theme_id === 'pearl-veil' || invitation.theme_id === 'tuscan-sunset') && (
+                {(invitation.theme_id === 'pearl-veil' ||
+                  invitation.theme_id === 'tuscan-sunset' ||
+                  invitation.theme_id === 'royal-emerald') && (
                   <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
                       background:
-                        'linear-gradient(180deg, rgba(16,10,6,0.12) 0%, rgba(16,10,6,0.06) 44%, rgba(16,10,6,0.68) 65%, rgba(16,10,6,0.88) 88%, rgba(244,226,193,0.92) 100%)',
+                        'linear-gradient(180deg, rgba(16,10,6,0.12) 0%, rgba(16,10,6,0.06) 44%, rgba(16,10,6,0.65) 66%, rgba(16,10,6,0.88) 88%, rgba(244,226,193,0.92) 100%)',
                     }}
                   />
                 )}
@@ -479,12 +485,12 @@ export default function EnvelopeExperience({
                 {/* Couple Names & Wedding Date Overlay — Sequential Ink & Word Reveal on Open */}
                 <div
                   className={`relative z-10 px-6 text-center flex flex-col items-center ${
-                    invitation.theme_id === 'royal-emerald'
+                    invitation.theme_id === 'midnight-minimalist'
                       ? 'pt-36'
-                      : invitation.theme_id === 'midnight-minimalist'
-                      ? 'pt-36'
-                      : invitation.theme_id === 'pearl-veil' || invitation.theme_id === 'tuscan-sunset'
-                      ? 'pt-[390px]'
+                      : invitation.theme_id === 'pearl-veil' ||
+                        invitation.theme_id === 'tuscan-sunset' ||
+                        invitation.theme_id === 'royal-emerald'
+                      ? 'pt-[396px]'
                       : invitation.theme_id === 'blush-floral'
                       ? 'pt-[192px]'
                       : 'pt-12'
@@ -499,10 +505,9 @@ export default function EnvelopeExperience({
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
-                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]'
-                        : invitation.theme_id === 'royal-emerald'
-                        ? 'text-[#0B3626] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
+                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.92)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#2E1A14] drop-shadow-[0_1px_10px_rgba(255,250,238,0.95)]'
                         : 'text-[#2f2a24]'
@@ -518,8 +523,9 @@ export default function EnvelopeExperience({
                     className={`font-great-vibes text-[24px] -my-1 block ${
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
-                        ? 'text-[#F0CF7E] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
+                        ? 'text-[#F0CF7E] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#8C5B32] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
                         : 'text-[#7a5c3e]'
@@ -535,10 +541,9 @@ export default function EnvelopeExperience({
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
-                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]'
-                        : invitation.theme_id === 'royal-emerald'
-                        ? 'text-[#0B3626] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
+                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.92)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#2E1A14] drop-shadow-[0_1px_10px_rgba(255,250,238,0.95)]'
                         : 'text-[#2f2a24]'
@@ -555,8 +560,9 @@ export default function EnvelopeExperience({
                       className={`font-serif text-[10px] tracking-[0.16em] uppercase mt-1.5 max-w-[250px] ${
                         invitation.theme_id === 'midnight-minimalist' ||
                         invitation.theme_id === 'pearl-veil' ||
-                        invitation.theme_id === 'tuscan-sunset'
-                          ? 'text-[#F5E8C8] drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]'
+                        invitation.theme_id === 'tuscan-sunset' ||
+                        invitation.theme_id === 'royal-emerald'
+                          ? 'text-[#F5E8C8] drop-shadow-[0_1px_6px_rgba(0,0,0,0.92)]'
                           : invitation.theme_id === 'blush-floral'
                           ? 'text-[#4A2E20] font-semibold drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
                           : 'text-[#5a5044]'
@@ -573,7 +579,8 @@ export default function EnvelopeExperience({
                     lineColorClass={
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
                         ? 'bg-[#E5C17B]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'bg-[#8C5B32]'
@@ -582,7 +589,8 @@ export default function EnvelopeExperience({
                     dotColorClass={
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
                         ? 'bg-[#E5C17B]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'bg-[#8C5B32]'
@@ -600,8 +608,9 @@ export default function EnvelopeExperience({
                     className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
-                        ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
+                        ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
                         : 'text-[#2f2a24]'
@@ -620,7 +629,8 @@ export default function EnvelopeExperience({
                     className={`text-[9px] font-sans uppercase tracking-[0.26em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] ${
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
                         ? 'bg-black/45 text-[#F8E7B2]'
                         : 'bg-[#FAF6EE]/75 text-[#5a4a38]'
                     }`}
@@ -633,7 +643,8 @@ export default function EnvelopeExperience({
                     className={`mt-1 ${
                       invitation.theme_id === 'midnight-minimalist' ||
                       invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset'
+                      invitation.theme_id === 'tuscan-sunset' ||
+                      invitation.theme_id === 'royal-emerald'
                         ? 'text-[#F8E7B2]'
                         : 'text-[#6e5d4b]'
                     }`}
