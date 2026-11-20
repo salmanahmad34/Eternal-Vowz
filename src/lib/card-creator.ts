@@ -20,7 +20,8 @@ export interface CardCreatePayload {
  */
 export async function createPaidCardInDb(
   supabaseAdmin: SupabaseClient,
-  payload: CardCreatePayload
+  payload: CardCreatePayload,
+  ownerUserId?: string | null
 ): Promise<Invitation> {
   const designConfig = (payload.design_config || {}) as {
     couple_names?: { partner1?: string; partner2?: string };
@@ -50,6 +51,7 @@ export async function createPaidCardInDb(
 
   const insertRow = {
     id: cardId,
+    user_id: ownerUserId || null,
     slug: uniqueSlug,
     theme_id: payload.theme_id || 'royal-emerald',
     title: payload.title?.trim() || `Wedding of ${p1} & ${p2}`,

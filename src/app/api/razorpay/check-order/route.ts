@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { incrementCouponUsage } from '@/lib/coupon-helper';
 import { CardCreatePayload, createPaidCardInDb } from '@/lib/card-creator';
+import { getAuthenticatedUser } from '@/lib/server-auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,6 +26,11 @@ interface RazorpayPaymentItem {
  */
 export async function POST(req: NextRequest) {
   try {
+    const authUser = await getAuthenticatedUser(req);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
@@ -122,7 +128,7 @@ export async function POST(req: NextRequest) {
     let createdCard = null;
 
     if (!targetCardId && cardPayload) {
-      createdCard = await createPaidCardInDb(supabaseAdmin, cardPayload);
+      createdCard = await createPaidCardInDb(supabaseAdmin, cardPayload, authUser.id);
       targetCardId = createdCard.id;
     } else if (targetCardId) {
       const freshExpiresAt = new Date(

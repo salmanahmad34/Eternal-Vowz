@@ -301,8 +301,8 @@ export default function LandingPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#C9A84C]">
                   RSVP BUILT-IN &mdash; Effortless guest tracking
                 </p>
-                <p className="text-base text-[#8B7355] leading-relaxed max-w-xl">
-                  The best celebrations don&apos;t start on the day — they start with the invitation. Choose from <strong className="text-[#291418] font-medium">5 signature animated designs</strong> (3D Lifafa, 3D Palace Gates, or Frosted-Blur Veil) and fill only the main details; optional sections hide automatically.
+                <p className="text-base text-[#8B7355] leading-relaxed max-w-lg">
+                  Create cinematic 3D wedding invitations in minutes — pick from <strong className="text-[#291418] font-medium">5 animated designs</strong>, add your details, and share instantly on WhatsApp.
                 </p>
               </div>
 
@@ -345,7 +345,7 @@ export default function LandingPage() {
               <div className="w-full max-w-[368px] flex items-center justify-between px-4 py-2 mb-3 rounded-full bg-white/80 backdrop-blur-sm border border-[#E2D7BD] text-xs text-[#8B7355]">
                 <span className="flex items-center gap-2 font-medium text-[#291418]">
                   <span className="w-2 h-2 rounded-full bg-[#C9A84C] animate-pulse" />
-                  <span>Live Interactive Card (Tap Wax Seal)</span>
+                  <span>Live Interactive Card (Tap Anywhere)</span>
                 </span>
                 <button
                   type="button"

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import FloatingParticles from './FloatingParticles';
 
 interface CinemaVideoRevealProps {
   videoSrc: string;
   posterSrc: string;
+  heroImageSrc?: string;
   guestName?: string;
   waxSealInitial?: string;
   coupleNames?: { partner1: string; partner2: string };
@@ -22,11 +23,12 @@ interface CinemaVideoRevealProps {
  * NOT a video player:
  * - Zero controls, zero text clutter — ONLY a clean "Tap Anywhere to Enter" pill at bottom
  * - Tapping ANYWHERE dissolves the pill immediately & glides smoothly through the animation
- * - Automatically crossfades straight into the opened card & starts background music on finish
+ * - Crossfades directly into the ALREADY-MOUNTED Hero image underneath with ZERO black flash
  */
 export default function CinemaVideoReveal({
   videoSrc,
   posterSrc,
+  heroImageSrc,
   stage,
   isPreview = false,
   onStartPlay,
@@ -35,7 +37,6 @@ export default function CinemaVideoReveal({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const completedRef = useRef(false);
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const isPlaying = stage === 'opening';
 
@@ -50,17 +51,22 @@ export default function CinemaVideoReveal({
     if (completedRef.current) return;
     completedRef.current = true;
     clearFallbackTimer();
-    setIsFadingOut(true);
-    setTimeout(() => {
-      onVideoComplete();
-    }, 260);
+    // Keep the bright final frame frozen (never fade to black) while parent crossfades straight into the Hero card
+    const v = videoRef.current;
+    if (v && !v.paused) {
+      try {
+        v.pause();
+      } catch {
+        // Ignore pause error
+      }
+    }
+    onVideoComplete();
   };
 
   // Reset cleanly when replayed or remounted
   useEffect(() => {
     if (stage === 'closed') {
       completedRef.current = false;
-      setIsFadingOut(false);
       clearFallbackTimer();
       const v = videoRef.current;
       if (v) {
@@ -80,7 +86,6 @@ export default function CinemaVideoReveal({
   const handleTapAnywhere = () => {
     if (stage !== 'closed') return;
     completedRef.current = false;
-    setIsFadingOut(false);
     onStartPlay();
 
     const v = videoRef.current;
@@ -109,7 +114,8 @@ export default function CinemaVideoReveal({
   const handleTimeUpdate = () => {
     const v = videoRef.current;
     if (!v || !isPlaying || completedRef.current) return;
-    if (v.duration && v.duration > 1 && v.currentTime >= v.duration - 0.28) {
+    // Trigger crossfade right before the end so any trailing black video frame is never shown
+    if (v.duration && v.duration > 1 && v.currentTime >= v.duration - 0.35) {
       finishSequence();
     }
   };
@@ -120,17 +126,18 @@ export default function CinemaVideoReveal({
       onContextMenu={(e) => e.preventDefault()}
       className={`relative w-full ${
         isPreview ? 'h-[640px]' : 'h-[100dvh] max-h-[860px] min-h-[640px]'
-      } overflow-hidden cursor-pointer select-none bg-[#120D0A]`}
+      } overflow-hidden cursor-pointer select-none`}
     >
+      {/* Warm preloaded Hero/Poster safety backdrop underneath video so zero black ever flashes */}
+      <img
+        src={isPlaying && heroImageSrc ? heroImageSrc : posterSrc}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
+      />
+
       {/* Seamless Full-Bleed Animated Scene Layer (zero controls, pointer-events-none) */}
-      <motion.div
-        animate={{
-          opacity: isFadingOut ? 0.15 : 1,
-          scale: isFadingOut ? 1.03 : 1,
-        }}
-        transition={{ duration: 0.35, ease: 'easeInOut' }}
-        className="absolute inset-0 z-0"
-      >
+      <div className="absolute inset-0 z-[1]">
         <video
           ref={videoRef}
           src={videoSrc}
@@ -145,7 +152,7 @@ export default function CinemaVideoReveal({
           onEnded={finishSequence}
           className="w-full h-full object-cover pointer-events-none"
         />
-      </motion.div>
+      </div>
 
       {/* Subtle Ambient Golden Motes while waiting for tap */}
       {!isPlaying && (
@@ -178,7 +185,7 @@ export default function CinemaVideoReveal({
         <motion.div
           animate={{ opacity: [0.85, 1, 0.85], y: [0, -3, 0] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="px-6 py-2.5 rounded-full bg-[#1C140E]/82 text-[#FFF6E0] border border-[#E5C17B]/60 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-md"
+          className="px-6 py-2.5 rounded-full bg-[#1C140E]/85 text-[#FFF6E0] border border-[#E5C17B]/60 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-md"
         >
           <span className="text-[10px] uppercase tracking-[0.24em] font-semibold">
             Tap Anywhere to Enter

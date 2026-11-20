@@ -7,6 +7,7 @@ import {
   validateCouponServer,
 } from '@/lib/coupon-helper';
 import { CardCreatePayload, createPaidCardInDb } from '@/lib/card-creator';
+import { getAuthenticatedUser } from '@/lib/server-auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -43,6 +44,14 @@ interface RazorpayOrderResponse {
 
 export async function POST(req: NextRequest) {
   try {
+    const authUser = await getAuthenticatedUser(req);
+    if (!authUser) {
+      return NextResponse.json(
+        { error: 'Please sign in to continue with payment.' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== 'object') {
       return NextResponse.json(
@@ -114,7 +123,7 @@ export async function POST(req: NextRequest) {
     if (!isCreateNew) {
       const { data: card, error: cardError } = await supabaseAdmin
         .from('ev_cards')
-        .select('id, title, is_paid')
+        .select('id, title, is_paid, user_id')
         .eq('id', rawCardId)
         .maybeSingle();
 
@@ -130,6 +139,13 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { error: 'Invitation card not found' },
           { status: 404 }
+        );
+      }
+
+      if (card.user_id && card.user_id !== authUser.id) {
+        return NextResponse.json(
+          { error: 'You do not have permission to pay for this card' },
+          { status: 403 }
         );
       }
 
@@ -166,7 +182,7 @@ export async function POST(req: NextRequest) {
       let createdCard = null;
 
       if (isCreateNew && cardPayload) {
-        createdCard = await createPaidCardInDb(supabaseAdmin, cardPayload);
+        createdCard = await createPaidCardInDb(supabaseAdmin, cardPayload, authUser.id);
         targetCardId = createdCard.id;
       } else {
         const freshExpiresAt = new Date(

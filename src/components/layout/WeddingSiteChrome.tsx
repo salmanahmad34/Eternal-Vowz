@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ export function WeddingNavbar() {
 
   useEffect(() => {
     setHostUser(DataService.getCurrentUser());
+    DataService.getAuthenticatedHost().then((u) => setHostUser(u));
   }, []);
 
   return (
@@ -112,7 +113,7 @@ export function WeddingNavbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1]"
             >
-              5 Curated Card Themes (₹79 / Card)
+              5 Curated Card Themes (â‚¹79 / Card)
             </Link>
             <Link
               href="/#how-it-works"
@@ -167,7 +168,7 @@ export function WeddingNavbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full py-3 rounded-md bg-[#C9A84C] text-white text-sm font-medium text-center"
                 >
-                  Get Started &bull; ₹79 / Card
+                  Get Started &bull; â‚¹79 / Card
                 </Link>
                 <Link
                   href="/login"
@@ -185,109 +186,76 @@ export function WeddingNavbar() {
   );
 }
 
+
 export function WeddingFooter() {
+  const year = new Date().getFullYear();
   return (
-    <footer className="bg-[#F2ECE1] border-t border-[#E2D7BD] text-[#5A4636]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
-          {/* Brand Column (2 cols) */}
-          <div className="md:col-span-2 space-y-4">
+    <footer className="bg-[#1F1410] text-[#D9C9AE]">
+      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+          {/* Brand */}
+          <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
               <EternalLogoBadge size="md" />
               <div>
-                <span className="font-serif text-2xl font-semibold text-[#291418] block leading-none">
+                <span className="font-serif text-2xl font-semibold text-[#FFF4DD] block leading-none">
                   Eternal Vowz
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.22em] text-[#8B7355] font-medium block mt-0.5">
-                  Digital Wedding Invitations &amp; RSVP Tracking
+                <span className="text-[10px] uppercase tracking-[0.22em] text-[#C9A84C] font-medium block mt-1">
+                  Digital Wedding Invitations
                 </span>
               </div>
             </div>
-            <p className="text-sm text-[#6E5B47] max-w-md leading-relaxed">
-              Invitations as special as the moment itself. Create interactive 3D Embossed Lifafas, 3D Shahi Palace Double-Door Gates, and Cinematic Frosted-Blur Veils with built-in RSVP tracking — flat <strong>₹79 per card</strong> (active for 1 month / 30 days).
+            <p className="text-sm text-[#BFAE92] max-w-sm leading-relaxed">
+              Cinematic 3D wedding cards with built-in RSVP tracking. Flat{' '}
+              <span className="text-[#FFF4DD] font-medium">â‚¹79 per card</span>, live for 30 days.
             </p>
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#E2D7BD] text-xs font-medium text-[#291418]">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#C9A84C]" />
-                <span>256-Bit SSL &amp; Payment Ready</span>
-              </span>
-              <a
-                href="mailto:mrsalman7307@gmail.com"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#E2D7BD] text-xs font-medium text-[#291418] hover:text-[#C9A84C] transition-colors"
-              >
-                <Mail className="w-3.5 h-3.5 text-[#C9A84C]" />
-                <span>mrsalman7307@gmail.com</span>
-              </a>
-            </div>
+            <a
+              href="mailto:mrsalman7307@gmail.com"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#C9A84C]/40 text-xs font-medium text-[#FFF4DD] hover:bg-[#C9A84C] hover:text-[#1F1410] transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>mrsalman7307@gmail.com</span>
+            </a>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-serif text-lg font-semibold text-[#291418] mb-3.5">
-              Quick Links
+          {/* Explore */}
+          <div className="md:col-span-3">
+            <h4 className="text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-4">
+              Explore
             </h4>
-            <ul className="space-y-2.5 text-sm text-[#6E5B47]">
-              <li>
-                <Link href="/#designs" className="hover:text-[#291418] transition-colors">
-                  5 Curated Card Themes (₹79)
-                </Link>
-              </li>
-              <li>
-                <Link href="/#how-it-works" className="hover:text-[#291418] transition-colors">
-                  How It Works
-                </Link>
-              </li>
-              <li>
-                <Link href="/#comparison" className="hover:text-[#291418] transition-colors">
-                  Paper vs Digital
-                </Link>
-              </li>
-              <li>
-                <Link href="/login" className="hover:text-[#291418] transition-colors">
-                  Host Login / Get Started
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard" className="hover:text-[#291418] transition-colors">
-                  The Host Dashboard
-                </Link>
-              </li>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/#designs" className="hover:text-white transition-colors">Card Themes</Link></li>
+              <li><Link href="/#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
+              <li><Link href="/#comparison" className="hover:text-white transition-colors">Paper vs Digital</Link></li>
+              <li><Link href="/login" className="hover:text-white transition-colors">Host Login</Link></li>
+              <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
             </ul>
           </div>
 
-          {/* Legal & Support */}
-          <div>
-            <h4 className="font-serif text-lg font-semibold text-[#291418] mb-3.5">
+          {/* Legal */}
+          <div className="md:col-span-4">
+            <h4 className="text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mb-4">
               Legal &amp; Support
             </h4>
-            <ul className="space-y-2.5 text-sm text-[#6E5B47]">
-              <li>
-                <Link href="/privacy" className="hover:text-[#291418] transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-[#291418] transition-colors">
-                  Terms &amp; Conditions (30-Day Validity)
-                </Link>
-              </li>
-              <li>
-                <Link href="/refund" className="hover:text-[#291418] transition-colors">
-                  Refund &amp; Cancellation Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-[#291418] transition-colors">
-                  Contact Us (mrsalman7307@gmail.com)
-                </Link>
-              </li>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
+              <li><Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
+            <span className="mt-5 inline-flex items-center gap-1.5 text-[11px] text-[#BFAE92]">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#C9A84C]" />
+              Secure payments by Razorpay
+            </span>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-[#E2D7BD] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#8B7355]">
-          <p>&copy; {new Date().getFullYear()} Eternal Vowz (E&amp;V). All rights reserved. 100% Original Artwork.</p>
-          <p>Support: mrsalman7307@gmail.com &bull; Priority WhatsApp Support unlocked inside Dashboard after purchase</p>
+        <div className="mt-10 pt-5 border-t border-[#C9A84C]/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#8F7F66]">
+          <p>&copy; {year} Eternal Vowz (E&amp;V). All rights reserved.</p>
+          <p>Made with care for every nikah &amp; shaadi</p>
         </div>
       </div>
     </footer>

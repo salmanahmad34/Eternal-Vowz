@@ -246,6 +246,17 @@ export default function EnvelopeExperience({
   const isCinemaVideo = Boolean(cinemaConfig);
   const isDarkPalace = invitation.theme_id === 'pearl-veil';
 
+  const heroImageSrc =
+    invitation.theme_id === 'pearl-veil'
+      ? '/assets/pearl-veil/hero-palace-corridor.jpg'
+      : invitation.theme_id === 'royal-emerald'
+      ? '/assets/mughal-silk/hero-mughal-courtyard.jpg'
+      : invitation.theme_id === 'midnight-minimalist'
+      ? '/assets/celestial-box/hero-celestial-stage.jpg'
+      : invitation.theme_id === 'blush-floral'
+      ? '/assets/shahi-gold/hero-mountain-pavilion.jpg'
+      : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg';
+
   const isFrostedBlur =
     !isCinemaVideo && cfg.opening_style === 'frosted-blur';
 
@@ -390,20 +401,22 @@ export default function EnvelopeExperience({
         } z-10 ${isDarkPalace ? 'bg-[#1A110B]' : 'bg-[#f4e2c1]'}`}
         style={{ color: isDarkPalace ? '#FFF4CF' : '#2f2a24' }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {/* =====================================================================
-              STAGE 1 & 2: 3D EMBOSSED LIFAFA OR 3D SHAHI PALACE DOUBLE-GATES
+              STAGE 1 & 2: SEAMLESS 3D CINEMA OVERLAY (ZERO BLACK FLASH) OR LIFAFA/GATES
           ===================================================================== */}
           {(stage === 'closed' || stage === 'opening') && (
             <motion.div
               key="original-opening-stage"
               initial={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.55, ease: 'easeInOut' } }}
+              exit={{ opacity: 0, transition: { duration: 0.45, ease: 'easeOut' } }}
+              className={isCinemaVideo ? 'absolute inset-x-0 top-0 z-40' : 'relative z-40'}
             >
               {isCinemaVideo && cinemaConfig ? (
                 <CinemaVideoReveal
                   videoSrc={cinemaConfig.videoSrc}
                   posterSrc={cinemaConfig.posterSrc}
+                  heroImageSrc={heroImageSrc}
                   guestName={guest ? guest.guest_name : 'Honored Guest & Family'}
                   waxSealInitial={waxSealSymbol}
                   coupleNames={coupleNames}
@@ -449,40 +462,38 @@ export default function EnvelopeExperience({
               )}
             </motion.div>
           )}
+        </AnimatePresence>
 
-          {/* =====================================================================
-              STAGE 3: OPENED ORIGINAL WATERCOLOR ILLUSTRATED INVITATION SUITE
-          ===================================================================== */}
-          {stage === 'opened' && (
-            <motion.div
-              key="opened-original-scroll"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, ease: 'easeOut' }}
-              className="relative w-full overflow-x-clip"
-            >
-              {/* Ambient Shimmering Golden Bokeh Particles */}
+        {/* =====================================================================
+            STAGE 3: OPENED INVITATION SUITE
+            (Pre-mounted directly beneath cinema video so dissolve is 100% seamless — zero black screen!)
+        ===================================================================== */}
+        {(stage === 'opened' || isCinemaVideo) && (
+          <motion.div
+            key="opened-original-scroll"
+            initial={isCinemaVideo ? { opacity: 1 } : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className={`relative w-full ${
+              stage !== 'opened'
+                ? `${isPreview ? 'h-[640px]' : 'h-[100dvh] max-h-[860px] min-h-[640px]'} overflow-hidden pointer-events-none`
+                : 'overflow-x-clip'
+            }`}
+          >
+            {/* Ambient Shimmering Golden Bokeh Particles */}
+            {stage === 'opened' && (
               <FloatingParticles count={isPreview ? 10 : 18} color="#E6B85C" />
+            )}
 
-              {/* -----------------------------------------------------------------
-                  HERO SECTION: UNIQUE THEME-SPECIFIC WATERCOLOR / PALACE SCENE (690px)
-              ----------------------------------------------------------------- */}
-              <div className="relative w-full h-[690px] overflow-hidden">
-                <img
-                  src={
-                    invitation.theme_id === 'pearl-veil'
-                      ? '/assets/pearl-veil/hero-palace-corridor.jpg'
-                      : invitation.theme_id === 'royal-emerald'
-                      ? '/assets/mughal-silk/hero-mughal-courtyard.jpg'
-                      : invitation.theme_id === 'midnight-minimalist'
-                      ? '/assets/celestial-box/hero-celestial-stage.jpg'
-                      : invitation.theme_id === 'blush-floral'
-                      ? '/assets/shahi-gold/hero-mountain-pavilion.jpg'
-                      : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg'
-                  }
-                  alt="Wedding Card Hero Scene"
-                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                />
+            {/* -----------------------------------------------------------------
+                HERO SECTION: UNIQUE THEME-SPECIFIC WATERCOLOR / PALACE SCENE (690px)
+            ----------------------------------------------------------------- */}
+            <div className="relative w-full h-[690px] overflow-hidden">
+              <img
+                src={heroImageSrc}
+                alt="Wedding Card Hero Scene"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              />
                 {invitation.theme_id === 'midnight-minimalist' && (
                   <div
                     className="absolute inset-0 pointer-events-none"
@@ -533,19 +544,20 @@ export default function EnvelopeExperience({
                 />
 
                 {/* Couple Names & Wedding Date Overlay — Sequential Ink & Word Reveal on Open */}
-                <div
-                  className={`relative z-10 px-6 text-center flex flex-col items-center ${
-                    invitation.theme_id === 'midnight-minimalist'
-                      ? 'pt-[54px]'
-                      : invitation.theme_id === 'pearl-veil' ||
-                        invitation.theme_id === 'tuscan-sunset' ||
-                        invitation.theme_id === 'royal-emerald'
-                      ? 'pt-[396px]'
-                      : invitation.theme_id === 'blush-floral'
-                      ? 'pt-[192px]'
-                      : 'pt-12'
-                  }`}
-                >
+                {stage === 'opened' && (
+                  <div
+                    className={`relative z-10 px-6 text-center flex flex-col items-center ${
+                      invitation.theme_id === 'midnight-minimalist'
+                        ? 'pt-[54px]'
+                        : invitation.theme_id === 'pearl-veil' ||
+                          invitation.theme_id === 'tuscan-sunset' ||
+                          invitation.theme_id === 'royal-emerald'
+                        ? 'pt-[396px]'
+                        : invitation.theme_id === 'blush-floral'
+                        ? 'pt-[192px]'
+                        : 'pt-12'
+                    }`}
+                  >
                   <ScrollInkHeading
                     as="h1"
                     immediate
@@ -666,47 +678,51 @@ export default function EnvelopeExperience({
                         : 'text-[#2f2a24]'
                     }`}
                   />
-                </div>
+                  </div>
+                )}
 
                 {/* Gentle Bottom Scroll Cue on Hero */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.65, duration: 0.7 }}
-                  className="absolute bottom-5 inset-x-0 z-20 flex flex-col items-center pointer-events-none"
-                >
-                  <span
-                    className={`text-[9px] font-sans uppercase tracking-[0.26em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] ${
-                      invitation.theme_id === 'midnight-minimalist' ||
-                      invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset' ||
-                      invitation.theme_id === 'royal-emerald'
-                        ? 'bg-black/45 text-[#F8E7B2]'
-                        : 'bg-[#FAF6EE]/75 text-[#5a4a38]'
-                    }`}
-                  >
-                    Scroll to Read Invitation
-                  </span>
+                {stage === 'opened' && (
                   <motion.div
-                    animate={{ y: [0, 5, 0] }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-                    className={`mt-1 ${
-                      invitation.theme_id === 'midnight-minimalist' ||
-                      invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset' ||
-                      invitation.theme_id === 'royal-emerald'
-                        ? 'text-[#F8E7B2]'
-                        : 'text-[#6e5d4b]'
-                    }`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.35, duration: 0.7 }}
+                    className="absolute bottom-5 inset-x-0 z-20 flex flex-col items-center pointer-events-none"
                   >
-                    <ChevronDown className="w-4 h-4" />
+                    <span
+                      className={`text-[9px] font-sans uppercase tracking-[0.26em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] ${
+                        invitation.theme_id === 'midnight-minimalist' ||
+                        invitation.theme_id === 'pearl-veil' ||
+                        invitation.theme_id === 'tuscan-sunset' ||
+                        invitation.theme_id === 'royal-emerald'
+                          ? 'bg-black/45 text-[#F8E7B2]'
+                          : 'bg-[#FAF6EE]/75 text-[#5a4a38]'
+                      }`}
+                    >
+                      Scroll to Read Invitation
+                    </span>
+                    <motion.div
+                      animate={{ y: [0, 5, 0] }}
+                      transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                      className={`mt-1 ${
+                        invitation.theme_id === 'midnight-minimalist' ||
+                        invitation.theme_id === 'pearl-veil' ||
+                        invitation.theme_id === 'tuscan-sunset' ||
+                        invitation.theme_id === 'royal-emerald'
+                          ? 'text-[#F8E7B2]'
+                          : 'text-[#6e5d4b]'
+                      }`}
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </motion.div>
                   </motion.div>
-                </motion.div>
+                )}
               </div>
 
               {/* -----------------------------------------------------------------
-                  CONTINUOUS SCROLL BODY (Seamless Sticky Candlelit Corridor for Pearl Veil / Rose Parchment for others)
+                  CONTINUOUS SCROLL BODY (Mounted once opened for crisp performance)
               ----------------------------------------------------------------- */}
+              {stage === 'opened' && (
               <div
                 className="relative w-full"
                 style={
@@ -1809,18 +1825,27 @@ export default function EnvelopeExperience({
                     </button>
                   )}
 
-                  <ScrollWordReveal
-                    text="Crafted with Love ❤️ Eternal Vowz (E&V) Bespoke Wedding Suite"
-                    delay={0.1}
-                    className={`font-serif italic text-xs ${
-                      isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
-                    }`}
-                  />
+                  <div className="pt-2 space-y-1.5">
+                    <div className="flex items-center justify-center gap-2 opacity-75">
+                      <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                      <span className={`font-serif text-[11px] font-semibold tracking-[0.2em] uppercase ${isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e5d4b]'}`}>
+                        E&amp;V
+                      </span>
+                      <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                    </div>
+                    <ScrollWordReveal
+                      text="Crafted with Love • Eternal Vowz Bespoke Wedding Suite"
+                      delay={0.1}
+                      className={`font-sans text-[11px] tracking-wide ${
+                        isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
+                      }`}
+                    />
+                  </div>
                 </ScrollRevealBlock>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              )}
+          </motion.div>
+        )}
       </div>
     </div>
   );

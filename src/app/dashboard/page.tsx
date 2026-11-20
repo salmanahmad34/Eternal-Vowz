@@ -71,7 +71,11 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     setLoading(true);
-    const user = DataService.getCurrentUser();
+    const user = await DataService.getAuthenticatedHost();
+    if (!user) {
+      window.location.replace('/login?next=/dashboard');
+      return;
+    }
     setHostUser(user);
 
     const cards = await DataService.getAllInvitations();
@@ -494,7 +498,9 @@ export default function DashboardPage() {
             )}
             <Link
               href="/login"
-              onClick={() => DataService.logoutHost()}
+              onClick={() => {
+                void DataService.logoutHost();
+              }}
               className="p-2.5 rounded-md bg-white border border-[#E2D7BD] hover:bg-[#F2ECE1] text-[#8B7355] hover:text-[#291418] transition-colors"
               title="Log out"
             >

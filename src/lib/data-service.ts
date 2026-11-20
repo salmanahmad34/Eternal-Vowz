@@ -529,48 +529,202 @@ function setLocalItem<T>(key: string, value: T): void {
   }
 }
 
+function mapSupabaseUser(user: {
+  id: string;
+  email?: string;
+  phone?: string;
+  created_at?: string;
+  user_metadata?: Record<string, unknown>;
+}): HostUser {
+  const meta = user.user_metadata || {};
+  const fullName =
+    (typeof meta.full_name === 'string' && meta.full_name.trim()) ||
+    (typeof meta.name === 'string' && meta.name.trim()) ||
+    (user.email ? user.email.split('@')[0] : 'Host');
+
+  return {
+    id: user.id,
+    name: fullName,
+    email: user.email || '',
+    phone: user.phone || (typeof meta.phone === 'string' ? meta.phone : ''),
+    created_at: user.created_at || new Date().toISOString(),
+  };
+}
+
 export const DataService = {
   // =========================================================================
-  // HOST AUTHENTICATION
+  // REAL SUPABASE AUTHENTICATION (Email/Password + Google OAuth PKCE)
   // =========================================================================
+  async getAuthenticatedHost(): Promise<HostUser | null> {
+    if (!isSupabaseConfigured || !supabase) return null;
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data?.user) {
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(STORAGE_KEY_USER);
+        }
+        return null;
+      }
+      const mapped = mapSupabaseUser(data.user);
+      setLocalItem(STORAGE_KEY_USER, mapped);
+      return mapped;
+    } catch {
+      return null;
+    }
+  },
+
+  async getAccessToken(): Promise<string | null> {
+    if (!isSupabaseConfigured || !supabase) return null;
+    try {
+      const { data } = await supabase.auth.getSession();
+      return data?.session?.access_token || null;
+    } catch {
+      return null;
+    }
+  },
+
   getCurrentUser(): HostUser | null {
     return getLocalItem<HostUser | null>(STORAGE_KEY_USER, null);
   },
 
-  loginHost(name: string, email: string, phone?: string): HostUser {
-    const user: HostUser = {
-      id: `host-${Date.now()}`,
-      name: name.trim() || 'Host',
-      email: email.trim() || 'host@eternalvowz.com',
-      phone: phone?.trim() || '',
-      created_at: new Date().toISOString(),
-    };
-    setLocalItem(STORAGE_KEY_USER, user);
-    return user;
+  async signInWithEmail(
+    email: string,
+    password: string
+  ): Promise<{ user: HostUser | null; error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { user: null, error: 'Authentication service is not configured.' };
+    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    if (error || !data.user) {
+      return {
+        user: null,
+        error: error?.message || 'Invalid email or password.',
+      };
+    }
+    const mapped = mapSupabaseUser(data.user);
+    setLocalItem(STORAGE_KEY_USER, mapped);
+    return { user: mapped, error: null };
   },
 
-  logoutHost(): void {
+  async signUpWithEmail(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<{ user: HostUser | null; needsConfirmation: boolean; error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return {
+        user: null,
+        needsConfirmation: false,
+        error: 'Authentication service is not configured.',
+      };
+    }
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.netlify.app';
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+        data: {
+          full_name: name.trim() || 'Host',
+        },
+      },
+    });
+
+    if (error) {
+      return { user: null, needsConfirmation: false, error: error.message };
+    }
+
+    // If Supabase returned an active session immediately, user is signed in
+    if (data.session && data.user) {
+      const mapped = mapSupabaseUser(data.user);
+      setLocalItem(STORAGE_KEY_USER, mapped);
+      return { user: mapped, needsConfirmation: false, error: null };
+    }
+
+    // Email confirmation required by Supabase Auth settings
+    return { user: null, needsConfirmation: true, error: null };
+  },
+
+  async signInWithGoogle(nextPath = '/dashboard'): Promise<{ error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: 'Authentication service is not configured.' };
+    }
+    const safeNext =
+      nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/dashboard';
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.netlify.app';
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+        queryParams: {
+          prompt: 'select_account',
+        },
+      },
+    });
+    return { error: error ? error.message : null };
+  },
+
+  async sendPasswordReset(email: string): Promise<{ error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: 'Authentication service is not configured.' };
+    }
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.netlify.app';
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`,
+    });
+    return { error: error ? error.message : null };
+  },
+
+  async updatePassword(newPassword: string): Promise<{ error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: 'Authentication service is not configured.' };
+    }
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    return { error: error ? error.message : null };
+  },
+
+  async logoutHost(): Promise<void> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // Ignore signOut network errors and clear local caches below
+      }
+    }
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem(STORAGE_KEY_USER);
+      window.localStorage.removeItem(STORAGE_KEY_INVITATIONS);
+      window.localStorage.removeItem(STORAGE_KEY_GUESTS);
     }
   },
 
   // =========================================================================
-  // INVITATION CARDS CRUD (REAL DATA ONLY — NO FAKE DASHBOARD FALLBACKS)
+  // INVITATION CARDS CRUD (STRICT PER-USER ISOLATION — NO FAKE FALLBACKS)
   // =========================================================================
   async getAllInvitations(): Promise<Invitation[]> {
     if (isSupabaseConfigured && supabase) {
       try {
+        const { data: userData } = await supabase.auth.getUser();
+        const uid = userData?.user?.id;
+        if (!uid) return [];
+
         const { data, error } = await supabase
           .from('ev_cards')
           .select('*')
+          .eq('user_id', uid)
           .order('created_at', { ascending: false });
         if (!error && Array.isArray(data)) return data as Invitation[];
       } catch (e) {
-        console.warn('Supabase getAllInvitations fallback:', e);
+        console.warn('Supabase getAllInvitations error:', e);
       }
     }
-    return getLocalItem<Invitation[]>(STORAGE_KEY_INVITATIONS, []);
+    return [];
   },
 
   async getInvitationBySlug(slug: string): Promise<Invitation | null> {
@@ -586,9 +740,6 @@ export const DataService = {
         console.warn('Supabase getInvitationBySlug fallback:', e);
       }
     }
-    const all = await this.getAllInvitations();
-    const realMatch = all.find((inv) => inv.slug === slug);
-    if (realMatch) return realMatch;
 
     // Allow Landing Page "Try Sample" preview links (/invite/layla-omar-veil, etc.) to keep working
     const demoSamples = [
@@ -614,52 +765,42 @@ export const DataService = {
         console.warn('Supabase getInvitationById fallback:', e);
       }
     }
-    const all = await this.getAllInvitations();
-    const realMatch = all.find((inv) => inv.id === id);
-    if (realMatch) return realMatch;
-
-    const demoSamples = [
-      INITIAL_DEMO_INVITATION,
-      SECOND_DEMO_INVITATION,
-      THIRD_DEMO_INVITATION,
-      FOURTH_DEMO_INVITATION,
-      FIFTH_DEMO_INVITATION,
-    ];
-    return demoSamples.find((inv) => inv.id === id) || null;
+    return null;
   },
 
   async createInvitation(newCard: Omit<Invitation, 'id' | 'created_at' | 'updated_at'>): Promise<Invitation> {
-    const all = await this.getAllInvitations();
+    const host = await this.getAuthenticatedHost();
+    if (!host) {
+      throw new Error('Authentication required to create a card.');
+    }
     const id = generateUUID();
     const nowMs = Date.now();
     const created: Invitation = {
       ...newCard,
       id,
+      user_id: host.id,
       created_at: new Date(nowMs).toISOString(),
       expires_at: new Date(nowMs + 30 * 24 * 60 * 60 * 1000).toISOString(),
       updated_at: new Date(nowMs).toISOString(),
     };
 
-    const updatedList = [created, ...all];
-    setLocalItem(STORAGE_KEY_INVITATIONS, updatedList);
-
     if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('ev_cards').insert({
-          id: created.id,
-          slug: created.slug,
-          theme_id: created.theme_id,
-          title: created.title,
-          event_date: created.event_date,
-          venue_details: created.venue_details,
-          design_config: created.design_config,
-          is_published: created.is_published,
-          created_at: created.created_at,
-          expires_at: created.expires_at,
-          updated_at: created.updated_at,
-        });
-      } catch (e) {
-        console.warn('Supabase createInvitation fallback:', e);
+      const { error } = await supabase.from('ev_cards').insert({
+        id: created.id,
+        user_id: host.id,
+        slug: created.slug,
+        theme_id: created.theme_id,
+        title: created.title,
+        event_date: created.event_date,
+        venue_details: created.venue_details,
+        design_config: created.design_config,
+        is_published: created.is_published,
+        created_at: created.created_at,
+        expires_at: created.expires_at,
+        updated_at: created.updated_at,
+      });
+      if (error) {
+        throw new Error(error.message);
       }
     }
 
@@ -667,29 +808,27 @@ export const DataService = {
   },
 
   async updateInvitation(id: string, updates: Partial<Invitation>): Promise<Invitation> {
-    const all = await this.getAllInvitations();
-    const index = all.findIndex((inv) => inv.id === id);
-    let updated: Invitation;
-
-    if (index >= 0) {
-      updated = { ...all[index], ...updates, updated_at: new Date().toISOString() };
-      all[index] = updated;
-    } else {
-      updated = {
-        ...INITIAL_DEMO_INVITATION,
-        ...updates,
-        id,
-        updated_at: new Date().toISOString(),
-      };
-      all.push(updated);
+    const host = await this.getAuthenticatedHost();
+    if (!host) {
+      throw new Error('Authentication required to update a card.');
+    }
+    const existing = await this.getInvitationById(id);
+    if (!existing || (existing.user_id && existing.user_id !== host.id)) {
+      throw new Error('You do not have permission to edit this card.');
     }
 
-    setLocalItem(STORAGE_KEY_INVITATIONS, all);
+    const updated: Invitation = {
+      ...existing,
+      ...updates,
+      id,
+      user_id: host.id,
+      updated_at: new Date().toISOString(),
+    };
 
     if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('ev_cards').upsert({
-          id: updated.id,
+      const { error } = await supabase
+        .from('ev_cards')
+        .update({
           slug: updated.slug,
           theme_id: updated.theme_id,
           title: updated.title,
@@ -697,11 +836,13 @@ export const DataService = {
           venue_details: updated.venue_details,
           design_config: updated.design_config,
           is_published: updated.is_published,
-          expires_at: updated.expires_at,
           updated_at: updated.updated_at,
-        });
-      } catch (e) {
-        console.warn('Supabase updateInvitation fallback:', e);
+        })
+        .eq('id', id)
+        .eq('user_id', host.id);
+
+      if (error) {
+        throw new Error(error.message);
       }
     }
 
@@ -709,34 +850,37 @@ export const DataService = {
   },
 
   async deleteInvitation(id: string): Promise<void> {
-    const all = await this.getAllInvitations();
-    const filtered = all.filter((inv) => inv.id !== id);
-    setLocalItem(STORAGE_KEY_INVITATIONS, filtered);
-
-    const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
-    setLocalItem(
-      STORAGE_KEY_GUESTS,
-      guests.filter((g) => g.invitation_id !== id)
-    );
+    const host = await this.getAuthenticatedHost();
+    if (!host) {
+      throw new Error('Authentication required to delete a card.');
+    }
 
     if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('ev_cards').delete().eq('id', id);
-      } catch (e) {
-        console.warn('Supabase deleteInvitation fallback:', e);
+      const { error } = await supabase
+        .from('ev_cards')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', host.id);
+      if (error) {
+        throw new Error(error.message);
       }
     }
   },
 
   // =========================================================================
-  // GUESTS & RSVP TRACKING
+  // GUESTS & RSVP TRACKING (SCOPED TO OWNER'S CARDS)
   // =========================================================================
   async getAllGuests(): Promise<GuestWithRsvp[]> {
     if (isSupabaseConfigured && supabase) {
       try {
+        const myCards = await this.getAllInvitations();
+        const cardIds = myCards.map((c) => c.id);
+        if (cardIds.length === 0) return [];
+
         const { data: guests, error } = await supabase
           .from('ev_card_guests')
           .select('*, ev_card_rsvps(*)')
+          .in('invitation_id', cardIds)
           .order('created_at', { ascending: false });
         if (!error && guests) {
           return guests.map((g: Record<string, unknown> & { ev_card_rsvps?: Record<string, unknown>[] | Record<string, unknown> }) => {
@@ -750,10 +894,10 @@ export const DataService = {
           });
         }
       } catch (e) {
-        console.warn('Supabase getAllGuests fallback:', e);
+        console.warn('Supabase getAllGuests error:', e);
       }
     }
-    return getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
+    return [];
   },
 
   async getGuestsWithRsvp(invitationId: string): Promise<GuestWithRsvp[]> {
