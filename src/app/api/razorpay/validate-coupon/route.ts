@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { validateCouponServer } from '@/lib/coupon-helper';
+import { checkRateLimit, getClientIp } from '@/lib/security';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+    const rateCheck = checkRateLimit(clientIp, 'validate-coupon', 10, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { valid: false, error: 'Too many coupon attempts. Please wait a minute before trying again.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateCheck.resetInMs / 1000)) } }
+      );
+    }
     const body = await req.json().catch(() => null);
     const code = typeof body?.code === 'string' ? body.code.trim() : '';
 

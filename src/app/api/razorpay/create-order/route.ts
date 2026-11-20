@@ -8,6 +8,7 @@ import {
 } from '@/lib/coupon-helper';
 import { CardCreatePayload, createPaidCardInDb } from '@/lib/card-creator';
 import { getAuthenticatedUser } from '@/lib/server-auth';
+import { checkRateLimit, getClientIp } from '@/lib/security';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -44,6 +45,14 @@ interface RazorpayOrderResponse {
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+    const rateCheck = checkRateLimit(clientIp, 'razorpay-create-order', 15, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Please wait a minute before creating a new order.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateCheck.resetInMs / 1000)) } }
+      );
+    }
     const authUser = await getAuthenticatedUser(req);
     if (!authUser) {
       return NextResponse.json(

@@ -19,16 +19,19 @@ export const TRACK_MAP: Record<string, string> = {
 
 export function resolveTrackUrl(trackIdOrUrl?: string): string {
   if (!trackIdOrUrl) return DEFAULT_WEDDING_AUDIO;
+  if (TRACK_MAP[trackIdOrUrl]) {
+    return TRACK_MAP[trackIdOrUrl];
+  }
   if (
     trackIdOrUrl.startsWith('http://') ||
     trackIdOrUrl.startsWith('https://') ||
-    trackIdOrUrl.startsWith('/') ||
+    (trackIdOrUrl.startsWith('/') && !trackIdOrUrl.startsWith('//')) ||
     trackIdOrUrl.startsWith('data:audio/') ||
     trackIdOrUrl.startsWith('blob:')
   ) {
     return trackIdOrUrl;
   }
-  return TRACK_MAP[trackIdOrUrl] || DEFAULT_WEDDING_AUDIO;
+  return DEFAULT_WEDDING_AUDIO;
 }
 
 class LuxuryAudioPlayer {

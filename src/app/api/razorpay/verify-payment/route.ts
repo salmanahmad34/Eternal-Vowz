@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { incrementCouponUsage } from '@/lib/coupon-helper';
 import { CardCreatePayload, createPaidCardInDb } from '@/lib/card-creator';
 import { getAuthenticatedUser } from '@/lib/server-auth';
+import { checkRateLimit, getClientIp } from '@/lib/security';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,14 @@ function verifyCheckoutSignature(
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+    const rateCheck = checkRateLimit(clientIp, 'razorpay-verify-payment', 20, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Too many verification attempts. Please wait a minute.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateCheck.resetInMs / 1000)) } }
+      );
+    }
     const authUser = await getAuthenticatedUser(req);
     if (!authUser) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });

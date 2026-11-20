@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TimelineItem, VenueDetails } from '@/types/database';
+import { safeExternalUrl } from '@/lib/security';
 import { 
   MapPin, 
   ExternalLink, 
@@ -160,7 +161,7 @@ export default function EventSchedule({
         {/* Action Buttons: Open Maps & Add to Calendar */}
         <div className="pt-3 border-t border-stone-200/80 flex flex-col sm:flex-row gap-2.5">
           <a
-            href={venue.maps_url || `https://maps.google.com/?q=${encodeURIComponent(venue.venue_name + ' ' + venue.address)}`}
+            href={safeExternalUrl(venue.maps_url) !== '#' ? safeExternalUrl(venue.maps_url) : `https://maps.google.com/?q=${encodeURIComponent(venue.venue_name + ' ' + venue.address)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-sans text-xs sm:text-sm font-medium shadow-xs transition-colors"

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Invitation, GuestWithRsvp } from '@/types/database';
 import { luxuryAudio } from '@/lib/audio';
+import { safeExternalUrl } from '@/lib/security';
 import OriginalEmbossedLifafa from './OriginalEmbossedLifafa';
 import RoyalPalaceGatesReveal from './RoyalPalaceGatesReveal';
 import FrostedBlurReveal from './FrostedBlurReveal';
@@ -912,7 +913,7 @@ export default function EnvelopeExperience({
                     {invitation.venue_details.maps_url && (
                       <ScrollRevealBlock direction="up" delay={0.16}>
                         <a
-                          href={invitation.venue_details.maps_url}
+                          href={safeExternalUrl(invitation.venue_details.maps_url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`mt-5 mx-auto max-w-[285px] rounded-full px-4 py-2.5 shadow-md flex items-center justify-between gap-3 transition-transform hover:scale-[1.02] ${

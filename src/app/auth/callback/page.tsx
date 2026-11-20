@@ -6,14 +6,8 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { DataService } from '@/lib/data-service';
 import { EternalLogoBadge } from '@/components/layout/EternalLoader';
+import { sanitizeNextPath } from '@/lib/security';
 import { Loader2, AlertCircle } from 'lucide-react';
-
-function sanitizeNext(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.includes('\\')) {
-    return '/dashboard';
-  }
-  return raw;
-}
 
 function AuthCallbackHandler() {
   const router = useRouter();
@@ -36,7 +30,7 @@ function AuthCallbackHandler() {
         return;
       }
 
-      const nextPath = sanitizeNext(searchParams.get('next'));
+      const nextPath = sanitizeNextPath(searchParams.get('next'));
       const code = searchParams.get('code');
 
       try {

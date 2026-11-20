@@ -1,5 +1,6 @@
 import { Invitation, GuestWithRsvp, RSVP, RsvpStatus, HostUser } from '@/types/database';
 import { supabase, isSupabaseConfigured } from './supabase';
+import { sanitizeText } from './security';
 
 const STORAGE_KEY_INVITATIONS = 'eternal_vowz_invitations_v8';
 const STORAGE_KEY_GUESTS = 'eternal_vowz_guests_v8';
@@ -987,16 +988,31 @@ export const DataService = {
     guestId: string,
     rsvpData: { status: RsvpStatus; headcount: number; meal_choice?: string; message?: string }
   ): Promise<RSVP> {
+    const cleanGuestId = sanitizeText(guestId, 64);
+    if (!cleanGuestId) {
+      throw new Error('Valid guest identifier required');
+    }
+
+    const validStatus: RsvpStatus =
+      rsvpData.status === 'attending' || rsvpData.status === 'declined'
+        ? rsvpData.status
+        : 'pending';
+    const cleanHeadcount = validStatus === 'attending'
+      ? Math.max(1, Math.min(20, Math.floor(Number(rsvpData.headcount) || 1)))
+      : 0;
+    const cleanMessage = sanitizeText(rsvpData.message, 500);
+    const cleanMeal = sanitizeText(rsvpData.meal_choice, 100);
+
     const guests = getLocalItem<GuestWithRsvp[]>(STORAGE_KEY_GUESTS, []);
-    const guest = guests.find((g) => g.id === guestId);
+    const guest = guests.find((g) => g.id === cleanGuestId);
 
     const updatedRsvp: RSVP = {
       id: guest?.rsvp?.id || generateUUID(),
-      guest_id: guestId,
-      status: rsvpData.status,
-      headcount: rsvpData.headcount,
-      meal_choice: rsvpData.meal_choice,
-      message: rsvpData.message,
+      guest_id: cleanGuestId,
+      status: validStatus,
+      headcount: cleanHeadcount,
+      meal_choice: cleanMeal || undefined,
+      message: cleanMessage || undefined,
       updated_at: new Date().toISOString(),
     };
 
