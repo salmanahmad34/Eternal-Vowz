@@ -138,11 +138,44 @@ export const THEMES: Record<ThemeId, ThemeConfig> = {
   },
 };
 
-export const MUSIC_TRACKS = [
-  { id: 'wedding-nasheed', name: 'Eternal Vowz Signature Wedding Vocal Nasheed', mood: 'Soulful, Serene & 100% Halal' },
-  { id: 'royal-harp', name: 'Eternal Vowz Signature Wedding Vocal Nasheed (Classic)', mood: 'Warm, Classical & Ethereal' },
-  { id: 'acoustic-romance', name: 'Eternal Vowz Signature Wedding Vocal Nasheed (Intimate)', mood: 'Intimate, Heartfelt & Pure' },
-  { id: 'cinematic-piano', name: 'Eternal Vowz Signature Wedding Vocal Nasheed (Grand)', mood: 'Poetic, Uplifting & Royal' },
+export interface MusicTrackOption {
+  id: string;
+  name: string;
+  mood: string;
+  url: string;
+}
+
+export const MUSIC_TRACKS: MusicTrackOption[] = [
+  {
+    id: 'wedding-nasheed',
+    name: 'Eternal Vowz Signature Nasheed',
+    mood: 'Soulful, Serene & Halal Vocals',
+    url: '/assets/audio/wedding-nasheed.mp3',
+  },
+  {
+    id: 'royal-bansuri-flute',
+    name: 'Royal Mughal Bansuri & Flute',
+    mood: 'Warm, Spiritual & Ethereal Indian Melody',
+    url: '/assets/audio/royal-bansuri-flute.mp3',
+  },
+  {
+    id: 'romantic-piano-strings',
+    name: 'Romantic Candlelight Piano & Strings',
+    mood: 'Heartfelt, Gentle & Poetic Romance',
+    url: '/assets/audio/romantic-piano-strings.mp3',
+  },
+  {
+    id: 'shahi-sitar-melodies',
+    name: 'Shahi Darbar Sitar & Classical Raag',
+    mood: 'Royal Court Sitar & Classical Atmosphere',
+    url: '/assets/audio/shahi-sitar-melodies.mp3',
+  },
+  {
+    id: 'ethereal-harp-strings',
+    name: 'Ethereal Celesta & Golden Harp',
+    mood: 'Fairytale, Pure & Celestial Harmony',
+    url: '/assets/audio/ethereal-harp-strings.mp3',
+  },
 ];
 
 export const MEAL_OPTIONS = [

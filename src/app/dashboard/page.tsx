@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem } from '@/types/database';
 import { DataService, INITIAL_DEMO_INVITATION } from '@/lib/data-service';
-import { THEMES } from '@/lib/themes';
+import { THEMES, MUSIC_TRACKS } from '@/lib/themes';
+import { luxuryAudio } from '@/lib/audio';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
 import { EternalLogoBadge } from '@/components/layout/EternalLoader';
 import RazorpayCheckoutModal from '@/components/RazorpayCheckoutModal';
@@ -38,6 +39,9 @@ import {
   Calendar,
   Settings,
   CreditCard,
+  Music,
+  Volume2,
+  Upload,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -68,6 +72,46 @@ export default function DashboardPage() {
   const [showMobilePreviewModal, setShowMobilePreviewModal] = useState(false);
   const [checkoutCard, setCheckoutCard] = useState<Invitation | null>(null);
   const [checkoutMode, setCheckoutMode] = useState<'pay-existing' | 'create-new'>('pay-existing');
+  const [previewTrackId, setPreviewTrackId] = useState<string | null>(null);
+
+  const handleToggleAudioPreview = (trackIdOrUrl: string) => {
+    const isNowPlaying = luxuryAudio.togglePreview(trackIdOrUrl);
+    setPreviewTrackId(isNowPlaying ? trackIdOrUrl : null);
+  };
+
+  const handleCustomAudioFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      setSaveToast('Audio file size must be less than 15MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setDraftCard({
+        ...draftCard,
+        design_config: {
+          ...draftCard.design_config,
+          music_track: 'custom',
+          custom_music_url: dataUrl,
+        },
+      });
+      setSaveToast(`Custom song loaded: ${file.name}`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCustomAudioUrlChange = (url: string) => {
+    setDraftCard({
+      ...draftCard,
+      design_config: {
+        ...draftCard.design_config,
+        music_track: 'custom',
+        custom_music_url: url,
+      },
+    });
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -1472,6 +1516,160 @@ export default function DashboardPage() {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+
+                {/* Wedding Music Selection & Audio Player */}
+                <div className="rounded-xl bg-white border border-neutral-200 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-[#FAF3E0] text-[#B8860B] flex items-center justify-center">
+                        <Music className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-neutral-900">
+                          Wedding Background Music
+                        </h4>
+                        <p className="text-xs text-neutral-500">
+                          Plays continuously from the moment guest taps to open card (Listen samples or use custom song)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 5 Curated Tracks */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {MUSIC_TRACKS.map((track) => {
+                      const isSelected =
+                        (draftCard.design_config.music_track || 'wedding-nasheed') === track.id &&
+                        !draftCard.design_config.custom_music_url;
+                      const isPlaying = previewTrackId === track.id;
+
+                      return (
+                        <div
+                          key={track.id}
+                          className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-2 cursor-pointer ${
+                            isSelected
+                              ? 'border-[#B8860B] bg-[#FFFBF0] ring-1 ring-[#B8860B]'
+                              : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                          }`}
+                          onClick={() => {
+                            setDraftCard({
+                              ...draftCard,
+                              design_config: {
+                                ...draftCard.design_config,
+                                music_track: track.id,
+                                custom_music_url: '',
+                              },
+                            });
+                            setReplayTrigger((p) => p + 1);
+                          }}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`w-2 h-2 rounded-full ${
+                                  isSelected ? 'bg-[#B8860B]' : 'bg-neutral-300'
+                                }`}
+                              />
+                              <div className="text-xs font-semibold text-neutral-900 truncate">
+                                {track.name}
+                              </div>
+                            </div>
+                            <div className="text-[11px] text-neutral-500 truncate mt-0.5">
+                              {track.mood}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleAudioPreview(track.id);
+                            }}
+                            className={`p-1.5 px-2.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors shrink-0 ${
+                              isPlaying
+                                ? 'bg-[#B8860B] text-white border-[#B8860B]'
+                                : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100'
+                            }`}
+                            title={isPlaying ? 'Pause' : 'Listen Sample'}
+                          >
+                            <Volume2
+                              className={`w-3.5 h-3.5 ${isPlaying ? 'animate-pulse' : ''}`}
+                            />
+                            <span className="text-[10px]">{isPlaying ? 'Stop' : 'Listen'}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Custom Music Upload & URL */}
+                  <div className="pt-2 border-t border-neutral-100 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-neutral-800 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#B8860B]" />
+                        <span>Add Custom Wedding Song (Bride &amp; Groom Choice)</span>
+                      </label>
+                      {draftCard.design_config.custom_music_url && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">
+                          Custom Song Active
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {/* Upload MP3 from device */}
+                      <label className="border border-dashed border-neutral-300 hover:border-[#B8860B] rounded-xl p-3 flex items-center gap-2.5 cursor-pointer bg-neutral-50 hover:bg-[#FFFDF7] transition-all">
+                        <Upload className="w-4 h-4 text-neutral-600 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium text-neutral-800 truncate">
+                            Upload MP3 from Phone / PC
+                          </div>
+                          <div className="text-[10px] text-neutral-500">
+                            Select custom audio file (up to 15MB)
+                          </div>
+                        </div>
+                        <input
+                          type="file"
+                          accept="audio/*"
+                          className="hidden"
+                          onChange={handleCustomAudioFileUpload}
+                        />
+                      </label>
+
+                      {/* Direct Audio URL */}
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="url"
+                          value={
+                            draftCard.design_config.custom_music_url?.startsWith('data:')
+                              ? 'Custom Audio File Uploaded'
+                              : draftCard.design_config.custom_music_url || ''
+                          }
+                          disabled={Boolean(
+                            draftCard.design_config.custom_music_url?.startsWith('data:')
+                          )}
+                          onChange={(e) => handleCustomAudioUrlChange(e.target.value)}
+                          placeholder="Paste MP3 Audio URL (https://...)"
+                          className="flex-1 px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-[#B8860B]"
+                        />
+                        {draftCard.design_config.custom_music_url && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleToggleAudioPreview(
+                                draftCard.design_config.custom_music_url!
+                              )
+                            }
+                            className="p-2 rounded-xl bg-[#B8860B] text-white text-xs hover:bg-[#996F08] shrink-0"
+                            title="Listen Custom Music"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

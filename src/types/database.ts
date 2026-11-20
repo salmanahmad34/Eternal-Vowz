@@ -38,6 +38,7 @@ export interface DesignConfig {
   subtitle?: string;
   story?: string;
   music_track?: string;
+  custom_music_url?: string;
   wax_seal_initial?: string;
   opening_style?: 'lifafa' | 'palace-gates' | 'frosted-blur';
   accent_color?: string;

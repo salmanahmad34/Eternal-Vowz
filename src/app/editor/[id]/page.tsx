@@ -24,7 +24,9 @@ import {
   Check, 
   ChevronLeft,
   Heart,
-  Volume2
+  Volume2,
+  Upload,
+  Sparkles,
 } from 'lucide-react';
 
 export default function InvitationEditorPage() {
@@ -122,15 +124,30 @@ export default function InvitationEditorPage() {
     handleUpdateDesign({ timeline: updated });
   };
 
-  const testMusicTrack = (trackId: string) => {
-    if (audioPreviewPlaying === trackId) {
-      luxuryAudio.stop();
-      setAudioPreviewPlaying(null);
-    } else {
-      luxuryAudio.stop();
-      luxuryAudio.startAmbientMusic(trackId);
-      setAudioPreviewPlaying(trackId);
-    }
+  const testMusicTrack = (trackIdOrUrl: string) => {
+    const isNowPlaying = luxuryAudio.togglePreview(trackIdOrUrl);
+    setAudioPreviewPlaying(isNowPlaying ? trackIdOrUrl : null);
+  };
+
+  const handleCustomAudioFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      handleUpdateDesign({
+        music_track: 'custom',
+        custom_music_url: dataUrl,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCustomAudioUrlChange = (url: string) => {
+    handleUpdateDesign({
+      music_track: 'custom',
+      custom_music_url: url,
+    });
   };
 
   return (
@@ -654,6 +671,70 @@ export default function InvitationEditorPage() {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Custom Wedding Music Section */}
+              <div className="p-4 rounded-2xl border-2 border-stone-200 bg-white space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                    <h4 className="font-serif font-medium text-sm text-stone-900">
+                      Add Custom Couple Track
+                    </h4>
+                  </div>
+                  {invitation.design_config.custom_music_url && (
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">
+                      Custom Song Active
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-2.5">
+                  <label className="border border-dashed border-stone-300 hover:border-[#C5A059] rounded-xl p-3 flex items-center gap-2.5 cursor-pointer bg-stone-50 hover:bg-[#FFFDF7] transition-all">
+                    <Upload className="w-4 h-4 text-stone-600 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-stone-800 truncate">
+                        Upload MP3 file from Device
+                      </div>
+                      <div className="text-[10px] text-stone-500">
+                        Select audio from phone / computer (up to 15MB)
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className="hidden"
+                      onChange={handleCustomAudioFileUpload}
+                    />
+                  </label>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="url"
+                      value={
+                        invitation.design_config.custom_music_url?.startsWith('data:')
+                          ? 'Custom Audio File Uploaded'
+                          : invitation.design_config.custom_music_url || ''
+                      }
+                      disabled={Boolean(
+                        invitation.design_config.custom_music_url?.startsWith('data:')
+                      )}
+                      onChange={(e) => handleCustomAudioUrlChange(e.target.value)}
+                      placeholder="Or paste direct MP3 link (https://...)"
+                      className="flex-1 px-3 py-2 rounded-xl border border-stone-200 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#C5A059]/40"
+                    />
+                    {invitation.design_config.custom_music_url && (
+                      <button
+                        type="button"
+                        onClick={() => testMusicTrack(invitation.design_config.custom_music_url!)}
+                        className="p-2 rounded-xl bg-[#C5A059] text-white hover:bg-[#B38F46] shrink-0"
+                        title="Listen to Custom Song"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900 space-y-1">

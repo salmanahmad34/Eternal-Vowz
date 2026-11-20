@@ -1,25 +1,63 @@
-// Eternal Vowz (E&V) Signature Wedding Audio Player
-// Plays the custom uploaded soulful wedding vocal track (/assets/audio/wedding-nasheed.mp3)
-// across every wedding invitation card with smooth fade-in, seamless looping & mute control.
+// Eternal Vowz (E&V) Luxury Wedding Audio Engine
+// Plays curated background music tracks or custom uploaded bride & groom songs
+// with smooth volume fade-in, seamless looping, sample listening preview & mute control.
 
-export const WEDDING_AUDIO_URL = '/assets/audio/wedding-nasheed.mp3';
+export const DEFAULT_WEDDING_AUDIO = '/assets/audio/wedding-nasheed.mp3';
+
+export const TRACK_MAP: Record<string, string> = {
+  'wedding-nasheed': '/assets/audio/wedding-nasheed.mp3',
+  'royal-bansuri-flute': '/assets/audio/royal-bansuri-flute.mp3',
+  'romantic-piano-strings': '/assets/audio/romantic-piano-strings.mp3',
+  'shahi-sitar-melodies': '/assets/audio/shahi-sitar-melodies.mp3',
+  'ethereal-harp-strings': '/assets/audio/ethereal-harp-strings.mp3',
+
+  // Legacy theme aliases
+  'royal-harp': '/assets/audio/ethereal-harp-strings.mp3',
+  'acoustic-romance': '/assets/audio/royal-bansuri-flute.mp3',
+  'cinematic-piano': '/assets/audio/romantic-piano-strings.mp3',
+};
+
+export function resolveTrackUrl(trackIdOrUrl?: string): string {
+  if (!trackIdOrUrl) return DEFAULT_WEDDING_AUDIO;
+  if (
+    trackIdOrUrl.startsWith('http://') ||
+    trackIdOrUrl.startsWith('https://') ||
+    trackIdOrUrl.startsWith('/') ||
+    trackIdOrUrl.startsWith('data:audio/') ||
+    trackIdOrUrl.startsWith('blob:')
+  ) {
+    return trackIdOrUrl;
+  }
+  return TRACK_MAP[trackIdOrUrl] || DEFAULT_WEDDING_AUDIO;
+}
 
 class LuxuryAudioPlayer {
   private audio: HTMLAudioElement | null = null;
+  private previewAudio: HTMLAudioElement | null = null;
   private ctx: AudioContext | null = null;
   private isPlaying = false;
   private isMuted = false;
   private fadeTimer: number | null = null;
-  private currentTrack = 'wedding-nasheed';
+  private currentTrackOrUrl = 'wedding-nasheed';
+  private previewTrackOrUrl: string | null = null;
   private targetVolume = 0.78;
 
-  private ensureAudioElement(): HTMLAudioElement | null {
+  private ensureAudioElement(targetUrl: string): HTMLAudioElement | null {
     if (typeof window === 'undefined') return null;
     if (!this.audio) {
-      this.audio = new Audio(WEDDING_AUDIO_URL);
+      this.audio = new Audio(targetUrl);
       this.audio.loop = true;
       this.audio.preload = 'auto';
       this.audio.volume = 0;
+    } else {
+      // Check if URL changed
+      const currentSrc = this.audio.src;
+      const isSame = currentSrc === targetUrl || currentSrc.endsWith(targetUrl);
+      if (!isSame) {
+        this.audio.pause();
+        this.audio.src = targetUrl;
+        this.audio.currentTime = 0;
+      }
     }
     return this.audio;
   }
@@ -65,36 +103,13 @@ class LuxuryAudioPlayer {
     }
   }
 
-  // Unlocks HTMLAudioElement synchronously inside a user tap gesture WITHOUT playing sound yet,
-  // so mobile Safari/Chrome allow music to start automatically once an intro animation finishes.
-  public primeForDelayedPlay() {
-    const el = this.ensureAudioElement();
-    if (!el || this.isPlaying) return;
-    try {
-      this.clearFade();
-      el.muted = true;
-      el.volume = 0;
-      const p = el.play();
-      if (p !== undefined) {
-        p.then(() => {
-          if (!this.isPlaying && this.audio) {
-            this.audio.pause();
-            this.audio.currentTime = 0;
-            this.audio.muted = this.isMuted;
-          }
-        }).catch(() => {
-          // Ignore if browser blocks silent unlock
-        });
-      }
-    } catch {
-      // Ignore audio prime errors
-    }
-  }
-
   // Starts the signature wedding MP3 immediately inside the user tap gesture with smooth volume fade-in
-  public startAmbientMusic(trackId: string = 'wedding-nasheed') {
-    this.currentTrack = trackId || 'wedding-nasheed';
-    const el = this.ensureAudioElement();
+  public startAmbientMusic(trackIdOrUrl?: string) {
+    this.stopPreview();
+    const resolvedUrl = resolveTrackUrl(trackIdOrUrl);
+    this.currentTrackOrUrl = trackIdOrUrl || 'wedding-nasheed';
+
+    const el = this.ensureAudioElement(resolvedUrl);
     if (!el) return;
 
     this.clearFade();
@@ -132,6 +147,61 @@ class LuxuryAudioPlayer {
     }
   }
 
+  // Previews an audio sample in the editor / dashboard form
+  public togglePreview(trackIdOrUrl: string): boolean {
+    const resolvedUrl = resolveTrackUrl(trackIdOrUrl);
+
+    // If currently previewing this track, pause it
+    if (this.previewAudio && this.previewTrackOrUrl === trackIdOrUrl && !this.previewAudio.paused) {
+      this.previewAudio.pause();
+      this.previewTrackOrUrl = null;
+      return false;
+    }
+
+    // Stop ambient music if playing
+    this.stop();
+
+    if (!this.previewAudio) {
+      this.previewAudio = new Audio();
+      this.previewAudio.volume = 0.85;
+      this.previewAudio.onended = () => {
+        this.previewTrackOrUrl = null;
+      };
+    } else {
+      this.previewAudio.pause();
+    }
+
+    this.previewAudio.src = resolvedUrl;
+    this.previewAudio.currentTime = 0;
+    this.previewTrackOrUrl = trackIdOrUrl;
+
+    const p = this.previewAudio.play();
+    if (p !== undefined) {
+      p.catch((err) => {
+        console.warn('Preview blocked:', err);
+        this.previewTrackOrUrl = null;
+      });
+    }
+    return true;
+  }
+
+  public stopPreview() {
+    if (this.previewAudio) {
+      try {
+        this.previewAudio.pause();
+        this.previewAudio.currentTime = 0;
+      } catch {}
+      this.previewTrackOrUrl = null;
+    }
+  }
+
+  public getPreviewTrack(): string | null {
+    if (this.previewAudio && !this.previewAudio.paused) {
+      return this.previewTrackOrUrl;
+    }
+    return null;
+  }
+
   public stop() {
     this.isPlaying = false;
     this.clearFade();
@@ -165,8 +235,8 @@ class LuxuryAudioPlayer {
     return {
       isPlaying: this.isPlaying,
       isMuted: this.isMuted,
-      track: this.currentTrack,
-      src: WEDDING_AUDIO_URL,
+      track: this.currentTrackOrUrl,
+      src: this.audio?.src || DEFAULT_WEDDING_AUDIO,
     };
   }
 }

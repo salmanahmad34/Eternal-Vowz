@@ -135,7 +135,8 @@ export default function EnvelopeExperience({
 
     // Start signature wedding music synchronously within the user tap gesture for 100% mobile compatibility
     if (autoPlayAudio) {
-      luxuryAudio.startAmbientMusic(invitation.design_config.music_track || 'wedding-nasheed');
+      const activeTrack = invitation.design_config.custom_music_url || invitation.design_config.music_track || 'wedding-nasheed';
+      luxuryAudio.startAmbientMusic(activeTrack);
     }
 
     setTimeout(() => {
@@ -144,21 +145,21 @@ export default function EnvelopeExperience({
     }, 1850);
   };
 
-  // For Pearl Botanical Veil 3D Cinema Video Intro:
-  // 1) On tap anywhere -> start seamless video immediately & silently prime mobile audio (music does NOT play yet)
-  // 2) On video end -> reveal card immediately & start background wedding music!
+  // Starts ambient wedding music right from the first tap across all cards (including 3D Cinema Video cards):
   const handleCinemaStart = () => {
     if (stage !== 'closed') return;
     setStage('opening');
     if (autoPlayAudio) {
-      luxuryAudio.primeForDelayedPlay();
+      const activeTrack = invitation.design_config.custom_music_url || invitation.design_config.music_track || 'wedding-nasheed';
+      luxuryAudio.startAmbientMusic(activeTrack);
     }
   };
 
   const handleCinemaComplete = () => {
     setStage('opened');
     if (autoPlayAudio) {
-      luxuryAudio.startAmbientMusic(invitation.design_config.music_track || 'wedding-nasheed');
+      const activeTrack = invitation.design_config.custom_music_url || invitation.design_config.music_track || 'wedding-nasheed';
+      luxuryAudio.startAmbientMusic(activeTrack);
     }
     if (onAnimationComplete) onAnimationComplete();
   };
