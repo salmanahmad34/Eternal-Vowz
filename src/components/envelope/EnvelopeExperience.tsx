@@ -10,6 +10,7 @@ import RoyalPalaceGatesReveal from './RoyalPalaceGatesReveal';
 import FrostedBlurReveal from './FrostedBlurReveal';
 import CinemaVideoReveal from './CinemaVideoReveal';
 import FloatingParticles from './FloatingParticles';
+import ScratchCardDate from '../invitation/ScratchCardDate';
 import RsvpSection from '../invitation/RsvpSection';
 import {
   ScrollInkHeading,
@@ -92,6 +93,51 @@ export default function EnvelopeExperience({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 165, hours: 18, minutes: 14, seconds: 32 });
+  const [isDateRevealed, setIsDateRevealed] = useState(false);
+
+  // Restore scratched/revealed date status from localStorage (persists across page reloads)
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const key = `ev_date_scratched_${invitation.slug || invitation.id}`;
+        if (localStorage.getItem(key) === 'true') {
+          setIsDateRevealed(true);
+        }
+      }
+    } catch {
+      // Storage unavailable in private browsing
+    }
+  }, [invitation.slug, invitation.id]);
+
+  // Forward desktop wheel events to the phone frame container for seamless snap scrolling
+  useEffect(() => {
+    if (isPreview || stage !== 'opened') return;
+    const phoneContainer = document.querySelector('[data-invitation-phone-frame="true"]');
+    if (!phoneContainer) return;
+
+    const handleWindowWheel = (e: WheelEvent) => {
+      if (!phoneContainer.contains(e.target as Node)) {
+        phoneContainer.scrollBy({ top: e.deltaY, behavior: 'auto' });
+      }
+    };
+    window.addEventListener('wheel', handleWindowWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWindowWheel);
+  }, [isPreview, stage]);
+
+  // Smooth scroll to next section
+  const scrollToNextSection = (targetId?: string) => {
+    if (targetId) {
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    const phoneContainer = document.querySelector('[data-invitation-phone-frame="true"]');
+    if (phoneContainer) {
+      phoneContainer.scrollBy({ top: window.innerHeight * 0.92, behavior: 'smooth' });
+    }
+  };
 
   // Live countdown ticker
   useEffect(() => {
@@ -312,9 +358,9 @@ export default function EnvelopeExperience({
             ? 'w-full bg-[#1A110B]'
             : 'w-full bg-[#f4e2c1]'
           : isDarkPalace
-          ? 'min-h-[100dvh] bg-[#120B07] flex justify-center'
-          : 'min-h-[100dvh] bg-[#f5f0e6] flex justify-center'
-      } overflow-x-clip relative select-none`}
+          ? 'h-[100dvh] overflow-hidden bg-[#120B07] flex justify-center'
+          : 'h-[100dvh] overflow-hidden bg-[#f5f0e6] flex justify-center'
+      } relative select-none`}
     >
       {/* =========================================================================
           DESKTOP BACKGROUND FRAMING (Candlelit Palace Glow vs Watercolor Corners)
@@ -404,10 +450,19 @@ export default function EnvelopeExperience({
       ========================================================================= */}
       <div
         data-invitation-phone-frame="true"
-        className={`relative overflow-x-clip w-full ${
-          isPreview ? '' : 'md:max-w-[390px] mx-auto md:shadow-2xl min-h-[100dvh]'
+        className={`relative w-full ${
+          isPreview
+            ? 'overflow-x-clip'
+            : stage === 'opened'
+            ? 'md:max-w-[390px] mx-auto md:shadow-2xl h-[100dvh] overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth'
+            : 'md:max-w-[390px] mx-auto md:shadow-2xl h-[100dvh] overflow-hidden'
         } z-10 ${isDarkPalace ? 'bg-[#1A110B]' : 'bg-[#f4e2c1]'}`}
-        style={{ color: isDarkPalace ? '#FFF4CF' : '#2f2a24' }}
+        style={{
+          color: isDarkPalace ? '#FFF4CF' : '#2f2a24',
+          scrollSnapType: !isPreview && stage === 'opened' ? 'y mandatory' : undefined,
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch',
+        }}
       >
         <AnimatePresence>
           {/* =====================================================================
@@ -496,7 +551,7 @@ export default function EnvelopeExperience({
             {/* -----------------------------------------------------------------
                 HERO SECTION: UNIQUE THEME-SPECIFIC WATERCOLOR / PALACE SCENE (full viewport height matches video)
             ----------------------------------------------------------------- */}
-            <div className="relative w-full h-[100dvh] max-h-[860px] min-h-[640px] overflow-hidden">
+            <div className="relative w-full h-[100dvh] snap-start snap-always shrink-0 overflow-hidden">
               <img
                 src={heroImageSrc}
                 alt="Wedding Card Hero Scene"
@@ -668,24 +723,65 @@ export default function EnvelopeExperience({
                     }
                   />
 
-                  {/* Date in 24.10.2027 format */}
-                  <ScrollInkHeading
-                    as="div"
-                    immediate
-                    delay={1.3}
-                    duration={0.8}
-                    text={dotDate}
-                    className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
-                      invitation.theme_id === 'midnight-minimalist' ||
-                      invitation.theme_id === 'pearl-veil' ||
-                      invitation.theme_id === 'tuscan-sunset' ||
-                      invitation.theme_id === 'royal-emerald'
-                        ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
-                        : invitation.theme_id === 'blush-floral'
-                        ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
-                        : 'text-[#2f2a24]'
-                    }`}
-                  />
+                  {/* Mystery Hidden Date Lock before scratch vs Revealed Date after scratch */}
+                  {!isDateRevealed ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-1 flex flex-col items-center gap-1.5"
+                    >
+                      <span
+                        className={`font-mono text-[19px] tracking-[0.35em] select-none ${
+                          invitation.theme_id === 'midnight-minimalist' ||
+                          invitation.theme_id === 'pearl-veil' ||
+                          invitation.theme_id === 'tuscan-sunset' ||
+                          invitation.theme_id === 'royal-emerald'
+                            ? 'text-[#F5E8C8]/85 drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
+                            : invitation.theme_id === 'blush-floral'
+                            ? 'text-[#4A2E20]/80'
+                            : 'text-[#5a5044]'
+                        }`}
+                      >
+                        •• •• ••••
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => scrollToNextSection('card-section-countdown')}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-sans font-semibold tracking-wider uppercase transition-all shadow-sm cursor-pointer ${
+                          isDarkPalace
+                            ? 'bg-[#1C120B]/90 text-[#E5C17B] border border-[#E5C17B]/50 hover:bg-[#2A1B10]'
+                            : 'bg-[#FAF6EE]/95 text-[#6E4F28] border border-[#C5A059]/40 hover:bg-white'
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 text-[#E5C17B] animate-spin" />
+                        <span>Scratch to Reveal Date Below ↓</span>
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.55 }}
+                    >
+                      <ScrollInkHeading
+                        as="div"
+                        immediate
+                        delay={0.1}
+                        duration={0.8}
+                        text={dotDate}
+                        className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
+                          invitation.theme_id === 'midnight-minimalist' ||
+                          invitation.theme_id === 'pearl-veil' ||
+                          invitation.theme_id === 'tuscan-sunset' ||
+                          invitation.theme_id === 'royal-emerald'
+                            ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
+                            : invitation.theme_id === 'blush-floral'
+                            ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
+                            : 'text-[#2f2a24]'
+                        }`}
+                      />
+                    </motion.div>
+                  )}
                   </div>
                 )}
 
@@ -695,19 +791,20 @@ export default function EnvelopeExperience({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.35, duration: 0.7 }}
-                    className="absolute bottom-5 inset-x-0 z-20 flex flex-col items-center pointer-events-none"
+                    onClick={() => scrollToNextSection('card-section-countdown')}
+                    className="absolute bottom-5 inset-x-0 z-20 flex flex-col items-center cursor-pointer pointer-events-auto"
                   >
                     <span
-                      className={`text-[9px] font-sans uppercase tracking-[0.26em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] ${
+                      className={`text-[9px] font-sans uppercase tracking-[0.24em] font-semibold px-3 py-1 rounded-full backdrop-blur-[2px] transition-transform hover:scale-105 ${
                         invitation.theme_id === 'midnight-minimalist' ||
                         invitation.theme_id === 'pearl-veil' ||
                         invitation.theme_id === 'tuscan-sunset' ||
                         invitation.theme_id === 'royal-emerald'
-                          ? 'bg-black/45 text-[#F8E7B2]'
-                          : 'bg-[#FAF6EE]/75 text-[#5a4a38]'
+                          ? 'bg-black/55 text-[#F8E7B2] border border-[#E5C17B]/40'
+                          : 'bg-[#FAF6EE]/85 text-[#5a4a38] border border-[#C5A059]/40'
                       }`}
                     >
-                      Scroll to Read Invitation
+                      {!isDateRevealed ? '✦ Scroll to Reveal Date ↓ ✦' : 'Scroll to Read Invitation ↓'}
                     </span>
                     <motion.div
                       animate={{ y: [0, 5, 0] }}
@@ -779,9 +876,12 @@ export default function EnvelopeExperience({
                 />
 
                 {/* ===============================================================
-                    BLOCK 1: LIVE COUNTDOWN (Always Shown — Clear Typography)
+                    BLOCK 1: LIVE COUNTDOWN & SCRATCH DATE REVEAL
                 =============================================================== */}
-                <section className="relative z-10 pt-5 pb-10 px-5 text-center">
+                <section
+                  id="card-section-countdown"
+                  className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-8 px-4 text-center"
+                >
                   <ScrollInkHeading
                     text="Countdown"
                     className={`font-serif font-semibold tracking-[0.06em] uppercase text-[24px] leading-tight ${
@@ -793,12 +893,22 @@ export default function EnvelopeExperience({
                   <ScrollWordReveal
                     text="Counting every moment until we celebrate together"
                     delay={0.12}
-                    className={`font-sans text-[12.5px] tracking-wide mt-1.5 mb-6 ${
+                    className={`font-sans text-[12.5px] tracking-wide mt-1 mb-1.5 ${
                       isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#5a4e42]'
                     }`}
                   />
 
-                  <div className="grid grid-cols-4 gap-2.5 max-w-[340px] mx-auto">
+                  {/* Interactive Scratch-to-Reveal Wedding Date Card */}
+                  <ScratchCardDate
+                    eventDate={invitation.event_date}
+                    dotDate={dotDate}
+                    invitationSlug={invitation.slug || invitation.id}
+                    isDarkPalace={isDarkPalace}
+                    isRevealed={isDateRevealed}
+                    onRevealed={() => setIsDateRevealed(true)}
+                  />
+
+                  <div className="grid grid-cols-4 gap-2.5 max-w-[340px] mx-auto mt-2">
                     {[
                       { value: String(timeLeft.days).padStart(2, '0'), label: 'DAYS' },
                       { value: String(timeLeft.hours).padStart(2, '0'), label: 'HOURS' },
@@ -842,7 +952,7 @@ export default function EnvelopeExperience({
                     BLOCK 2: THE VENUE (Shown if Venue Name or Address is filled)
                 =============================================================== */}
                 {hasVenue && (
-                  <section className="relative z-10 py-9 px-4 text-center">
+                  <section id="card-section-venue" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollInkHeading
                       text="The Venue"
                       className={`font-great-vibes text-[46px] leading-tight mb-3 ${
@@ -968,7 +1078,7 @@ export default function EnvelopeExperience({
                     BLOCK 3: SCHEDULE TIMELINE (Clear, High-Readability Luxury Cards)
                 =============================================================== */}
                 {showTimeline && (
-                  <section className="relative z-10 py-9 px-4 text-center">
+                  <section id="card-section-timeline" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollOrnamentDivider
                       lineColorClass={isDarkPalace ? 'bg-[#E5C17B]/70' : undefined}
                       dotColorClass={isDarkPalace ? 'bg-[#E5C17B]' : undefined}
@@ -1102,7 +1212,7 @@ export default function EnvelopeExperience({
                     BLOCK 4: DRESS CODE (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showDressCode && (
-                  <section className="relative z-10 py-9 px-5 text-center">
+                  <section id="card-section-dresscode" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollOrnamentDivider
                       className={`flex items-center justify-center gap-3 mb-4 ${
                         isDarkPalace ? 'opacity-80' : 'opacity-45'
@@ -1238,7 +1348,7 @@ export default function EnvelopeExperience({
                     BLOCK 5: BLESSINGS & GIFTS (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showGifts && (
-                  <section className="relative z-10 py-9 px-5 text-center">
+                  <section id="card-section-gifts" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollRevealBlock direction="scale">
                       <SectionHeaderBadge type="gift" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
@@ -1393,7 +1503,7 @@ export default function EnvelopeExperience({
                     BLOCK 6: ROYAL HALAL MENU (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showMenu && (
-                  <section className="relative z-10 py-9 px-4 text-center">
+                  <section id="card-section-menu" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollRevealBlock
                       direction="up"
                       className={`relative mx-auto w-full flex flex-col items-center justify-start ${
@@ -1534,7 +1644,7 @@ export default function EnvelopeExperience({
                     BLOCK 7: BLESSED UNION PORTRAIT & OUR STORY (Optional)
                 =============================================================== */}
                 {showStoryOrPortrait && (
-                  <section className="relative z-10 py-8 px-5 text-center">
+                  <section id="card-section-story" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollInkHeading
                       text="Blessed Union"
                       className={`font-great-vibes text-[42px] leading-tight ${
@@ -1621,7 +1731,7 @@ export default function EnvelopeExperience({
                     BLOCK 8: ACCOMMODATION (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showAccommodation && (
-                  <section className="relative z-10 py-9 px-5 text-center">
+                  <section id="card-section-accommodation" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollOrnamentDivider
                       className={`flex items-center justify-center gap-3 mb-4 ${
                         isDarkPalace ? 'opacity-80' : 'opacity-45'
@@ -1724,7 +1834,7 @@ export default function EnvelopeExperience({
                     BLOCK 9: FAQ ACCORDION (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showFaq && (
-                  <section className="relative z-10 py-9 px-5 text-center">
+                  <section id="card-section-faq" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
                     <ScrollRevealBlock direction="scale">
                       <SectionHeaderBadge type="faq" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
@@ -1798,58 +1908,79 @@ export default function EnvelopeExperience({
                 )}
 
                 {/* ===============================================================
-                    BLOCK 10: RSVP SECTION (Shown if show_rsvp !== false)
+                    BLOCK 10: RSVP SECTION & FOOTER (Shown if show_rsvp !== false)
                 =============================================================== */}
-                {showRsvp && <RsvpSection guest={guest} darkPalace={isDarkPalace} />}
+                {showRsvp ? (
+                  <section
+                    id="rsvp"
+                    className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-between py-8 px-4 text-center"
+                  >
+                    <RsvpSection guest={guest} darkPalace={isDarkPalace} />
 
-                {/* ===============================================================
-                    SCROLL TO RSVP INDICATOR & FOOTER
-                =============================================================== */}
-                <ScrollRevealBlock direction="up" className="pb-14 pt-4 text-center space-y-4 relative z-10">
-                  {showRsvp && (
-                    <button
-                      type="button"
-                      onClick={scrollToRsvp}
-                      className={`mx-auto flex flex-col items-center gap-1.5 opacity-85 hover:opacity-100 cursor-pointer ${
-                        isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
-                      }`}
-                    >
-                      <span className="font-sans text-[10px] tracking-[0.2em] uppercase font-semibold">
-                        SCROLL TO RSVP
-                      </span>
-                      <span
-                        className={`w-5 h-8 rounded-full border-[1.5px] flex items-start justify-center p-1 ${
-                          isDarkPalace ? 'border-[#E5C17B]' : 'border-[#2f2a24]'
+                    <div className="pb-8 pt-4 text-center space-y-3 relative z-10">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const phoneContainer = document.querySelector('[data-invitation-phone-frame="true"]');
+                          if (phoneContainer) {
+                            phoneContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
+                        className={`mx-auto flex flex-col items-center gap-1 opacity-80 hover:opacity-100 cursor-pointer transition-opacity ${
+                          isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
                         }`}
                       >
-                        <motion.span
-                          animate={{ y: [0, 8, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                          className={`w-1 h-2 rounded-full ${
-                            isDarkPalace ? 'bg-[#E5C17B]' : 'bg-[#2f2a24]'
+                        <span className="font-sans text-[10px] tracking-[0.2em] uppercase font-semibold">
+                          Back to Top ↑
+                        </span>
+                      </button>
+
+                      <div className="pt-2 space-y-1.5">
+                        <div className="flex items-center justify-center gap-2 opacity-75">
+                          <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                          <span
+                            className={`font-serif text-[11px] font-semibold tracking-[0.2em] uppercase ${
+                              isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e5d4b]'
+                            }`}
+                          >
+                            E&amp;V
+                          </span>
+                          <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                        </div>
+                        <ScrollWordReveal
+                          text="Crafted with Love • Eternal Vowz Bespoke Wedding Suite"
+                          delay={0.1}
+                          className={`font-sans text-[11px] tracking-wide ${
+                            isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
                           }`}
                         />
-                      </span>
-                    </button>
-                  )}
-
-                  <div className="pt-2 space-y-1.5">
-                    <div className="flex items-center justify-center gap-2 opacity-75">
-                      <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
-                      <span className={`font-serif text-[11px] font-semibold tracking-[0.2em] uppercase ${isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e5d4b]'}`}>
-                        E&amp;V
-                      </span>
-                      <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                      </div>
                     </div>
-                    <ScrollWordReveal
-                      text="Crafted with Love • Eternal Vowz Bespoke Wedding Suite"
-                      delay={0.1}
-                      className={`font-sans text-[11px] tracking-wide ${
-                        isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
-                      }`}
-                    />
+                  </section>
+                ) : (
+                  <div className="pb-14 pt-8 text-center space-y-4 relative z-10">
+                    <div className="pt-2 space-y-1.5">
+                      <div className="flex items-center justify-center gap-2 opacity-75">
+                        <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                        <span
+                          className={`font-serif text-[11px] font-semibold tracking-[0.2em] uppercase ${
+                            isDarkPalace ? 'text-[#E5C17B]' : 'text-[#6e5d4b]'
+                          }`}
+                        >
+                          E&amp;V
+                        </span>
+                        <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
+                      </div>
+                      <ScrollWordReveal
+                        text="Crafted with Love • Eternal Vowz Bespoke Wedding Suite"
+                        delay={0.1}
+                        className={`font-sans text-[11px] tracking-wide ${
+                          isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
+                        }`}
+                      />
+                    </div>
                   </div>
-                </ScrollRevealBlock>
+                )}
               </div>
               )}
           </motion.div>
