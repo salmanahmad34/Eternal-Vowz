@@ -494,9 +494,9 @@ export default function EnvelopeExperience({
             )}
 
             {/* -----------------------------------------------------------------
-                HERO SECTION: UNIQUE THEME-SPECIFIC WATERCOLOR / PALACE SCENE (690px)
+                HERO SECTION: UNIQUE THEME-SPECIFIC WATERCOLOR / PALACE SCENE (full viewport height matches video)
             ----------------------------------------------------------------- */}
-            <div className="relative w-full h-[690px] overflow-hidden">
+            <div className="relative w-full h-[100dvh] max-h-[860px] min-h-[640px] overflow-hidden">
               <img
                 src={heroImageSrc}
                 alt="Wedding Card Hero Scene"
@@ -556,14 +556,14 @@ export default function EnvelopeExperience({
                   <div
                     className={`relative z-10 px-6 text-center flex flex-col items-center ${
                       invitation.theme_id === 'midnight-minimalist'
-                        ? 'pt-[54px]'
+                        ? 'pt-[80px]'
                         : invitation.theme_id === 'pearl-veil' ||
                           invitation.theme_id === 'tuscan-sunset' ||
                           invitation.theme_id === 'royal-emerald'
-                        ? 'pt-[396px]'
+                        ? 'pt-[52vh]'
                         : invitation.theme_id === 'blush-floral'
-                        ? 'pt-[192px]'
-                        : 'pt-12'
+                        ? 'pt-[26vh]'
+                        : 'pt-[48vh]'
                     }`}
                   >
                   <ScrollInkHeading
