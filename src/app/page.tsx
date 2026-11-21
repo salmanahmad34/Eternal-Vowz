@@ -121,6 +121,42 @@ const SIGNATURE_CARD_DESIGNS = [
     heroImg: '/assets/celestial-box/hero-celestial-stage.jpg',
     shortDesc: 'Tap anywhere as a wax-sealed emerald silk box opens into a mountaintop floral arch.',
   },
+  {
+    id: 'jodhpur-sapphire',
+    category: '3D Royal Darbar',
+    badge: '✨ Royal Sapphire',
+    name: 'Jodhpur Sapphire Darbar',
+    couple: 'Zayn & Anaya',
+    slug: 'zayn-anaya-sapphire',
+    query: '',
+    price: '₹79',
+    heroImg: '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg',
+    shortDesc: 'Royal sapphire velvet envelope opening into a 24K gold Jharokha archway with marigold garlands.',
+  },
+  {
+    id: 'shahi-crimson',
+    category: '3D Crimson Velvet',
+    badge: '✨ 24K Gold Zari',
+    name: 'Shahi Crimson & Zari',
+    couple: 'Kabir & Roshni',
+    slug: 'kabir-roshni-crimson',
+    query: '',
+    price: '₹79',
+    heroImg: '/assets/shahi-crimson/hero-shahi-crimson.jpg',
+    shortDesc: 'Heritage deep crimson velvet Lifafa with 24K gold zari borders, rose petals & sitar melodies.',
+  },
+  {
+    id: 'kashmir-lotus',
+    category: '3D Frosted Mist',
+    badge: '✨ Kashmiri Romance',
+    name: 'Kashmir Chinar Lotus',
+    couple: 'Mir & Falak',
+    slug: 'mir-falak-lotus',
+    query: '',
+    price: '₹79',
+    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
+    shortDesc: 'Misty lavender silk veil opening into Dal Lake lotus blossoms and golden Chinar leaf filigree.',
+  },
 ];
 
 const FILTER_CATEGORIES = [
@@ -130,6 +166,9 @@ const FILTER_CATEGORIES = [
   '3D Haveli Courtyard',
   '3D Silk Veil Reveal',
   '3D Wax Box Reveal',
+  '3D Royal Darbar',
+  '3D Crimson Velvet',
+  '3D Frosted Mist',
 ];
 
 const COMPARISON_ROWS = [
@@ -462,8 +501,8 @@ export default function LandingPage() {
             })}
           </div>
 
-          {/* 5-Card Portrait Grid (Exact WooowInvites Curated Theme Cards) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* 8-Card Portrait Grid (Exact WooowInvites Curated Theme Cards) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {filteredDesigns.map((design) => (
               <div
                 key={design.id}

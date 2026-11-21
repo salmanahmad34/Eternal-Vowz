@@ -3,7 +3,10 @@ export type ThemeId =
   | 'blush-floral'
   | 'midnight-minimalist'
   | 'tuscan-sunset'
-  | 'pearl-veil';
+  | 'pearl-veil'
+  | 'jodhpur-sapphire'
+  | 'shahi-crimson'
+  | 'kashmir-lotus';
 
 export type RsvpStatus = 'attending' | 'declined' | 'pending';
 

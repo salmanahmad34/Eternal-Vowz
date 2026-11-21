@@ -257,6 +257,12 @@ export default function EnvelopeExperience({
       ? '/assets/celestial-box/hero-celestial-stage.jpg'
       : invitation.theme_id === 'blush-floral'
       ? '/assets/shahi-gold/hero-mountain-pavilion.jpg'
+      : invitation.theme_id === 'jodhpur-sapphire'
+      ? '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg'
+      : invitation.theme_id === 'shahi-crimson'
+      ? '/assets/shahi-crimson/hero-shahi-crimson.jpg'
+      : invitation.theme_id === 'kashmir-lotus'
+      ? '/assets/kashmir-lotus/hero-kashmir-lotus.jpg'
       : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg';
 
   const isFrostedBlur =

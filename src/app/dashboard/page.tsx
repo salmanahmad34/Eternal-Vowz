@@ -1476,7 +1476,7 @@ export default function DashboardPage() {
                   <label className="block text-xs font-medium text-neutral-700 mb-2">
                     Card Color &amp; Hero Artwork Theme
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {(Object.keys(THEMES) as ThemeId[]).map((tKey) => {
                       const t = THEMES[tKey];
                       const active = draftCard.theme_id === tKey;
@@ -1491,7 +1491,7 @@ export default function DashboardPage() {
                               design_config: {
                                 ...draftCard.design_config,
                                 opening_style:
-                                  tKey === 'pearl-veil'
+                                  tKey === 'pearl-veil' || tKey === 'kashmir-lotus'
                                     ? 'frosted-blur'
                                     : tKey === 'blush-floral'
                                     ? 'palace-gates'

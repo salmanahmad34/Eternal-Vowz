@@ -136,6 +136,87 @@ export const THEMES: Record<ThemeId, ThemeConfig> = {
     },
     waxSealInitialDefault: 'L&O',
   },
+  'jodhpur-sapphire': {
+    id: 'jodhpur-sapphire',
+    name: 'Jodhpur Royal Sapphire & Marigold Darbar',
+    subtitle: 'Royal sapphire blue velvet, 24K antique gold Jharokha arch, golden marigold garlands & brass palace lanterns',
+    previewColor: '#0F2B5C',
+    accentGold: '#E5C17B',
+    colors: {
+      envelopeExterior: '#0F2B5C', // Royal sapphire blue
+      envelopeFlap: '#0A1E40',     // Darker sapphire flap
+      envelopeInterior: '#061329', // Inner pocket
+      envelopeLiningPattern: 'linear-gradient(135deg, #0A1E40 0%, #0F2B5C 50%, #081730 100%)',
+      waxSealBackground: '#B45309', // Amber Gold Topaz wax seal
+      waxSealColor: '#FEF3C7',
+      cardBackground: '#FAF8F2',   // Warm ivory cotton paper
+      cardBorder: '#E5C17B',
+      cardHeaderColor: '#0F2B5C',
+      cardTextColor: '#1E293B',
+      accentGlow: 'rgba(229, 193, 123, 0.4)',
+      badgeBg: '#EFF6FF',
+      badgeText: '#1D4ED8',
+    },
+    typography: {
+      headingFont: 'font-serif',
+      bodyFont: 'font-sans',
+    },
+    waxSealInitialDefault: 'Z&A',
+  },
+  'shahi-crimson': {
+    id: 'shahi-crimson',
+    name: 'Shahi Crimson Velvet & 24K Gold Zari',
+    subtitle: 'Heritage deep crimson velvet Lifafa, 24K gold zari borders, fresh red rose petals & royal brass royal crest',
+    previewColor: '#6B111A',
+    accentGold: '#D4AF37',
+    colors: {
+      envelopeExterior: '#6B111A', // Deep royal crimson velvet
+      envelopeFlap: '#540D14',     // Darker wine flap
+      envelopeInterior: '#3D090E', // Inner velvet pocket
+      envelopeLiningPattern: 'linear-gradient(135deg, #540D14 0%, #6B111A 50%, #3D090E 100%)',
+      waxSealBackground: '#8A1C14', // Royal crimson & gold wax crest
+      waxSealColor: '#FDE68A',
+      cardBackground: '#FFFDF9',   // Silk ivory royal paper
+      cardBorder: '#D4AF37',
+      cardHeaderColor: '#6B111A',
+      cardTextColor: '#2A1215',
+      accentGlow: 'rgba(212, 175, 55, 0.45)',
+      badgeBg: '#FEF2F2',
+      badgeText: '#991B1B',
+    },
+    typography: {
+      headingFont: 'font-serif',
+      bodyFont: 'font-sans',
+    },
+    waxSealInitialDefault: 'K&R',
+  },
+  'kashmir-lotus': {
+    id: 'kashmir-lotus',
+    name: 'Kashmir Chinar Lotus & Silver Mist',
+    subtitle: 'Misty lavender silk veil, Chinar gold leaf filigree, floating white lotus blossoms & serene Kashmiri romance',
+    previewColor: '#7C6E94',
+    accentGold: '#C5A059',
+    colors: {
+      envelopeExterior: '#DDD6E8', // Misty lavender silver
+      envelopeFlap: '#D1C7E0',     // Soft lilac flap
+      envelopeInterior: '#C4B7D6', // Inner pocket
+      envelopeLiningPattern: 'linear-gradient(135deg, #E6E0F0 0%, #DDD6E8 50%, #CBC0DC 100%)',
+      waxSealBackground: '#7C6E94', // Misty plum wax seal
+      waxSealColor: '#FDFCFE',
+      cardBackground: '#FAF9FC',   // Alabaster paper
+      cardBorder: '#BFA89E',
+      cardHeaderColor: '#3B2E4A',
+      cardTextColor: '#282033',
+      accentGlow: 'rgba(124, 110, 148, 0.35)',
+      badgeBg: '#F5F3FF',
+      badgeText: '#6D28D9',
+    },
+    typography: {
+      headingFont: 'font-serif',
+      bodyFont: 'font-sans',
+    },
+    waxSealInitialDefault: 'M&F',
+  },
 };
 
 export interface MusicTrackOption {
