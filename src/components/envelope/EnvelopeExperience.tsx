@@ -10,7 +10,7 @@ import RoyalPalaceGatesReveal from './RoyalPalaceGatesReveal';
 import FrostedBlurReveal from './FrostedBlurReveal';
 import CinemaVideoReveal from './CinemaVideoReveal';
 import FloatingParticles from './FloatingParticles';
-import ScratchCardDate from '../invitation/ScratchCardDate';
+import ScratchCountdownBoxes from '../invitation/ScratchCountdownBoxes';
 import RsvpSection from '../invitation/RsvpSection';
 import {
   ScrollInkHeading,
@@ -723,65 +723,25 @@ export default function EnvelopeExperience({
                     }
                   />
 
-                  {/* Mystery Hidden Date Lock before scratch vs Revealed Date after scratch */}
-                  {!isDateRevealed ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="mt-1 flex flex-col items-center gap-1.5"
-                    >
-                      <span
-                        className={`font-mono text-[19px] tracking-[0.35em] select-none ${
-                          invitation.theme_id === 'midnight-minimalist' ||
-                          invitation.theme_id === 'pearl-veil' ||
-                          invitation.theme_id === 'tuscan-sunset' ||
-                          invitation.theme_id === 'royal-emerald'
-                            ? 'text-[#F5E8C8]/85 drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
-                            : invitation.theme_id === 'blush-floral'
-                            ? 'text-[#4A2E20]/80'
-                            : 'text-[#5a5044]'
-                        }`}
-                      >
-                        •• •• ••••
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => scrollToNextSection('card-section-countdown')}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-sans font-semibold tracking-wider uppercase transition-all shadow-sm cursor-pointer ${
-                          isDarkPalace
-                            ? 'bg-[#1C120B]/90 text-[#E5C17B] border border-[#E5C17B]/50 hover:bg-[#2A1B10]'
-                            : 'bg-[#FAF6EE]/95 text-[#6E4F28] border border-[#C5A059]/40 hover:bg-white'
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 text-[#E5C17B] animate-spin" />
-                        <span>Scratch to Reveal Date Below ↓</span>
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.55 }}
-                    >
-                      <ScrollInkHeading
-                        as="div"
-                        immediate
-                        delay={0.1}
-                        duration={0.8}
-                        text={dotDate}
-                        className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
-                          invitation.theme_id === 'midnight-minimalist' ||
-                          invitation.theme_id === 'pearl-veil' ||
-                          invitation.theme_id === 'tuscan-sunset' ||
-                          invitation.theme_id === 'royal-emerald'
-                            ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
-                            : invitation.theme_id === 'blush-floral'
-                            ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
-                            : 'text-[#2f2a24]'
-                        }`}
-                      />
-                    </motion.div>
-                  )}
+                  <div className="mt-1">
+                    <ScrollInkHeading
+                      as="div"
+                      immediate
+                      delay={0.1}
+                      duration={0.8}
+                      text={dotDate}
+                      className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
+                        invitation.theme_id === 'midnight-minimalist' ||
+                        invitation.theme_id === 'pearl-veil' ||
+                        invitation.theme_id === 'tuscan-sunset' ||
+                        invitation.theme_id === 'royal-emerald'
+                          ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
+                          : invitation.theme_id === 'blush-floral'
+                          ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
+                          : 'text-[#2f2a24]'
+                      }`}
+                    />
+                  </div>
                   </div>
                 )}
 
@@ -804,7 +764,7 @@ export default function EnvelopeExperience({
                           : 'bg-[#FAF6EE]/85 text-[#5a4a38] border border-[#C5A059]/40'
                       }`}
                     >
-                      {!isDateRevealed ? '✦ Scroll to Reveal Date ↓ ✦' : 'Scroll to Read Invitation ↓'}
+                      Scroll to Read Invitation ↓
                     </span>
                     <motion.div
                       animate={{ y: [0, 5, 0] }}
@@ -876,7 +836,7 @@ export default function EnvelopeExperience({
                 />
 
                 {/* ===============================================================
-                    BLOCK 1: LIVE COUNTDOWN & SCRATCH DATE REVEAL
+                    BLOCK 1: LIVE 3-BOX SCRATCH COUNTDOWN & CELEBRATION
                 =============================================================== */}
                 <section
                   id="card-section-countdown"
@@ -893,59 +853,18 @@ export default function EnvelopeExperience({
                   <ScrollWordReveal
                     text="Counting every moment until we celebrate together"
                     delay={0.12}
-                    className={`font-sans text-[12.5px] tracking-wide mt-1 mb-1.5 ${
+                    className={`font-sans text-[12.5px] tracking-wide mt-1 mb-2 ${
                       isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#5a4e42]'
                     }`}
                   />
 
-                  {/* Interactive Scratch-to-Reveal Wedding Date Card */}
-                  <ScratchCardDate
-                    eventDate={invitation.event_date}
-                    dotDate={dotDate}
+                  {/* 3 Interactive Scratchable Countdown Boxes (Days, Hours, Minutes) */}
+                  <ScratchCountdownBoxes
+                    timeLeft={timeLeft}
                     invitationSlug={invitation.slug || invitation.id}
                     isDarkPalace={isDarkPalace}
-                    isRevealed={isDateRevealed}
-                    onRevealed={() => setIsDateRevealed(true)}
+                    onExploreNext={() => scrollToNextSection(hasVenue ? 'card-section-venue' : 'card-section-schedule')}
                   />
-
-                  <div className="grid grid-cols-4 gap-2.5 max-w-[340px] mx-auto mt-2">
-                    {[
-                      { value: String(timeLeft.days).padStart(2, '0'), label: 'DAYS' },
-                      { value: String(timeLeft.hours).padStart(2, '0'), label: 'HOURS' },
-                      { value: String(timeLeft.minutes).padStart(2, '0'), label: 'MINUTES' },
-                      { value: String(timeLeft.seconds).padStart(2, '0'), label: 'SECONDS' },
-                    ].map((unit, idx) => (
-                      <ScrollRevealBlock
-                        key={unit.label}
-                        direction="scale"
-                        delay={idx * 0.1}
-                        className="flex flex-col items-center"
-                      >
-                        <div
-                          className={`w-full aspect-square rounded-xl backdrop-blur-[4px] flex items-center justify-center ${
-                            isDarkPalace
-                              ? 'bg-[#1E130C]/90 border border-[#E5C17B]/50 shadow-[0_10px_24px_rgba(0,0,0,0.55)]'
-                              : 'bg-[#fbf9f5]/95 border border-[#e2d6c0] shadow-sm'
-                          }`}
-                        >
-                          <span
-                            className={`font-serif font-bold tabular-nums text-[28px] tracking-tight leading-none ${
-                              isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2f2a24]'
-                            }`}
-                          >
-                            {unit.value}
-                          </span>
-                        </div>
-                        <span
-                          className={`font-sans font-semibold text-[10px] tracking-[0.16em] uppercase mt-2 ${
-                            isDarkPalace ? 'text-[#E5C17B]' : 'text-[#5a4e42]'
-                          }`}
-                        >
-                          {unit.label}
-                        </span>
-                      </ScrollRevealBlock>
-                    ))}
-                  </div>
                 </section>
 
                 {/* ===============================================================

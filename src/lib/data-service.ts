@@ -811,6 +811,55 @@ export const DataService = {
     return getLocalItem<HostUser | null>(STORAGE_KEY_USER, null);
   },
 
+  // Passwordless Email OTP Login & Automatic Account Creation (First time create, next time login)
+  async sendEmailOtp(email: string): Promise<{ error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: 'Authentication service is not configured.' };
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
+    const { error } = await supabase.auth.signInWithOtp({
+      email: cleanEmail,
+      options: {
+        shouldCreateUser: true, // First time: creates account; returning: logs in
+        emailRedirectTo: `${origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      return { error: error.message };
+    }
+    return { error: null };
+  },
+
+  async verifyEmailOtp(
+    email: string,
+    token: string
+  ): Promise<{ user: HostUser | null; error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { user: null, error: 'Authentication service is not configured.' };
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim().replace(/\D/g, '');
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanToken,
+      type: 'email',
+    });
+
+    if (error || !data.user) {
+      return {
+        user: null,
+        error: error?.message || 'Invalid or expired verification code. Please check and try again.',
+      };
+    }
+
+    const mapped = mapSupabaseUser(data.user);
+    setLocalItem(STORAGE_KEY_USER, mapped);
+    return { user: mapped, error: null };
+  },
+
   async signInWithEmail(
     email: string,
     password: string
@@ -846,7 +895,7 @@ export const DataService = {
       };
     }
     const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.netlify.app';
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
@@ -880,7 +929,7 @@ export const DataService = {
     const safeNext =
       nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/dashboard';
     const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.netlify.app';
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -898,7 +947,7 @@ export const DataService = {
       return { error: 'Authentication service is not configured.' };
     }
     const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.netlify.app';
+      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: `${origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`,
     });

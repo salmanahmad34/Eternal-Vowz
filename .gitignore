@@ -41,3 +41,8 @@ Before_the_Vow.mp3
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local backups, reports & screenshots
+/backups/
+/reports/
+/screenshots/

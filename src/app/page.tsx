@@ -19,7 +19,6 @@ import {
   Lock,
   MessageCircle,
   ChevronDown,
-  Star,
   Mail,
   FileText,
   Eye,
@@ -306,16 +305,6 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             {/* Left Editorial Column */}
             <div className="lg:col-span-6 space-y-7">
-              {/* Frosted 5-Star Champagne Rating Pill */}
-              <div className="inline-flex flex-wrap items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/60 backdrop-blur-sm border border-[#C9A84C]/35 text-[11px] font-medium tracking-[0.16em] uppercase text-[#5A4636]">
-                <span className="flex items-center gap-0.5 text-[#C9A84C]">
-                  {[0, 1, 2, 3, 4].map((s) => (
-                    <Star key={s} className="w-3 h-3 fill-[#C9A84C] text-[#C9A84C]" />
-                  ))}
-                </span>
-                <span>4.9 &mdash; Eternal Vowz &bull; ₹79 Per Card</span>
-              </div>
-
               {/* Tall Poetic Cormorant Garamond H1 with Dynamic Italic Champagne Gold Phrase */}
               <h1 className="font-serif text-[2.75rem] sm:text-5xl lg:text-6xl xl:text-[66px] leading-[1.05] font-normal text-[#291418]">
                 Invitations as special as the moment itself — designed to{' '}
