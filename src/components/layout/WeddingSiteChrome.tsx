@@ -243,7 +243,8 @@ export function WeddingFooter() {
             <ul className="space-y-2.5 text-sm">
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
-              <li><Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link href="/refund" className="hover:text-white transition-colors">Refund &amp; Cancellation Policy</Link></li>
+              <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping &amp; Delivery Policy</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
             <span className="mt-5 inline-flex items-center gap-1.5 text-[11px] text-[#BFAE92]">
