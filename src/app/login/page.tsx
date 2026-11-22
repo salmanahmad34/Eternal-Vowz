@@ -601,11 +601,11 @@ function LoginFormContent() {
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Sending Verification OTP...</span>
+                <span>Creating Account...</span>
               </>
             ) : (
               <>
-                <span>Create Account & Verify</span>
+                <span>Create Host Account</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
