@@ -35,8 +35,6 @@ import {
   Copy,
   Check,
   Sparkles,
-  Share2,
-  MessageCircle,
   X,
 } from 'lucide-react';
 
@@ -230,13 +228,6 @@ export default function EnvelopeExperience({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const scrollToRsvp = () => {
-    const el = document.getElementById('rsvp');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const cfg = invitation.design_config;
   const coupleNames = cfg.couple_names;
   const waxSealSymbol =
@@ -259,69 +250,6 @@ export default function EnvelopeExperience({
         year: 'numeric',
       })
     : dotDate;
-
-  // WhatsApp & Social Share Support
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [shareRecipientName, setShareRecipientName] = useState('');
-  const [copiedShareLink, setCopiedShareLink] = useState(false);
-
-  const THEME_PREVIEW_MAP: Record<string, string> = {
-    'pearl-veil': '/assets/pearl-veil/hero-palace-corridor.jpg',
-    'blush-floral': '/assets/shahi-gold/hero-mountain-pavilion.jpg',
-    'tuscan-sunset': '/assets/tuscan-haveli/hero-haveli-courtyard.jpg',
-    'royal-emerald': '/assets/mughal-silk/hero-mughal-courtyard.jpg',
-    'midnight-minimalist': '/assets/celestial-box/hero-celestial-stage.jpg',
-    'kashmir-lotus': '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
-    'shahi-crimson': '/assets/shahi-crimson/hero-shahi-crimson.jpg',
-    'jodhpur-sapphire': '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg',
-  };
-
-  const cardHeroImage =
-    invitation.design_config?.banner_image_url ||
-    THEME_PREVIEW_MAP[invitation.theme_id || 'tuscan-sunset'] ||
-    '/assets/tuscan-haveli/hero-haveli-courtyard.jpg';
-
-  const getShareUrl = () => {
-    if (typeof window !== 'undefined') {
-      return window.location.href;
-    }
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://eternal-vowz.onrender.com';
-    return `${baseUrl}/invite/${invitation.slug || invitation.id}`;
-  };
-
-  const handleWhatsAppShare = (customRecipient?: string) => {
-    const url = getShareUrl();
-    const couple = `${coupleNames.partner1} & ${coupleNames.partner2}`;
-
-    const salutation = customRecipient?.trim()
-      ? `Dear *${customRecipient.trim()}*,\n\n`
-      : '';
-
-    const venue = invitation.venue_details?.venue_name || invitation.venue_details?.city || '';
-
-    const message =
-      `💍 *Royal Wedding Invitation* 💍\n\n` +
-      salutation +
-      `With great joy and blessings of our families, you are cordially invited to celebrate the blessed wedding union of:\n\n` +
-      `✨ *${couple}* ✨\n\n` +
-      (readableEventDate ? `🗓 *Date:* ${readableEventDate}\n` : '') +
-      (venue ? `📍 *Venue:* ${venue}\n` : '') +
-      `\n💌 *Tap below to open your personal 3D Royal Invitation & submit RSVP:*\n` +
-      `${url}\n\n` +
-      `We eagerly look forward to celebrating this blessed moment with you! 🌸\n` +
-      `— With warm regards,\n*${couple}*`;
-
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
-  };
-
-  const handleCopyShareLink = () => {
-    const url = getShareUrl();
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      setCopiedShareLink(true);
-      setTimeout(() => setCopiedShareLink(false), 2400);
-    }
-  };
 
   // Conditional Visibility Flags ("user jitni detail card me fill kare utna hi card me show ho")
   const hasVenue = Boolean(
@@ -485,18 +413,7 @@ export default function EnvelopeExperience({
       ========================================================================= */}
       {stage === 'opened' && (
         <>
-          <div className={`${isPreview ? 'absolute top-3 right-3' : 'fixed top-4 right-4'} z-[60] flex items-center gap-2`}>
-            {/* WhatsApp Share Button */}
-            <button
-              type="button"
-              onClick={() => setIsShareModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full backdrop-blur-md shadow-md transition-all text-xs font-sans font-semibold cursor-pointer bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-[0_4px_12px_rgba(37,211,102,0.35)] active:scale-95"
-              title="Share Card on WhatsApp"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>WhatsApp</span>
-            </button>
-
+          <div className={`${isPreview ? 'absolute top-3 right-3' : 'fixed top-4 right-4'} z-[60]`}>
             <button
               type="button"
               onClick={handleReplay}
@@ -1921,91 +1838,6 @@ export default function EnvelopeExperience({
                 )}
 
                 {/* ===============================================================
-                    BLOCK 9.5: SHARE THIS ROYAL INVITATION ON WHATSAPP
-                =============================================================== */}
-                <section
-                  id="card-section-share"
-                  className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-8 px-4 text-center"
-                >
-                  <ScrollInkHeading
-                    text="Share The Joy"
-                    className={`font-great-vibes text-[44px] leading-tight mb-2 ${
-                      isDarkPalace
-                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
-                        : 'text-[#2f2a24]'
-                    }`}
-                  />
-                  <ScrollWordReveal
-                    text="Invite family & friends directly on WhatsApp with live 3D card preview"
-                    delay={0.08}
-                    className={`font-sans text-[12.5px] tracking-wide mb-5 max-w-xs mx-auto ${
-                      isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#5a4e42]'
-                    }`}
-                  />
-
-                  {/* Card Artwork Thumbnail with Royal Names */}
-                  <ScrollRevealBlock
-                    direction="scale"
-                    delay={0.12}
-                    className={`relative mx-auto w-full max-w-[310px] rounded-2xl overflow-hidden p-3.5 border shadow-lg ${
-                      isDarkPalace
-                        ? 'bg-gradient-to-b from-[#24170E] to-[#160E08] border-[#E5C17B]/45'
-                        : 'bg-gradient-to-b from-[#FFFDF9] to-[#F5ECE0] border-[#D4AF37]/45'
-                    }`}
-                  >
-                    <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden mb-3 border border-[#D4AF37]/30">
-                      <img
-                        src={cardHeroImage}
-                        alt={`${coupleNames.partner1} & ${coupleNames.partner2}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/15 pointer-events-none" />
-                      <div className="absolute bottom-2.5 left-3 right-3 text-left">
-                        <span className="font-serif text-white font-bold text-base block leading-tight drop-shadow-sm">
-                          💍 {coupleNames.partner1} &amp; {coupleNames.partner2}
-                        </span>
-                        <span className="font-sans text-[#E5C17B] text-[10px] uppercase tracking-wider font-semibold">
-                          ✦ Royal 3D Digital Invitation ✦
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2.5">
-                      <button
-                        type="button"
-                        onClick={() => handleWhatsAppShare()}
-                        className="w-full py-3 px-4 rounded-xl font-sans font-bold text-xs tracking-wider uppercase bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
-                      >
-                        <Share2 className="w-4 h-4 fill-white" />
-                        <span>Share on WhatsApp</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleCopyShareLink}
-                        className={`w-full py-2.5 px-4 rounded-xl font-sans font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer border ${
-                          isDarkPalace
-                            ? 'border-[#E5C17B]/40 hover:bg-white/5 text-[#E5C17B]'
-                            : 'border-[#C5A059]/50 hover:bg-[#F6EEDB] text-[#291418]'
-                        }`}
-                      >
-                        {copiedShareLink ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-500" />
-                            <span>Link Copied to Clipboard!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>Copy Invitation Link</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </ScrollRevealBlock>
-                </section>
-
-                {/* ===============================================================
                     BLOCK 10: RSVP SECTION & FOOTER (Shown if show_rsvp !== false)
                 =============================================================== */}
                 {showRsvp ? (
@@ -2084,129 +1916,6 @@ export default function EnvelopeExperience({
           </motion.div>
         )}
       </div>
-
-      {/* =========================================================================
-          ROYAL WHATSAPP SHARE MODAL DIALOG
-      ========================================================================= */}
-      <AnimatePresence>
-        {isShareModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
-            onClick={() => setIsShareModalOpen(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className={`w-full max-w-sm rounded-3xl p-5 text-center relative overflow-hidden border shadow-2xl ${
-                isDarkPalace
-                  ? 'bg-gradient-to-b from-[#24170E] via-[#1B110A] to-[#120B06] border-[#D4AF37]/50 text-[#FFF4CF]'
-                  : 'bg-gradient-to-b from-[#FFFDF9] via-[#FAF5EC] to-[#F2E8D7] border-[#C5A059]/45 text-[#2C1F14]'
-              }`}
-            >
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => setIsShareModalOpen(false)}
-                className={`absolute top-4 right-4 p-1.5 rounded-full transition-colors cursor-pointer ${
-                  isDarkPalace ? 'hover:bg-white/10 text-[#E5C17B]' : 'hover:bg-black/5 text-[#7A5828]'
-                }`}
-                aria-label="Close Share Dialog"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="w-12 h-12 mx-auto rounded-full bg-[#25D366]/20 border border-[#25D366]/50 flex items-center justify-center text-[#25D366] mb-3">
-                <Share2 className="w-6 h-6" />
-              </div>
-
-              <h3 className="font-serif text-2xl font-bold mb-1">
-                Share on WhatsApp
-              </h3>
-              <p className={`font-sans text-xs mb-3.5 ${isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#6e5d4b]'}`}>
-                Invite family &amp; friends with an attractive 3D card preview
-              </p>
-
-              {/* Card Thumbnail Preview with Royal Names */}
-              <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden mb-3.5 border border-[#D4AF37]/35 shadow-sm">
-                <img
-                  src={cardHeroImage}
-                  alt={`${coupleNames.partner1} & ${coupleNames.partner2}`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/15 pointer-events-none" />
-                <div className="absolute bottom-2.5 left-3 right-3 text-left">
-                  <span className="font-serif text-white font-bold text-base block leading-tight drop-shadow-sm">
-                    💍 {coupleNames.partner1} &amp; {coupleNames.partner2}
-                  </span>
-                  <span className="font-sans text-[#E5C17B] text-[10px] uppercase tracking-wider font-semibold">
-                    ✦ {readableEventDate} ✦
-                  </span>
-                </div>
-              </div>
-
-              {/* Personalize Guest Name Input */}
-              <div className="text-left mb-3.5">
-                <label className={`block text-[10.5px] font-sans font-semibold uppercase tracking-wider mb-1 ${isDarkPalace ? 'text-[#E5C17B]' : 'text-[#8C6430]'}`}>
-                  Personalize For Guest (Optional):
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Tariq Family, Farhan Bhai"
-                  value={shareRecipientName}
-                  onChange={(e) => setShareRecipientName(e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg text-xs font-sans outline-hidden border ${
-                    isDarkPalace
-                      ? 'bg-[#150D07] border-[#D4AF37]/40 text-[#FFF4CF] placeholder:text-[#E5C17B]/40 focus:border-[#D4AF37]'
-                      : 'bg-white border-[#C5A059]/40 text-[#2C1F14] placeholder:text-[#8C6430]/40 focus:border-[#C5A059]'
-                  }`}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleWhatsAppShare(shareRecipientName);
-                    setIsShareModalOpen(false);
-                  }}
-                  className="w-full py-3 px-4 rounded-xl font-sans font-bold text-xs tracking-wider uppercase bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
-                >
-                  <Share2 className="w-4 h-4 fill-white" />
-                  <span>Send on WhatsApp</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCopyShareLink}
-                  className={`w-full py-2.5 px-4 rounded-xl font-sans font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer border ${
-                    isDarkPalace
-                      ? 'border-[#E5C17B]/40 hover:bg-white/5 text-[#E5C17B]'
-                      : 'border-[#C5A059]/50 hover:bg-[#F6EEDB] text-[#291418]'
-                  }`}
-                >
-                  {copiedShareLink ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>Link Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy Invitation Link</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

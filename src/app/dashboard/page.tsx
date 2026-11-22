@@ -425,6 +425,37 @@ export default function DashboardPage() {
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  const handleShareCardDirectWhatsApp = (card: Invitation) => {
+    const cardGuests = allGuests.filter((g) => g.invitation_id === card.id);
+    const firstGuest = cardGuests[0];
+    const url = firstGuest ? getGuestInviteUrl(firstGuest, card) : getCardPublicUrl(card);
+    const couple = `${card.design_config.couple_names.partner1} & ${card.design_config.couple_names.partner2}`;
+    const eventDateObj = card.event_date ? new Date(card.event_date) : null;
+    const formattedDate =
+      eventDateObj && !isNaN(eventDateObj.getTime())
+        ? eventDateObj.toLocaleDateString('en-US', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : '';
+    const venue = card.venue_details?.venue_name || card.venue_details?.city || '';
+
+    const message =
+      `💍 *Royal Wedding Invitation* 💍\n\n` +
+      `With great joy and blessings of our families, we warmly invite you and your family to celebrate the blessed wedding union of:\n\n` +
+      `✨ *${couple}* ✨\n\n` +
+      (formattedDate ? `🗓 *Date:* ${formattedDate}\n` : '') +
+      (venue ? `📍 *Venue:* ${venue}\n` : '') +
+      `\n💌 *Tap below to open your personal 3D Royal Invitation & submit RSVP:*\n` +
+      `${url}\n\n` +
+      `We eagerly look forward to celebrating this blessed occasion with you! 🌸\n` +
+      `— With warm regards,\n*${couple}*`;
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedInvitation || !newGuestName.trim()) return;
@@ -1001,6 +1032,16 @@ export default function DashboardPage() {
                         >
                           <Settings className="w-3.5 h-3.5" />
                           <span>{isSelected ? 'Managing RSVPs' : 'Manage'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleShareCardDirectWhatsApp(card)}
+                          className="px-3.5 py-2 rounded-md bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+                          title="Share Card on WhatsApp"
+                        >
+                          <Share2 className="w-3.5 h-3.5 fill-white" />
+                          <span>WhatsApp</span>
                         </button>
 
                         <button
