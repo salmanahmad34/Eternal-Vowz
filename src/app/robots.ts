@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
     '/llms.txt',
     '/llms-full.txt',
     '/google9d1eb35adfd63784.html',
-    '/invite/',
     '/contact',
     '/privacy',
     '/terms',
@@ -21,11 +20,12 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
+      // 1. Block aggressive scrapers entirely
       {
-        userAgent: '*',
-        allow: publicRoutes,
-        disallow: ['/dashboard', '/editor/', '/api/', '/auth/'],
+        userAgent: ['Bytespider', 'ByteDance'],
+        disallow: ['/'],
       },
+      // 2. Allow verified AI crawlers only on public content (protect customer /invite/ cards)
       {
         userAgent: [
           'GPTBot',
@@ -34,12 +34,17 @@ export default function robots(): MetadataRoute.Robots {
           'Google-Extended',
           'Amazonbot',
           'Applebot-Extended',
-          'Bytespider',
           'cohere-ai',
           'CCBot',
         ],
         allow: publicRoutes,
-        disallow: ['/dashboard', '/editor/', '/api/', '/auth/'],
+        disallow: ['/dashboard', '/editor/', '/api/', '/auth/', '/invite/'],
+      },
+      // 3. Default search engines rule
+      {
+        userAgent: '*',
+        allow: publicRoutes,
+        disallow: ['/dashboard', '/editor/', '/api/', '/auth/', '/invite/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

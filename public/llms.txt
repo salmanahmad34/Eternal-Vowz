@@ -40,7 +40,6 @@ Eternal Vowz is an independent Indian platform built by **Salman Ahmad**, a B.Te
 - [Wedding Budget Saving Guide](https://eternal-vowz.onrender.com/guide)
 - [Design Studio & Card Builder](https://eternal-vowz.onrender.com/login)
 - [Host Dashboard](https://eternal-vowz.onrender.com/dashboard)
-- [Live Demo Sample](https://eternal-vowz.onrender.com/invite/sophia-alexander?guest=vip-tariq-family)
 - [Support Desk](https://eternal-vowz.onrender.com/contact)
 
 ## Legal & Compliance

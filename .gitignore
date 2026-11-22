@@ -46,3 +46,40 @@ next-env.d.ts
 /backups/
 /reports/
 /screenshots/
+
+# Part 2: Security & Privacy Guardrails (Strict Ignores)
+# Database dumps & exports (preserve supabase/ migrations)
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+/data/
+/exports/
+/customer-data/
+/guest-exports/
+*.csv
+*.xlsx
+*.sql
+!supabase/schema.sql
+!supabase/auth_rls_hardening.sql
+
+# Private keys, certificates & credentials
+*.key
+*.crt
+*.cert
+*.pfx
+*.p12
+*.keystore
+id_rsa*
+id_ed25519*
+
+# Temporary scratch scripts & logs
+/scratch/
+/tmp/
+/temp/
+*.tmp
+*.temp
+*.log
+*.swp
+*~
+

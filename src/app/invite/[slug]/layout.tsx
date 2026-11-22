@@ -55,6 +55,17 @@ export async function generateMetadata({
     return {
       title: '💍 Royal Wedding Invitation | Eternal Vowz',
       description: 'You are cordially invited to celebrate this sacred union. Tap to open your 3D digital invitation.',
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        noarchive: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+        },
+      },
       openGraph: {
         title: '💍 Royal Wedding Invitation | Eternal Vowz',
         description: 'You are cordially invited to celebrate this sacred union. Tap to open your 3D digital invitation.',
@@ -104,8 +115,16 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: {
-      canonical: pageUrl,
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      noarchive: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
     },
     openGraph: {
       title,

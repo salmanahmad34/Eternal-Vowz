@@ -37,28 +37,28 @@ Haan, digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 3
 
 ## 8 Signature Design Nuggets (Detailed Breakdown)
 
-1. **Pearl Botanical Veil** (`/invite/layla-omar-veil?theme=pearl-veil`)
+1. **Pearl Botanical Veil** (Theme ID: `pearl-veil`)
    Pearl Botanical Veil ek minimalist luxury wedding invitation hai jisme soft ivory, pastel floral flourishes, aur champagne gold typography milti hai. Yeh modern day-weddings aur sophisticated Christian ya intimate ceremonies ke liye best hai, jisme soft wind chimes aur elegant opening animation shamil hai.
 
-2. **Shahi Palace Gates** (`/invite/amira-rayyan-palace?theme=blush-floral`)
+2. **Shahi Palace Gates** (Theme ID: `blush-floral`)
    Shahi Palace Gates ek grand royal Rajasthani palace fort theme hai jisme double golden doors swing open hote hain. Gold filigree borders, regal dhol ya shehnai background music, aur traditional Darbar darshya ke sath yeh grand big-fat Indian weddings ke liye perfect choice hai.
 
-3. **Tuscan Sunset Rose** (`/invite/sophia-alexander?theme=tuscan-sunset`)
+3. **Tuscan Sunset Rose** (Theme ID: `tuscan-sunset`)
    Tuscan Sunset Rose ek warm terracotta aur rose gold Mediterranean courtyard invitation hai. Sunkissed Italian arches, warm sitar background melodies, aur floral bougainvillea styling ke sath yeh romantic destination weddings aur sunset receptions ke liye design kiya gaya hai.
 
-4. **Royal Mughal Arch** (`/invite/zoya-ayaan-nikah?theme=royal-emerald`)
+4. **Royal Mughal Arch** (Theme ID: `royal-emerald`)
    Royal Mughal Arch ek heritage Islamic wedding aur Nikah invitation hai jisme deep emerald green velvet, white marble jaali work, aur crescent gold arches shamil hain. Khususi duayein, Bismillah calligraphy, aur traditional sufi/shehnai melodies ke sath yeh sacred ceremonies ke liye behtareen hai.
 
-5. **Celestial Starlight** (`/invite/fatima-hamza-starlight?theme=midnight-minimalist`)
+5. **Celestial Starlight** (Theme ID: `midnight-minimalist`)
    Celestial Starlight ek midnight navy blue aur sparkling gold constellation theme hai jo evening receptions, cocktail parties, aur sangeet nights ke liye banayi gayi hai. Starlight particle glow, modern sans-serif typography, aur romantic acoustic background score is card ko cinematic banate hain.
 
-6. **Kashmir Chinar Lotus** (`/invite/mir-falak-lotus?theme=kashmir-lotus`)
+6. **Kashmir Chinar Lotus** (Theme ID: `kashmir-lotus`)
    Kashmir Chinar Lotus theme Dal Lake aur Mughal gardens ki natural khubsurti se prerit hai. Golden chinar leaves, lotus petals, aur Kashmiri rabab/flute music ke sath yeh nature-inspired, peaceful aur elegant wedding celebrations ke liye ideal digital invitation hai.
 
-7. **Shahi Crimson & Zari** (`/invite/kabir-roshni-crimson?theme=shahi-crimson`)
+7. **Shahi Crimson & Zari** (Theme ID: `shahi-crimson`)
    Shahi Crimson & Zari ek traditional Indian shaadi theme hai jo deep crimson red velvet aur 24-karat gold zari embroidery par aadharit hai. Heavy bridal lehenga styling, auspicious golden motifs, aur live mangal geet tunes ke sath yeh traditional Hindu aur North Indian weddings ki pehli pasand hai.
 
-8. **Jodhpur Sapphire Darbar** (`/invite/zayn-anaya-sapphire?theme=jodhpur-sapphire`)
+8. **Jodhpur Sapphire Darbar** (Theme ID: `jodhpur-sapphire`)
    Jodhpur Sapphire Darbar Blue City ke royal Mehrangarh palace se inspired ek majestic wedding theme hai. Deep imperial sapphire blue, carved stone jharokhas, aur royal fanfare trumpet audio ke sath yeh card har guest ko shahi mehmaan jaisa feel karwata hai.
 
 ## Official Site Links
