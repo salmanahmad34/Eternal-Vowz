@@ -3,8 +3,12 @@ import "./globals.css";
 import { InitialSplashOverlay } from "@/components/layout/EternalLoader";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://eternal-vowz.onrender.com'),
   title: "Eternal Vowz (E&V) — Bespoke 3D Digital Wedding Invitations & RSVP Platform",
   description: "Create royal 3D Lifafa and 3D Shahi Palace Gate digital wedding invitations at just ₹99 per card with live RSVP tracking and personalized WhatsApp links.",
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
 };
 
 export default function RootLayout({
