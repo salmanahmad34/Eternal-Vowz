@@ -860,6 +860,76 @@ export const DataService = {
     return { user: mapped, error: null };
   },
 
+  async verifySignupOtp(
+    email: string,
+    token: string
+  ): Promise<{ user: HostUser | null; error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { user: null, error: 'Authentication service is not configured.' };
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim().replace(/\D/g, '');
+
+    let res = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanToken,
+      type: 'signup',
+    });
+
+    if (res.error) {
+      res = await supabase.auth.verifyOtp({
+        email: cleanEmail,
+        token: cleanToken,
+        type: 'email',
+      });
+    }
+
+    if (res.error || !res.data.user) {
+      return {
+        user: null,
+        error: res.error?.message || 'Invalid or expired verification code. Please check and try again.',
+      };
+    }
+
+    const mapped = mapSupabaseUser(res.data.user);
+    setLocalItem(STORAGE_KEY_USER, mapped);
+    return { user: mapped, error: null };
+  },
+
+  async resetPasswordWithOtp(
+    email: string,
+    token: string,
+    newPassword: string
+  ): Promise<{ user: HostUser | null; error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { user: null, error: 'Authentication service is not configured.' };
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim().replace(/\D/g, '');
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanToken,
+      type: 'recovery',
+    });
+
+    if (error || !data.user) {
+      return {
+        user: null,
+        error: error?.message || 'Invalid or expired password reset code.',
+      };
+    }
+
+    const updateRes = await supabase.auth.updateUser({ password: newPassword });
+    if (updateRes.error) {
+      return { user: null, error: updateRes.error.message };
+    }
+
+    const mapped = mapSupabaseUser(updateRes.data.user || data.user);
+    setLocalItem(STORAGE_KEY_USER, mapped);
+    return { user: mapped, error: null };
+  },
+
   async signInWithEmail(
     email: string,
     password: string
