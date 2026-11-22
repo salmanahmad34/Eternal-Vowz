@@ -942,6 +942,13 @@ export const DataService = {
       password,
     });
     if (error || !data.user) {
+      if (error?.message?.toLowerCase().includes('invalid login credentials')) {
+        return {
+          user: null,
+          error:
+            'Incorrect password, or no password is set for this account. If you created this account with Google, click "Continue with Google", or click "Forgot Password?" below to set a new password.',
+        };
+      }
       return {
         user: null,
         error: error?.message || 'Invalid email or password.',
