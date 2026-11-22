@@ -55,7 +55,7 @@ const MARQUEE_ROW_TWO = [
   'Real-Time RSVP Headcount',
   'Halal Catering Summary',
   'One-Tap Google Maps',
-  '30-Day Private Hosting',
+  'Card Active for 30 Days',
   'Post-Purchase WhatsApp Support',
 ];
 
@@ -218,7 +218,7 @@ const COMPARISON_ROWS = [
     feature: 'Privacy & Active Validity',
     sub: 'Control over family links',
     physical: 'Printed cards circulate indefinitely',
-    digital: 'Active for 1 Month (30 Days), then expires automatically',
+    digital: 'Card Active for 30 Days, then expires automatically',
   },
 ];
 
@@ -361,7 +361,7 @@ export default function LandingPage() {
                   <span>&bull;</span>
                   <span>Unlimited WhatsApp guests</span>
                   <span>&bull;</span>
-                  <span>1-Month (30-Day) active hosting</span>
+                  <span>Card 30 Days tak active rahega</span>
                   <span>&bull;</span>
                   <span>256-Bit SSL secure</span>
                 </p>
@@ -464,7 +464,7 @@ export default function LandingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-[#C9A84C] shrink-0" />
-                <span>Flat ₹99 per card &bull; Active for 1 month (30 days) with live RSVPs.</span>
+                <span>Flat ₹99 per card &bull; Card 30 Days tak active rahega with live RSVPs.</span>
               </li>
             </ul>
           </div>
@@ -731,10 +731,10 @@ export default function LandingPage() {
                 <Clock className="w-5 h-5" />
               </div>
               <h3 className="font-serif text-2xl font-semibold text-[#291418]">
-                1-Month (30-Day) Automatic Expiry
+                30 Days Card Active &amp; Automatic Expiry
               </h3>
               <p className="text-sm text-[#8B7355] leading-relaxed">
-                Every wedding card stays live for <strong className="text-[#291418] font-medium">30 days (1 month)</strong> from activation and expires automatically afterward so your private family celebration never lingers online indefinitely.
+                Every wedding card stays active for <strong className="text-[#291418] font-medium">30 days</strong> from activation and expires automatically afterward so your private family celebration never lingers online indefinitely.
               </p>
             </div>
 
@@ -872,7 +872,7 @@ export default function LandingPage() {
                     Save ₹15,000+ &amp; 3 Weeks of Printing Stress
                   </span>
                   <span className="text-xs text-[#8B7355]">
-                    Flat ₹99 per card &bull; 8 animated themes &bull; Active for 1 full month (30 days)
+                    Flat ₹99 per card &bull; 8 animated themes &bull; Card 30 Days tak active rahega
                   </span>
                 </div>
               </div>
@@ -1029,7 +1029,7 @@ export default function LandingPage() {
           <div className="mt-16 max-w-4xl mx-auto rounded-3xl cta-gold-banner p-10 sm:p-14 text-center space-y-5 shadow-[0_24px_60px_-20px_rgba(201,168,76,0.55)] relative overflow-hidden">
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/25 backdrop-blur-sm border border-white/35 text-xs text-white font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Flat ₹99 Per Card &bull; Active for 1 Month (30 Days)</span>
+              <span>Flat ₹99 Per Card &bull; Card Active for 30 Days</span>
             </span>
 
             <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-white">

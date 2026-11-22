@@ -345,7 +345,7 @@ export default function EnvelopeExperience({
             Wedding Invitation Expired
           </h1>
           <p className="text-xs text-[#6E5D53] leading-relaxed mb-6">
-            Each Eternal Vowz digital wedding card is active for <strong>1 Month (30 Days)</strong> from creation. This invitation link has completed its 30-day hosting period.
+            Each Eternal Vowz digital wedding card is active for <strong>30 Days</strong> from creation. This invitation card has completed its 30-day active period.
           </p>
           <a
             href="/dashboard"

@@ -76,10 +76,10 @@ export default function TermsPage() {
                 4. Validity &amp; 30-Day Card Lifecycle
               </h2>
               <p>
-                Each activated ₹99 digital card license includes <strong>1 full month (30 days)</strong> of active hosting starting from the moment of publication.
+                Each activated ₹99 digital card license remains active for <strong>30 days</strong> starting from the moment of publication.
               </p>
               <p>
-                During this 30-day window, hosts enjoy unlimited live edits (updating venues, times, or dress codes) and unlimited guest RSVPs. After 30 days, the public guest link will automatically expire to protect personal wedding information, with an option to extend hosting inside your Host Dashboard.
+                During this 30-day window, hosts enjoy unlimited live edits (updating venues, times, or dress codes) and unlimited guest RSVPs. After 30 days, the public guest link will automatically expire to protect personal wedding information, with an option to renew your card inside your Host Dashboard.
               </p>
             </section>
 

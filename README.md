@@ -1,6 +1,6 @@
 # Eternal Vowz (E&V) — 3D Digital Wedding Invitation & RSVP Platform
 
-Bespoke 3D interactive digital wedding invitations with real-time RSVP tracking, personalized WhatsApp guest links, and a Smart Conditional Card Builder — priced at a flat **₹99 per card** with 1-month (30-day) active hosting.
+Bespoke 3D interactive digital wedding invitations with real-time RSVP tracking, personalized WhatsApp guest links, and a Smart Conditional Card Builder — priced at a flat **₹99 per card** (card active for 30 days).
 
 ## Signature Features
 
