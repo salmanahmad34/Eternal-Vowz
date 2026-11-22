@@ -132,7 +132,7 @@ export default function RootLayout({
         {/* Google Analytics 4 (GA4) & Google Tag Manager */}
         <Script
           strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-24RY3NY9GB'}`}
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-KZN895KCFM'}`}
         />
         <Script
           id="google-analytics"
@@ -142,7 +142,7 @@ export default function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-24RY3NY9GB'}', {
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-KZN895KCFM'}', {
                 page_path: window.location.pathname,
               });
             `,
@@ -151,7 +151,7 @@ export default function RootLayout({
         <Script
           id="google-tag-manager"
           strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtm.js?id=GTM-KJBXPSBW"
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-MMTKVDD8"
         />
       </head>
       <body className="font-sans bg-[#FAF7F2] text-[#291418] antialiased selection:bg-[#C9A84C]/20 selection:text-[#291418]">
