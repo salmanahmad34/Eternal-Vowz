@@ -429,7 +429,7 @@ export default function ScratchCardDate({
                   : 'bg-[#C5A059]/15 text-[#5A4526] border border-[#C5A059]/30'
               }`}
             >
-              <Check className="w-2.5 h-2.5 stroke-[3]" />
+              <Sparkles className="w-2.5 h-2.5 text-[#D4AF37]" />
               <span>Mark Your Calendar</span>
             </span>
           </div>

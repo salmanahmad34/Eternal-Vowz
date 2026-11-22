@@ -248,6 +248,15 @@ export default function EnvelopeExperience({
       ).padStart(2, '0')}.${eventDateObj.getFullYear()}`
     : '24.10.2027';
 
+  const readableEventDate = !isNaN(eventDateObj.getTime())
+    ? eventDateObj.toLocaleDateString('en-US', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : dotDate;
+
   // Conditional Visibility Flags ("user jitni detail card me fill kare utna hi card me show ho")
   const hasVenue = Boolean(
     invitation.venue_details?.venue_name?.trim() || invitation.venue_details?.address?.trim()
@@ -869,6 +878,8 @@ export default function EnvelopeExperience({
                     timeLeft={timeLeft}
                     invitationSlug={invitation.slug || invitation.id}
                     isDarkPalace={isDarkPalace}
+                    readableDate={readableEventDate}
+                    eventDate={dotDate}
                     onExploreNext={() => scrollToNextSection(hasVenue ? 'card-section-venue' : 'card-section-schedule')}
                   />
                 </section>

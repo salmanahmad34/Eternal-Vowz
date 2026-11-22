@@ -490,18 +490,18 @@ export default function LandingPage() {
             })}
           </div>
 
-          {/* 8-Card Portrait Grid (Exact WooowInvites Curated Theme Cards) */}
+          {/* 8-Card Portrait Grid (Exact WooowInvites Curated Theme Cards in 9:16) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {filteredDesigns.map((design) => (
               <div
                 key={design.id}
-                className="rounded-2xl bg-white border border-[#E2D7BD]/90 overflow-hidden flex flex-col justify-between editorial-card-shadow hover:-translate-y-1 hover:border-[#C9A84C] transition-all duration-300 group"
+                className="rounded-2xl bg-white border border-[#E2D7BD]/90 overflow-hidden flex flex-col justify-between editorial-card-shadow hover:-translate-y-1 hover:border-[#C9A84C] transition-all duration-300 group max-w-[340px] sm:max-w-none mx-auto w-full"
               >
-                {/* Tall Portrait Artwork — Clickable to View Full Live Sample */}
+                {/* 9:16 Portrait Artwork — Clickable to View Full Live Sample */}
                 <Link
                   href={`/invite/${design.slug}${design.query}`}
                   target="_blank"
-                  className="relative h-72 overflow-hidden bg-[#291418] block cursor-pointer"
+                  className="relative aspect-[9/16] w-full overflow-hidden bg-[#291418] block cursor-pointer"
                 >
                   <img
                     src={design.heroImg}

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, PartyPopper, Check, RotateCcw, X, Heart, ChevronDown } from 'lucide-react';
+import { Sparkles, PartyPopper, RotateCcw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ScratchCountdownBoxesProps {
@@ -14,6 +14,8 @@ interface ScratchCountdownBoxesProps {
   };
   invitationSlug?: string;
   isDarkPalace?: boolean;
+  eventDate?: string;
+  readableDate?: string;
   onAllScratched?: () => void;
   onExploreNext?: () => void;
 }
@@ -28,7 +30,9 @@ interface BoxUnit {
 function playPartyPopperSound() {
   if (typeof window === 'undefined') return;
   try {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextClass) return;
     const ctx = new AudioContextClass();
 
@@ -126,8 +130,8 @@ function SingleScratchBox({
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const width = rect.width || 100;
-    const height = rect.height || 100;
+    const width = rect.width || 80;
+    const height = rect.height || 80;
 
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
     canvas.width = width * dpr;
@@ -154,30 +158,30 @@ function SingleScratchBox({
 
     // Elegant inner border
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(4, 4, width - 8, height - 8);
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(3, 3, width - 6, height - 6);
 
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(6, 6, width - 12, height - 12);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(5, 5, width - 10, height - 10);
 
     // Sparkle icon
-    ctx.font = '16px sans-serif';
+    ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('✨', width / 2, height / 2 - 14);
+    ctx.fillText('✨', width / 2, height / 2 - 12);
 
     // "SCRATCH" text
     ctx.fillStyle = isDarkPalace ? '#2A1706' : '#3E250A';
-    ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
-    ctx.letterSpacing = '1.5px';
-    ctx.fillText('SCRATCH', width / 2, height / 2 + 6);
+    ctx.font = 'bold 9.5px system-ui, -apple-system, sans-serif';
+    ctx.letterSpacing = '1px';
+    ctx.fillText('SCRATCH', width / 2, height / 2 + 4);
 
     // Unit label hint (DAYS, HOURS, MINUTES)
-    ctx.font = '600 9px system-ui, -apple-system, sans-serif';
+    ctx.font = '600 8px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = isDarkPalace ? '#4A2F0F' : '#6A441B';
-    ctx.letterSpacing = '1px';
-    ctx.fillText(unit.label, width / 2, height / 2 + 20);
+    ctx.letterSpacing = '0.8px';
+    ctx.fillText(unit.label, width / 2, height / 2 + 16);
   }, [isDarkPalace, isScratched, unit.label]);
 
   useEffect(() => {
@@ -209,12 +213,12 @@ function SingleScratchBox({
       }
 
       const ratio = transparentPixels / sampled;
-      // Auto complete reveal when ~20% is scratched or user has scratched 8+ strokes
-      if (ratio >= 0.20 || strokeCountRef.current >= 8) {
+      // Auto complete reveal when ~18% is scratched or user has scratched 6+ strokes
+      if (ratio >= 0.18 || strokeCountRef.current >= 6) {
         setFading(true);
         setTimeout(() => {
           onScratched();
-        }, 180);
+        }, 160);
       }
     } catch {
       // Fallback
@@ -234,7 +238,7 @@ function SingleScratchBox({
       const y = clientY - rect.top;
 
       ctx.globalCompositeOperation = 'destination-out';
-      ctx.lineWidth = 36;
+      ctx.lineWidth = 28;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
@@ -243,7 +247,7 @@ function SingleScratchBox({
         ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
         ctx.lineTo(x, y);
       } else {
-        ctx.arc(x, y, 18, 0, Math.PI * 2);
+        ctx.arc(x, y, 14, 0, Math.PI * 2);
       }
       ctx.stroke();
 
@@ -273,7 +277,7 @@ function SingleScratchBox({
     checkScratchPercentage();
   };
 
-  // Touch Handlers (with smooth preventDefault)
+  // Touch Handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     isDrawingRef.current = true;
     lastPointRef.current = null;
@@ -296,37 +300,35 @@ function SingleScratchBox({
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative flex flex-col items-center select-none"
-    >
+    <div ref={containerRef} className="relative flex flex-col items-center select-none">
+      {/* Box container — compact & refined */}
       <div
-        className={`w-full aspect-square rounded-2xl relative overflow-hidden transition-all duration-300 flex flex-col items-center justify-center p-2 shadow-lg ${
+        className={`w-full aspect-square rounded-xl relative overflow-hidden transition-all duration-300 flex flex-col items-center justify-center p-1.5 shadow-md ${
           isDarkPalace
-            ? 'bg-gradient-to-b from-[#24170E] to-[#160E08] border border-[#E5C17B]/60 shadow-[0_8px_24px_rgba(0,0,0,0.65)]'
-            : 'bg-gradient-to-b from-[#FFFDF9] to-[#F5ECE0] border border-[#D4AF37]/50 shadow-[0_8px_20px_rgba(197,160,89,0.18)]'
-        } ${isScratched ? 'ring-2 ring-[#D4AF37]/40 ring-offset-1 ring-offset-transparent' : ''}`}
+            ? 'bg-gradient-to-b from-[#24170E] to-[#160E08] border border-[#E5C17B]/60 shadow-[0_4px_16px_rgba(0,0,0,0.55)]'
+            : 'bg-gradient-to-b from-[#FFFDF9] to-[#F5ECE0] border border-[#D4AF37]/50 shadow-[0_4px_14px_rgba(197,160,89,0.15)]'
+        } ${isScratched ? 'ring-1.5 ring-[#D4AF37]/50 ring-offset-1 ring-offset-transparent' : ''}`}
       >
         {/* Subtle decorative background watermark */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.04]"
           style={{
             backgroundImage: `radial-gradient(circle at center, #D4AF37 1px, transparent 1px)`,
-            backgroundSize: '12px 12px',
+            backgroundSize: '10px 10px',
           }}
         />
 
         {/* Revealed Number and Live Digits */}
         <div className="relative z-0 flex flex-col items-center justify-center">
           <span
-            className={`font-serif font-bold tabular-nums text-[32px] sm:text-[38px] leading-none tracking-tight drop-shadow-sm transition-transform duration-300 ${
+            className={`font-serif font-bold tabular-nums text-[26px] sm:text-[30px] leading-none tracking-tight drop-shadow-sm transition-transform duration-300 ${
               isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2C1F14]'
             } ${isScratched ? 'scale-100' : 'scale-95 blur-[0.5px]'}`}
           >
             {String(unit.value).padStart(2, '0')}
           </span>
           <span
-            className={`font-sans font-bold text-[9.5px] sm:text-[10px] tracking-[0.22em] uppercase mt-1.5 transition-colors ${
+            className={`font-sans font-bold text-[8.5px] sm:text-[9px] tracking-[0.2em] uppercase mt-1 transition-colors ${
               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#8C6430]'
             }`}
           >
@@ -345,36 +347,24 @@ function SingleScratchBox({
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className={`absolute inset-0 w-full h-full cursor-pointer touch-none z-10 transition-opacity duration-300 rounded-2xl ${
+            className={`absolute inset-0 w-full h-full cursor-pointer touch-none z-10 transition-opacity duration-300 rounded-xl ${
               fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
           />
         )}
-
-        {/* Small checkmark badge once scratched */}
-        {isScratched && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', damping: 12, stiffness: 200 }}
-            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#D4AF37] flex items-center justify-center text-[#2A1706] shadow-sm z-20"
-          >
-            <Check className="w-2.5 h-2.5 stroke-[3]" />
-          </motion.div>
-        )}
       </div>
 
-      {/* Helper text below each box */}
+      {/* Helper text below each box (NO check tick!) */}
       <span
-        className={`text-[9.5px] font-sans font-medium mt-1.5 tracking-wider uppercase transition-opacity ${
+        className={`text-[8.5px] font-sans font-medium mt-1 tracking-wider uppercase transition-opacity ${
           isScratched
-            ? 'text-[#D4AF37] opacity-80'
+            ? 'text-[#D4AF37] opacity-90'
             : isDarkPalace
             ? 'text-[#C5A059]/75'
             : 'text-[#8C6D46]/80'
         }`}
       >
-        {isScratched ? '✦ Unlocked' : 'Scratch Me'}
+        {isScratched ? '✦ Revealed' : 'Scratch Me'}
       </span>
     </div>
   );
@@ -384,6 +374,8 @@ export default function ScratchCountdownBoxes({
   timeLeft,
   invitationSlug = 'wedding',
   isDarkPalace = true,
+  eventDate,
+  readableDate,
   onAllScratched,
   onExploreNext,
 }: ScratchCountdownBoxesProps) {
@@ -397,7 +389,6 @@ export default function ScratchCountdownBoxes({
     minutes: false,
   });
 
-  const [showPartyModal, setShowPartyModal] = useState(false);
   const [hasCelebrated, setHasCelebrated] = useState(false);
 
   // Restore scratched state from localStorage
@@ -413,7 +404,6 @@ export default function ScratchCountdownBoxes({
               hours: !!parsed.hours,
               minutes: !!parsed.minutes,
             });
-            // If all were previously scratched, record celebrated
             if (parsed.days && parsed.hours && parsed.minutes) {
               setHasCelebrated(true);
             }
@@ -431,7 +421,7 @@ export default function ScratchCountdownBoxes({
     { id: 'minutes', label: 'MINUTES', value: timeLeft.minutes },
   ];
 
-  // Fire Party Popper fireworks & audio celebration
+  // Fire Party Popper fireworks & audio celebration (party bom burst!)
   const triggerCelebration = useCallback(() => {
     playPartyPopperSound();
 
@@ -439,7 +429,7 @@ export default function ScratchCountdownBoxes({
     try {
       confetti({
         particleCount: 110,
-        spread: 90,
+        spread: 95,
         origin: { y: 0.62 },
         colors: ['#FFD700', '#FFDF73', '#FF2D55', '#FFFFFF', '#4CD964', '#5856D6'],
         disableForReducedMotion: true,
@@ -477,7 +467,6 @@ export default function ScratchCountdownBoxes({
       // Confetti fallback
     }
 
-    setShowPartyModal(true);
     setHasCelebrated(true);
     if (onAllScratched) {
       onAllScratched();
@@ -499,7 +488,7 @@ export default function ScratchCountdownBoxes({
         if (next.days && next.hours && next.minutes && !hasCelebrated) {
           setTimeout(() => {
             triggerCelebration();
-          }, 300);
+          }, 260);
         }
 
         return next;
@@ -513,7 +502,6 @@ export default function ScratchCountdownBoxes({
     const fresh = { days: false, hours: false, minutes: false };
     setScratchedState(fresh);
     setHasCelebrated(false);
-    setShowPartyModal(false);
     try {
       if (typeof window !== 'undefined' && invitationSlug) {
         localStorage.removeItem(`ev_scratch_boxes_${invitationSlug}`);
@@ -527,19 +515,20 @@ export default function ScratchCountdownBoxes({
     (scratchedState.minutes ? 1 : 0);
 
   const allScratched = scratchedCount === 3;
+  const displayDate = readableDate || eventDate || 'Sunday, 24 October 2027';
 
   return (
-    <div className="w-full max-w-[360px] sm:max-w-[400px] mx-auto my-3 relative">
+    <div className="w-full max-w-[290px] sm:max-w-[320px] mx-auto my-2.5 relative">
       {/* Scratch Progress & Instruction Prompt */}
-      <div className="flex items-center justify-between px-2 mb-2.5">
+      <div className="flex items-center justify-between px-1 mb-2">
         <div className="flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
+          <Sparkles className="w-3 h-3 text-[#D4AF37] animate-pulse" />
           <span
-            className={`font-sans text-[11px] font-semibold tracking-wider uppercase ${
+            className={`font-sans text-[10px] font-semibold tracking-wider uppercase ${
               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7A5828]'
             }`}
           >
-            {allScratched ? '✦ All 3 Boxes Unlocked ✦' : `Scratch 3 Boxes to Unlock (${scratchedCount}/3)`}
+            {allScratched ? '✦ All 3 Moments Unlocked ✦' : `Scratch 3 Boxes (${scratchedCount}/3)`}
           </span>
         </div>
 
@@ -547,7 +536,7 @@ export default function ScratchCountdownBoxes({
           <button
             type="button"
             onClick={handleResetScratch}
-            className={`flex items-center gap-1 text-[10px] font-sans font-semibold tracking-wider transition-opacity hover:opacity-100 ${
+            className={`flex items-center gap-1 text-[9.5px] font-sans font-semibold tracking-wider transition-opacity hover:opacity-100 ${
               isDarkPalace ? 'text-[#C5A059] opacity-80' : 'text-[#8C6D46] opacity-75'
             }`}
             title="Scratch again"
@@ -558,8 +547,8 @@ export default function ScratchCountdownBoxes({
         )}
       </div>
 
-      {/* 3 Interactive Scratch Boxes */}
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5">
+      {/* 3 Interactive Compact Scratch Boxes */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
         {units.map((unit) => (
           <SingleScratchBox
             key={unit.id}
@@ -572,9 +561,9 @@ export default function ScratchCountdownBoxes({
       </div>
 
       {/* Live seconds ticking subtle reminder */}
-      <div className="text-center mt-3">
+      <div className="text-center mt-2.5">
         <span
-          className={`font-mono text-[10.5px] tracking-[0.25em] uppercase tabular-nums ${
+          className={`font-mono text-[9.5px] tracking-[0.22em] uppercase tabular-nums ${
             isDarkPalace ? 'text-[#E5C17B]/60' : 'text-[#8C6D46]/70'
           }`}
         >
@@ -583,137 +572,42 @@ export default function ScratchCountdownBoxes({
       </div>
 
       {/* ===============================================================
-          PARTY POPPER CELEBRATION MODAL (Triggers when all 3 are scratched)
+          INLINE CELEBRATION DATE REVEAL (NO BLOCKING POPUP DIALOG!)
+          Appears right below the boxes when scratched, with party popper
       =============================================================== */}
       <AnimatePresence>
-        {showPartyModal && (
+        {allScratched && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
-            onClick={() => setShowPartyModal(false)}
+            initial={{ opacity: 0, y: 12, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 18, stiffness: 240 }}
+            className={`mt-3.5 p-3 rounded-xl text-center border relative overflow-hidden shadow-sm ${
+              isDarkPalace
+                ? 'bg-gradient-to-b from-[#24170E]/95 via-[#1A1009]/95 to-[#120B06]/95 border-[#D4AF37]/50 text-[#FFF4CF]'
+                : 'bg-gradient-to-b from-[#FFFDF9] via-[#FAF5EC] to-[#F2E8D7] border-[#C5A059]/45 text-[#2C1F14]'
+            }`}
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: 30 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 280 }}
-              onClick={(e) => e.stopPropagation()}
-              className={`w-full max-w-sm rounded-3xl p-6 text-center relative overflow-hidden shadow-2xl border ${
-                isDarkPalace
-                  ? 'bg-gradient-to-b from-[#24170E] via-[#1B110A] to-[#120B06] border-[#D4AF37]/60 text-[#FFF4CF] shadow-[0_20px_50px_rgba(0,0,0,0.85)]'
-                  : 'bg-gradient-to-b from-[#FFFDF9] via-[#FAF5EC] to-[#F2E8D7] border-[#C5A059]/50 text-[#2C1F14] shadow-[0_20px_50px_rgba(197,160,89,0.3)]'
+            <div className="flex items-center justify-center gap-1.5 mb-1 text-[#D4AF37]">
+              <PartyPopper className="w-4 h-4 animate-bounce" />
+              <span className="font-serif font-bold text-xs sm:text-sm tracking-wide">
+                🎉 Countdown Unlocked! 🎉
+              </span>
+            </div>
+            <div
+              className={`font-serif text-base sm:text-lg font-bold tracking-wider leading-snug my-0.5 ${
+                isDarkPalace ? 'text-[#FFF2D1]' : 'text-[#2A1706]'
               }`}
             >
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => setShowPartyModal(false)}
-                className={`absolute top-4 right-4 p-1.5 rounded-full transition-colors ${
-                  isDarkPalace
-                    ? 'hover:bg-white/10 text-[#E5C17B]'
-                    : 'hover:bg-black/5 text-[#7A5828]'
-                }`}
-                aria-label="Close celebration popup"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              {/* Festive Party Popper Icon Animation */}
-              <motion.div
-                animate={{
-                  rotate: [0, -12, 12, -8, 8, 0],
-                  scale: [1, 1.15, 1.15, 1.1, 1.1, 1],
-                }}
-                transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2 }}
-                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#FFF2D1] flex items-center justify-center shadow-lg text-[#2A1706] mb-3.5"
-              >
-                <PartyPopper className="w-9 h-9" />
-              </motion.div>
-
-              {/* Title */}
-              <h3 className="font-serif text-2xl font-bold tracking-tight mb-1">
-                🎉 Countdown Unlocked! 🎉
-              </h3>
-              <p
-                className={`font-sans text-[11px] font-semibold tracking-widest uppercase mb-3 ${
-                  isDarkPalace ? 'text-[#E5C17B]' : 'text-[#8C6430]'
-                }`}
-              >
-                All 3 Moments Revealed
-              </p>
-
-              {/* Summary Unlocked Timer Pills */}
-              <div
-                className={`grid grid-cols-3 gap-2 p-2.5 rounded-xl my-3.5 border ${
-                  isDarkPalace
-                    ? 'bg-[#150D07]/90 border-[#D4AF37]/30'
-                    : 'bg-white/80 border-[#C5A059]/30'
-                }`}
-              >
-                <div>
-                  <span className="block font-serif font-bold text-xl tabular-nums text-[#D4AF37]">
-                    {timeLeft.days}
-                  </span>
-                  <span className="block text-[9px] font-sans font-bold tracking-wider opacity-70">
-                    DAYS
-                  </span>
-                </div>
-                <div>
-                  <span className="block font-serif font-bold text-xl tabular-nums text-[#D4AF37]">
-                    {timeLeft.hours}
-                  </span>
-                  <span className="block text-[9px] font-sans font-bold tracking-wider opacity-70">
-                    HOURS
-                  </span>
-                </div>
-                <div>
-                  <span className="block font-serif font-bold text-xl tabular-nums text-[#D4AF37]">
-                    {timeLeft.minutes}
-                  </span>
-                  <span className="block text-[9px] font-sans font-bold tracking-wider opacity-70">
-                    MINS
-                  </span>
-                </div>
-              </div>
-
-              {/* Emotional Warm Message */}
-              <p
-                className={`font-sans text-[12.5px] leading-relaxed mb-5 ${
-                  isDarkPalace ? 'text-[#E8D7B9]' : 'text-[#5A452D]'
-                }`}
-              >
-                Every second brings us closer to this joyous celebration! We are truly excited to celebrate our big day with you.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPartyModal(false);
-                    if (onExploreNext) {
-                      onExploreNext();
-                    }
-                  }}
-                  className="w-full py-3 px-4 rounded-xl font-sans font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-[#D4AF37] via-[#F3E2B3] to-[#C5A059] text-[#2A1706] shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Explore Wedding Invitation</span>
-                  <ChevronDown className="w-4 h-4 animate-bounce" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowPartyModal(false)}
-                  className={`text-[11px] font-sans font-medium py-1 transition-opacity ${
-                    isDarkPalace ? 'text-[#E5C17B]/70 hover:text-[#E5C17B]' : 'text-[#7A5828]/70 hover:text-[#7A5828]'
-                  }`}
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
+              ✦ {displayDate} ✦
+            </div>
+            <p
+              className={`font-sans text-[9.5px] tracking-wider uppercase mt-1 ${
+                isDarkPalace ? 'text-[#E5C17B]/80' : 'text-[#8C6430]/90'
+              }`}
+            >
+              Counting every moment until we celebrate together
+            </p>
           </motion.div>
         )}
       </AnimatePresence>

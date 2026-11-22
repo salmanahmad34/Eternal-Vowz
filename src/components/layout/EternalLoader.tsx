@@ -27,15 +27,17 @@ export function EternalLogoBadge({
         transition={animated ? { duration: 10, repeat: Infinity, ease: 'linear' } : undefined}
         className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#C9A84C]"
       />
-      {/* Inner Editorial Cream & Gold Medallion */}
+      {/* Inner Editorial Cream & Gold Medallion with Circular Monogram */}
       <motion.div
         animate={animated ? { scale: [1, 1.04, 1] } : undefined}
         transition={animated ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
-        className="w-[84%] h-[84%] rounded-full bg-gradient-to-br from-[#FFFDF8] to-[#F6EEDB] border border-[#C9A84C] shadow-xs flex items-center justify-center"
+        className="w-[84%] h-[84%] rounded-full overflow-hidden shadow-xs flex items-center justify-center bg-[#FAF7F2]"
       >
-        <span className="font-serif font-bold tracking-wider text-[#C9A84C] leading-none">
-          E&amp;V
-        </span>
+        <img
+          src="/assets/logo-circle.png"
+          alt="Eternal Vowz (E&V)"
+          className="w-full h-full object-cover rounded-full"
+        />
       </motion.div>
     </div>
   );
@@ -68,11 +70,13 @@ export function EternalLoader({
         <motion.div
           animate={{ scale: [0.95, 1.05, 0.95] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFFDF8] to-[#F6EEDB] border-2 border-[#C9A84C] shadow-md flex items-center justify-center"
+          className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#C9A84C] shadow-md flex items-center justify-center bg-[#FAF7F2]"
         >
-          <span className="font-serif text-lg font-bold tracking-widest text-[#C9A84C]">
-            E&amp;V
-          </span>
+          <img
+            src="/assets/logo-circle.png"
+            alt="Eternal Vowz (E&V)"
+            className="w-full h-full object-cover rounded-full"
+          />
         </motion.div>
       </div>
 
