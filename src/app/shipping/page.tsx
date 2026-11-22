@@ -5,6 +5,9 @@ import { Truck, CheckCircle2, Clock, Mail, ShieldCheck, Zap } from 'lucide-react
 export const metadata = {
   title: 'Shipping & Delivery Policy — Eternal Vowz (E&V)',
   description: 'Instant digital delivery terms and timeline for Eternal Vowz digital wedding cards.',
+  alternates: {
+    canonical: 'https://eternal-vowz.onrender.com/shipping',
+  },
 };
 
 export default function ShippingPolicyPage() {

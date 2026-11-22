@@ -55,7 +55,18 @@ const jsonLdSchema = {
       alternateName: 'E&V',
       url: 'https://eternal-vowz.onrender.com',
       logo: 'https://eternal-vowz.onrender.com/assets/logo-circle.png',
-      description: 'Bespoke 3D Digital Wedding Invitations and RSVP Tracking Platform',
+      description: 'Bespoke 3D Digital Wedding Invitations and RSVP Tracking Platform created by Salman Ahmad',
+      founder: {
+        '@type': 'Person',
+        name: 'Salman Ahmad',
+        jobTitle: 'Founder & Software Developer',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Azamgarh',
+          addressRegion: 'Uttar Pradesh',
+          addressCountry: 'India',
+        },
+      },
       contactPoint: {
         '@type': 'ContactPoint',
         email: 'mrsalman7307@gmail.com',
@@ -87,6 +98,38 @@ const jsonLdSchema = {
       '@type': 'FAQPage',
       '@id': 'https://eternal-vowz.onrender.com/#faq',
       mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Eternal Vowz kya hai aur card kitne din active rehta hai?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '3D Shahi Palace wedding invitation kya hai?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '3D Shahi Palace wedding invitation ek royal digital card hai jisme mehmaan jab link kholte hain, toh unke phone par ek grand shahi mahal ke double-door darwaze animated roop se khulte hain. Isme 24K gold filigree, authentic shehnai ya dhol music, event schedule, venue Google Maps, aur RSVP button shamil hota hai jo bina kisi app ke browser me chalta hai.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'India me WhatsApp digital RSVP kaise kaam karta hai?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'India me WhatsApp digital RSVP me host apne dashboard se har mehmaan ke naam ka personalized WhatsApp link bhejta hai. Mehmaan bina kisi app download ke link khol kar "Attending" ya "Declined" select karte hain aur kitne log aayenge likh dete hain. Host ke live dashboard par attendance count aur guest details real-time update ho jaati hain.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Digital wedding invitation paper card se sasta hai kya?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Haan, digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 300 paper cards print aur courier karwane ka kharcha ₹15,000 se ₹50,000 tak aata hai. Eternal Vowz par sirf ₹99 me poora royal 3D digital card banta hai, jisme unlimited WhatsApp links, live RSVP tracking, aur Google Maps shamil hote hain, bina printing ya delivery ke jhanjhat ke.',
+          },
+        },
         {
           '@type': 'Question',
           name: 'How long is my wedding invitation valid?',

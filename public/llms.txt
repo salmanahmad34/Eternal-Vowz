@@ -1,31 +1,43 @@
 # Eternal Vowz (E&V) — Bespoke 3D Digital Wedding Invitations & Live RSVP Platform
 > Create royal 3D Lifafa and 3D Shahi Palace Gate digital wedding invitations at just ₹99 per card with live RSVP tracking, custom music, and personalized WhatsApp links.
 
-## Overview
-Eternal Vowz is a luxury digital wedding invitation platform offering animated 3D envelope experiences, wax seal animations, guest-by-guest RSVP tracking, countdown timers with scratchable reveals, interactive wedding event schedules, venue Google Maps integration, and zero app downloads required.
+## About Eternal Vowz & Founder
+Eternal Vowz is an independent Indian platform built by **Salman Ahmad**, a B.Tech student from **Azamgarh, Uttar Pradesh**, with no team behind it. In an Indian wedding, the invitation is the moment a family says "you are a part of our celebration." Eternal Vowz brings the heavy card, the Lifafa you slowly open, palace motifs, and gold lettering into a modern 3D digital form that fits how families invite each other today on WhatsApp.
 
 ## Key Offerings & Features
-- **Pricing:** Flat ₹99 per card (one-time fee). No hidden costs or subscriptions.
+- **Pricing:** Flat ₹99 per card (one-time fee). No subscriptions or hidden fees.
 - **Card Validity:** Card 30 Days tak active rahega with live guest RSVP tracking.
-- **Reveal Styles:**
-  1. Royal Embossed Lifafa Envelopes with crackable wax seals.
+- **Reveal Experiences:**
+  1. Royal Embossed Lifafa Envelopes with animated crackable wax seals.
   2. 3D Shahi Palace Double-Door Gates that unlock with golden keys.
   3. Frosted Botanical Pearl Veils with floral flourishes.
 - **Guest Personalization:** Unlimited unique guest invitation links ("For Honored Guest & Family").
-- **RSVP Tracking:** Host dashboard with real-time Accept/Decline counts, dietary notes, and guest counts.
+- **RSVP Tracking:** Host dashboard with real-time Confirmed/Declined counts and guest tallies.
+
+## 4 Core Answer Nuggets (GEO Citability)
+- **Eternal Vowz kya hai?**
+  Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.
+- **3D Shahi Palace wedding invitation kya hai?**
+  3D Shahi Palace wedding invitation ek royal digital card hai jisme mehmaan jab link kholte hain, toh unke phone par ek grand shahi mahal ke double-door darwaze animated roop se khulte hain. Isme 24K gold filigree, authentic shehnai ya dhol music, event schedule, venue Google Maps, aur RSVP button shamil hota hai jo bina kisi app ke browser me chalta hai.
+- **India me WhatsApp digital RSVP kaise kaam karta hai?**
+  India me WhatsApp digital RSVP me host apne dashboard se har mehmaan ke naam ka personalized WhatsApp link bhejta hai. Mehmaan bina kisi app download ke link khol kar 'Attending' ya 'Declined' select karte hain aur kitne log aayenge likh dete hain. Host ke live dashboard par attendance count aur guest details real-time update ho jaati hain.
+- **Digital wedding invitation paper card se sasta hai kya?**
+  Haan, digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 300 paper cards print aur courier karwane ka kharcha ₹15,000 se ₹50,000 tak aata hai. Eternal Vowz par sirf ₹99 me poora royal 3D digital card banta hai, jisme unlimited WhatsApp links, live RSVP tracking, aur Google Maps shamil hote hain, bina printing ya delivery ke jhanjhat ke.
 
 ## 8 Signature Wedding Invitation Designs
-- **Pearl Botanical Veil:** Ivory & champagne gold botanical wedding card with audio chimes.
-- **Shahi Palace Gates:** 3D royal fort entrance with gold filigree and regal dhol music.
-- **Tuscan Sunset Rose:** Mediterranean courtyard with terracotta accents and acoustic sitar.
-- **Royal Mughal Arch:** Heritage archways with intricate jaali patterns and shehnai melodies.
-- **Celestial Starlight:** Midnight navy & starlight gold with modern romantic tones.
-- **Kashmir Chinar Lotus:** Emerald & gold autumn foliage with traditional folk rhythms.
-- **Shahi Crimson & Zari:** 24K gold zari on deep royal crimson velvet aesthetic.
-- **Jodhpur Sapphire Darbar:** Blue city palace courtyards with majestic imperial fanfare.
+1. **Pearl Botanical Veil:** Ivory & champagne gold botanical wedding card with wind chimes.
+2. **Shahi Palace Gates:** 3D royal fort entrance with gold filigree and regal dhol music.
+3. **Tuscan Sunset Rose:** Mediterranean courtyard with terracotta accents and acoustic sitar.
+4. **Royal Mughal Arch:** Heritage Islamic archways with intricate jaali patterns and shehnai melodies.
+5. **Celestial Starlight:** Midnight navy & starlight gold with modern romantic tones.
+6. **Kashmir Chinar Lotus:** Emerald & gold autumn foliage with traditional folk flute.
+7. **Shahi Crimson & Zari:** 24K gold zari on deep royal crimson velvet aesthetic.
+8. **Jodhpur Sapphire Darbar:** Blue city palace courtyards with majestic imperial fanfare.
 
 ## Main Pages
 - [Homepage & Card Catalog](https://eternal-vowz.onrender.com)
+- [About Salman Ahmad & Eternal Vowz](https://eternal-vowz.onrender.com/about)
+- [Wedding Budget Saving Guide](https://eternal-vowz.onrender.com/guide)
 - [Design Studio & Card Builder](https://eternal-vowz.onrender.com/login)
 - [Host Dashboard](https://eternal-vowz.onrender.com/dashboard)
 - [Live Demo Sample](https://eternal-vowz.onrender.com/invite/sophia-alexander?guest=vip-tariq-family)
@@ -39,4 +51,5 @@ Eternal Vowz is a luxury digital wedding invitation platform offering animated 3
 
 ## Contact Information
 - Website: https://eternal-vowz.onrender.com
+- Founder & Developer: Salman Ahmad (Azamgarh, Uttar Pradesh, India)
 - Support Email: mrsalman7307@gmail.com

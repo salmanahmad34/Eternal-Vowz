@@ -4,7 +4,16 @@ import { RotateCcw, CheckCircle2, Clock, Mail, ShieldAlert, CreditCard } from 'l
 
 export const metadata = {
   title: 'Cancellation & Refund Policy — Eternal Vowz (E&V)',
-  description: 'Official cancellation and refund policy for Eternal Vowz digital wedding card services.',
+  description: 'Official cancellation and refund policy for Eternal Vowz digital wedding card services with 100% money-back SLA and 24-hour window.',
+  alternates: {
+    canonical: 'https://eternal-vowz.onrender.com/refund',
+  },
+  openGraph: {
+    title: 'Cancellation & Refund Policy — Eternal Vowz',
+    description: 'Official cancellation and refund policy for Eternal Vowz digital wedding card services.',
+    url: 'https://eternal-vowz.onrender.com/refund',
+    siteName: 'Eternal Vowz',
+  },
 };
 
 export default function RefundPolicyPage() {

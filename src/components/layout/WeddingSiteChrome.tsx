@@ -40,7 +40,7 @@ export function WeddingNavbar() {
         </Link>
 
         {/* Center: Clean Editorial Navigation Row */}
-        <nav className="hidden lg:flex items-center gap-7 text-[14px] font-normal text-[#5A4636]">
+        <nav className="hidden lg:flex items-center gap-6 text-[14px] font-normal text-[#5A4636]">
           <Link href="/#how-it-works" className="hover:text-[#291418] transition-colors">
             How It Works
           </Link>
@@ -49,6 +49,12 @@ export function WeddingNavbar() {
             <span className="px-1.5 py-0.5 rounded bg-emerald-500 text-white text-[9px] font-bold uppercase leading-none">
               NEW
             </span>
+          </Link>
+          <Link href="/guide" className="hover:text-[#291418] transition-colors">
+            Budget Guide
+          </Link>
+          <Link href="/about" className="hover:text-[#291418] transition-colors">
+            About
           </Link>
           <Link href="/dashboard" className="hover:text-[#291418] transition-colors">
             The Dashboard
@@ -121,6 +127,20 @@ export function WeddingNavbar() {
               className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1]"
             >
               How It Works
+            </Link>
+            <Link
+              href="/guide"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1] text-[#9F7E28] font-semibold"
+            >
+              Budget Guide (Save ₹50,000+)
+            </Link>
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1]"
+            >
+              About Salman Ahmad &amp; Eternal Vowz
             </Link>
             <Link
               href="/dashboard"
@@ -227,7 +247,9 @@ export function WeddingFooter() {
               Explore
             </h4>
             <ul className="space-y-2.5 text-sm">
-              <li><Link href="/#designs" className="hover:text-white transition-colors">Card Themes</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">About Eternal Vowz</Link></li>
+              <li><Link href="/guide" className="hover:text-white transition-colors text-[#FFF4DD] font-medium">Budget Saving Guide</Link></li>
+              <li><Link href="/#designs" className="hover:text-white transition-colors">8 Card Themes</Link></li>
               <li><Link href="/#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
               <li><Link href="/#comparison" className="hover:text-white transition-colors">Paper vs Digital</Link></li>
               <li><Link href="/login" className="hover:text-white transition-colors">Host Login</Link></li>

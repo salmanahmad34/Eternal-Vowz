@@ -71,6 +71,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/pearl-veil/hero-palace-corridor.jpg',
     shortDesc: 'Tap anywhere to glide through a floral marble lattice into a candlelit palace hall.',
+    nugget: 'Pearl Botanical Veil ek minimalist luxury wedding invitation hai jisme soft ivory, pastel floral flourishes, aur champagne gold typography milti hai. Yeh modern day-weddings aur sophisticated ceremonies ke liye best hai, jisme soft wind chimes aur elegant opening animation shamil hai.',
   },
   {
     id: 'blush-floral',
@@ -83,6 +84,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/shahi-gold/hero-mountain-pavilion.jpg',
     shortDesc: 'Tap anywhere as gold dust & rose petals reveal a sunlit mountain pavilion.',
+    nugget: 'Shahi Palace Gates ek grand royal Rajasthani palace fort theme hai jisme double golden doors swing open hote hain. Gold filigree borders, regal dhol ya shehnai background music, aur traditional Darbar darshya ke sath yeh grand big-fat Indian weddings ke liye perfect choice hai.',
   },
   {
     id: 'tuscan-sunset',
@@ -95,6 +97,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/tuscan-haveli/hero-haveli-courtyard.jpg',
     shortDesc: 'Tap anywhere as grand royal haveli doors swing open into a chandelier courtyard.',
+    nugget: 'Tuscan Sunset Rose ek warm terracotta aur rose gold Mediterranean courtyard invitation hai. Sunkissed Italian arches, warm sitar background melodies, aur floral bougainvillea styling ke sath yeh romantic destination weddings aur sunset receptions ke liye design kiya gaya hai.',
   },
   {
     id: 'royal-emerald',
@@ -107,6 +110,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/mughal-silk/hero-mughal-courtyard.jpg',
     shortDesc: 'Tap anywhere as gold-embroidered silk veils part to reveal a candlelit Mughal palace.',
+    nugget: 'Royal Mughal Arch ek heritage Islamic wedding aur Nikah invitation hai jisme deep emerald green velvet, white marble jaali work, aur crescent gold arches shamil hain. Khususi duayein, Bismillah calligraphy, aur traditional sufi/shehnai melodies ke sath yeh sacred ceremonies ke liye behtareen hai.',
   },
   {
     id: 'midnight-minimalist',
@@ -119,6 +123,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/celestial-box/hero-celestial-stage.jpg',
     shortDesc: 'Tap anywhere as a wax-sealed emerald silk box opens into a mountaintop floral arch.',
+    nugget: 'Celestial Starlight ek midnight navy blue aur sparkling gold constellation theme hai jo evening receptions, cocktail parties, aur sangeet nights ke liye banayi gayi hai. Starlight particle glow, modern typography, aur romantic acoustic background score is card ko cinematic banate hain.',
   },
   {
     id: 'kashmir-lotus',
@@ -131,6 +136,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
     shortDesc: 'Misty lavender silk veil opening into Dal Lake lotus blossoms and golden Chinar leaf filigree.',
+    nugget: 'Kashmir Chinar Lotus theme Dal Lake aur Mughal gardens ki natural khubsurti se prerit hai. Golden chinar leaves, lotus petals, aur Kashmiri rabab/flute music ke sath yeh nature-inspired, peaceful aur elegant wedding celebrations ke liye ideal digital invitation hai.',
   },
   {
     id: 'shahi-crimson',
@@ -143,6 +149,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/shahi-crimson/hero-shahi-crimson.jpg',
     shortDesc: 'Heritage deep crimson velvet Lifafa with 24K gold zari borders, rose petals & sitar melodies.',
+    nugget: 'Shahi Crimson & Zari ek traditional Indian shaadi theme hai jo deep crimson red velvet aur 24-karat gold zari embroidery par aadharit hai. Heavy bridal styling, auspicious golden motifs, aur live mangal geet tunes ke sath yeh traditional Hindu aur North Indian weddings ki pehli pasand hai.',
   },
   {
     id: 'jodhpur-sapphire',
@@ -155,6 +162,7 @@ const SIGNATURE_CARD_DESIGNS = [
     price: '₹99',
     heroImg: '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg',
     shortDesc: 'Royal sapphire velvet envelope opening into a 24K gold Jharokha archway with marigold garlands.',
+    nugget: 'Jodhpur Sapphire Darbar Blue City ke royal Mehrangarh palace se inspired ek majestic wedding theme hai. Deep imperial sapphire blue, carved stone jharokhas, aur royal fanfare trumpet audio ke sath yeh card har guest ko shahi mehmaan jaisa feel karwata hai.',
   },
 ];
 
@@ -224,6 +232,34 @@ const COMPARISON_ROWS = [
 
 const FAQ_ITEMS = [
   {
+    icon: 'sparkles' as const,
+    bg: 'bg-[#EFF3FF]',
+    border: 'border-[#DCE5FF]',
+    q: 'Eternal Vowz kya hai aur card kitne din active rehta hai?',
+    a: 'Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.',
+  },
+  {
+    icon: 'sparkles' as const,
+    bg: 'bg-[#FDF7EB]',
+    border: 'border-[#F3E4C6]',
+    q: '3D Shahi Palace wedding invitation kya hai?',
+    a: '3D Shahi Palace wedding invitation ek royal digital card hai jisme mehmaan jab link kholte hain, toh unke phone par ek grand shahi mahal ke double-door darwaze animated roop se khulte hain. Isme 24K gold filigree, authentic shehnai ya dhol music, event schedule, venue Google Maps, aur RSVP button shamil hota hai jo bina kisi app ke browser me chalta hai.',
+  },
+  {
+    icon: 'share' as const,
+    bg: 'bg-[#EEFCF3]',
+    border: 'border-[#D3F5DF]',
+    q: 'India me WhatsApp digital RSVP kaise kaam karta hai?',
+    a: 'India me WhatsApp digital RSVP me host apne dashboard se har mehmaan ke naam ka personalized WhatsApp link bhejta hai. Mehmaan bina kisi app download ke link khol kar \'Attending\' ya \'Declined\' select karte hain aur kitne log aayenge likh dete hain. Host ke live dashboard par attendance count aur guest details real-time update ho jaati hain.',
+  },
+  {
+    icon: 'clock' as const,
+    bg: 'bg-[#ECFCFA]',
+    border: 'border-[#D3F5F1]',
+    q: 'Digital wedding invitation paper card se sasta hai kya?',
+    a: 'Haan, digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 300 paper cards print aur courier karwane ka kharcha ₹15,000 se ₹50,000 tak aata hai. Eternal Vowz par sirf ₹99 me poora royal 3D digital card banta hai, jisme unlimited WhatsApp links, live RSVP tracking, aur Google Maps shamil hote hain, bina printing ya delivery ke jhanjhat ke.',
+  },
+  {
     icon: 'clock' as const,
     bg: 'bg-[#ECFCFA]',
     border: 'border-[#D3F5F1]',
@@ -235,7 +271,7 @@ const FAQ_ITEMS = [
     bg: 'bg-[#EFF3FF]',
     border: 'border-[#DCE5FF]',
     q: 'What makes the 8 animated designs different?',
-    a: 'Eternal Vowz offers three distinct reveal experiences across 5 unique designs: (1) Classic 3D Embossed Royal Lifafa envelopes with wax seals, (2) 3D Shahi Palace Double-Door Gates that unlock and swing open, and (3) our brand-new Frosted-Blur Veil design that starts completely blurred and melts into crystal-clear HD when tapped.',
+    a: 'Eternal Vowz offers three distinct reveal experiences across 8 unique designs: (1) Classic 3D Embossed Royal Lifafa envelopes with wax seals, (2) 3D Shahi Palace Double-Door Gates that unlock and swing open, and (3) Frosted-Blur Botanical Veils that glide into crystal-clear HD palace halls.',
   },
   {
     icon: 'share' as const,
@@ -543,6 +579,12 @@ export default function LandingPage() {
                     <p className="text-xs text-[#8B7355] mt-1 leading-relaxed">
                       {design.shortDesc}
                     </p>
+                    {design.nugget && (
+                      <p className="text-[11px] text-[#6E5D4B] mt-2 pt-2 border-t border-[#F2ECE1] leading-relaxed bg-[#FAF8F5] p-2.5 rounded-lg border border-[#E8DFD1]/60">
+                        <span className="font-semibold text-[#8C6430] block not-italic text-[10px] uppercase tracking-wider mb-0.5">About This Suite:</span>
+                        {design.nugget}
+                      </p>
+                    )}
                   </div>
 
                   <div className="pt-2.5 border-t border-[#F2ECE1] space-y-2">

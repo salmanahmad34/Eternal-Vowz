@@ -5,6 +5,9 @@ import { FileText, ShieldCheck, CreditCard, Scale, HelpCircle } from 'lucide-rea
 export const metadata = {
   title: 'Terms & Conditions — Eternal Vowz (E&V)',
   description: 'Official terms and conditions governing the use of Eternal Vowz digital wedding invitation services.',
+  alternates: {
+    canonical: 'https://eternal-vowz.onrender.com/terms',
+  },
 };
 
 export default function TermsPage() {

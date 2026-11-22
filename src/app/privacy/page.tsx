@@ -5,6 +5,9 @@ import { ShieldCheck, Lock, Eye, Server, FileText } from 'lucide-react';
 export const metadata = {
   title: 'Privacy Policy — Eternal Vowz (E&V)',
   description: 'Learn how Eternal Vowz collects, stores, and protects host and wedding guest data.',
+  alternates: {
+    canonical: 'https://eternal-vowz.onrender.com/privacy',
+  },
 };
 
 export default function PrivacyPolicyPage() {
