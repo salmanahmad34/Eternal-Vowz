@@ -69,7 +69,7 @@ export default function ShippingPolicyPage() {
                 2. Mode of Delivery
               </h2>
               <p>
-                Upon successful payment of <strong>₹79 per card</strong> via our authorized payment partner (Razorpay), your digital wedding card is delivered electronically through the following methods:
+                Upon successful payment of <strong>₹99 per card</strong> via our authorized payment partner (Razorpay), your digital wedding card is delivered electronically through the following methods:
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-xs sm:text-sm">
                 <li>
@@ -101,7 +101,7 @@ export default function ShippingPolicyPage() {
                 4. Shipping Costs &amp; Handling Fees
               </h2>
               <p>
-                Because our services are delivered 100% digitally through the internet, there are <strong>zero (₹0) shipping or delivery charges</strong>. The price displayed at checkout (₹79 flat inclusive of applicable taxes) is the final amount payable.
+                Because our services are delivered 100% digitally through the internet, there are <strong>zero (₹0) shipping or delivery charges</strong>. The price displayed at checkout (₹99 flat inclusive of applicable taxes) is the final amount payable.
               </p>
             </section>
 

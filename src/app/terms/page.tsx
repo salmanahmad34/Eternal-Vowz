@@ -56,7 +56,7 @@ export default function TermsPage() {
                 3. Pricing, Billing &amp; Payment Gateway (Razorpay)
               </h2>
               <p>
-                Each digital wedding card created on Eternal Vowz is priced at a flat fee of <strong>₹79 (Seventy-Nine Indian Rupees)</strong> per card (inclusive of applicable taxes).
+                Each digital wedding card created on Eternal Vowz is priced at a flat fee of <strong>₹99 (Ninety-Nine Indian Rupees)</strong> per card (inclusive of applicable taxes).
               </p>
               <ul className="list-disc pl-5 space-y-1 text-xs sm:text-sm">
                 <li>
@@ -76,7 +76,7 @@ export default function TermsPage() {
                 4. Validity &amp; 30-Day Card Lifecycle
               </h2>
               <p>
-                Each activated ₹79 digital card license includes <strong>1 full month (30 days)</strong> of active hosting starting from the moment of publication.
+                Each activated ₹99 digital card license includes <strong>1 full month (30 days)</strong> of active hosting starting from the moment of publication.
               </p>
               <p>
                 During this 30-day window, hosts enjoy unlimited live edits (updating venues, times, or dress codes) and unlimited guest RSVPs. After 30 days, the public guest link will automatically expire to protect personal wedding information, with an option to extend hosting inside your Host Dashboard.
@@ -111,7 +111,7 @@ export default function TermsPage() {
                 7. Limitation of Liability
               </h2>
               <p>
-                Eternal Vowz is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. Under no circumstances shall Eternal Vowz or its operators be liable for indirect, incidental, or consequential damages resulting from third-party network outages or telecommunications failures. Our maximum aggregate liability shall not exceed the amount actually paid by you for the specific card license (₹79).
+                Eternal Vowz is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. Under no circumstances shall Eternal Vowz or its operators be liable for indirect, incidental, or consequential damages resulting from third-party network outages or telecommunications failures. Our maximum aggregate liability shall not exceed the amount actually paid by you for the specific card license (₹99).
               </p>
             </section>
 

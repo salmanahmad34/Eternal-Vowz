@@ -50,7 +50,7 @@ const MARQUEE_ROW_ONE = [
 
 const MARQUEE_ROW_TWO = [
   'Wedding Invitation',
-  'Flat ₹79 Per Card',
+  'Flat ₹99 Per Card',
   'Smart Optional Card Builder',
   'Real-Time RSVP Headcount',
   'Halal Catering Summary',
@@ -68,7 +68,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Layla & Omar',
     slug: 'layla-omar-veil',
     query: '',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/pearl-veil/hero-palace-corridor.jpg',
     shortDesc: 'Tap anywhere to glide through a floral marble lattice into a candlelit palace hall.',
   },
@@ -80,7 +80,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Amira & Rayyan',
     slug: 'amira-rayyan-palace',
     query: '',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/shahi-gold/hero-mountain-pavilion.jpg',
     shortDesc: 'Tap anywhere as gold dust & rose petals reveal a sunlit mountain pavilion.',
   },
@@ -92,7 +92,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Sophia & Alexander',
     slug: 'sophia-alexander',
     query: '?guest=vip-tariq-family',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/tuscan-haveli/hero-haveli-courtyard.jpg',
     shortDesc: 'Tap anywhere as grand royal haveli doors swing open into a chandelier courtyard.',
   },
@@ -104,7 +104,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Zoya & Ayaan',
     slug: 'zoya-ayaan-nikah',
     query: '?guest=guest-zaid-khan',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/mughal-silk/hero-mughal-courtyard.jpg',
     shortDesc: 'Tap anywhere as gold-embroidered silk veils part to reveal a candlelit Mughal palace.',
   },
@@ -116,7 +116,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Fatima & Hamza',
     slug: 'fatima-hamza-starlight',
     query: '',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/celestial-box/hero-celestial-stage.jpg',
     shortDesc: 'Tap anywhere as a wax-sealed emerald silk box opens into a mountaintop floral arch.',
   },
@@ -128,7 +128,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Zayn & Anaya',
     slug: 'zayn-anaya-sapphire',
     query: '',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg',
     shortDesc: 'Royal sapphire velvet envelope opening into a 24K gold Jharokha archway with marigold garlands.',
   },
@@ -140,7 +140,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Kabir & Roshni',
     slug: 'kabir-roshni-crimson',
     query: '',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/shahi-crimson/hero-shahi-crimson.jpg',
     shortDesc: 'Heritage deep crimson velvet Lifafa with 24K gold zari borders, rose petals & sitar melodies.',
   },
@@ -152,7 +152,7 @@ const SIGNATURE_CARD_DESIGNS = [
     couple: 'Mir & Falak',
     slug: 'mir-falak-lotus',
     query: '',
-    price: '₹79',
+    price: '₹99',
     heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
     shortDesc: 'Misty lavender silk veil opening into Dal Lake lotus blossoms and golden Chinar leaf filigree.',
   },
@@ -176,7 +176,7 @@ const COMPARISON_ROWS = [
     feature: 'Total Cost (300+ Guests)',
     sub: 'Printing, envelopes & postage',
     physical: '₹15,000 – ₹45,000+ printing & courier fees',
-    digital: 'Flat ₹79 per card — share with unlimited WhatsApp guests',
+    digital: 'Flat ₹99 per card — share with unlimited WhatsApp guests',
   },
   {
     icon: 'clock' as const,
@@ -242,7 +242,7 @@ const FAQ_ITEMS = [
     bg: 'bg-[#EEFCF3]',
     border: 'border-[#D3F5DF]',
     q: 'How do I share my card & what is the price?',
-    a: 'Every signature wedding invitation card on Eternal Vowz is priced at a flat ₹79 per card (one-time fee). You receive unlimited personalized guest links ("For Honored Guest & Family") to share instantly via WhatsApp, SMS, or email with live read receipts.',
+    a: 'Every signature wedding invitation card on Eternal Vowz is priced at a flat ₹99 per card (one-time fee). You receive unlimited personalized guest links ("For Honored Guest & Family") to share instantly via WhatsApp, SMS, or email with live read receipts.',
   },
   {
     icon: 'sliders' as const,
@@ -256,13 +256,13 @@ const FAQ_ITEMS = [
     bg: 'bg-[#FDF7EB]',
     border: 'border-[#F3E4C6]',
     q: 'How do I reach support or WhatsApp concierge?',
-    a: 'For all pre-purchase or general inquiries, email our official support desk at mrsalman7307@gmail.com. Once you create or purchase a ₹79 card, direct Priority WhatsApp Support unlocks immediately inside your Host Dashboard.',
+    a: 'For all pre-purchase or general inquiries, email our official support desk at mrsalman7307@gmail.com. Once you create or purchase a ₹99 card, direct Priority WhatsApp Support unlocks immediately inside your Host Dashboard.',
   },
   {
     icon: 'shield' as const,
     bg: 'bg-[#FDF0F3]',
     border: 'border-[#F8D9E1]',
-    q: 'Is my wedding data & ₹79 payment secure?',
+    q: 'Is my wedding data & ₹99 payment secure?',
     a: 'Yes. Eternal Vowz uses 256-bit SSL encryption, strict HTTP security headers, and server-side HMAC-SHA256 verification for payment and API integrations. We never sell or share guest data with third parties.',
   },
 ];
@@ -341,7 +341,7 @@ export default function LandingPage() {
                     href="/login"
                     className="button-shine px-7 py-4 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold uppercase tracking-[0.18em] inline-flex items-center gap-2.5 transition-all shadow-[0_12px_28px_-8px_rgba(201,168,76,0.55)]"
                   >
-                    <span>Create Your Card &bull; ₹79</span>
+                    <span>Create Your Card &bull; ₹99</span>
                     <ArrowRight className="w-4 h-4 shrink-0" />
                   </Link>
 
@@ -357,7 +357,7 @@ export default function LandingPage() {
                 </div>
 
                 <p className="text-xs text-[#8B7355] flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="font-semibold text-[#291418]">Flat ₹79 per card</span>
+                  <span className="font-semibold text-[#291418]">Flat ₹99 per card</span>
                   <span>&bull;</span>
                   <span>Unlimited WhatsApp guests</span>
                   <span>&bull;</span>
@@ -446,7 +446,7 @@ export default function LandingPage() {
           <div className="max-w-2xl mx-auto text-center mb-10 space-y-4">
             <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-xs font-medium text-[#8B7355]">
               <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
-              <span>Beautiful Themes &bull; Flat ₹79 Per Card</span>
+              <span>Beautiful Themes &bull; Flat ₹99 Per Card</span>
             </span>
 
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#291418]">
@@ -464,7 +464,7 @@ export default function LandingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-[#C9A84C] shrink-0" />
-                <span>Flat ₹79 per card &bull; Active for 1 month (30 days) with live RSVPs.</span>
+                <span>Flat ₹99 per card &bull; Active for 1 month (30 days) with live RSVPs.</span>
               </li>
             </ul>
           </div>
@@ -510,7 +510,7 @@ export default function LandingPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/15 pointer-events-none" />
 
-                  {/* Top-Left Champagne Badge + Top-Right ₹79 Tag */}
+                  {/* Top-Left Champagne Badge + Top-Right ₹99 Tag */}
                   <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-1.5">
                     <span className="px-2.5 py-1 rounded-full bg-[#C9A84C] text-white text-[10px] font-semibold shadow-sm truncate">
                       {design.badge}
@@ -532,7 +532,7 @@ export default function LandingPage() {
                   </div>
                 </Link>
 
-                {/* Clean White Footer Strip with Clear "View Sample" & "Create @ ₹79" Buttons */}
+                {/* Clean White Footer Strip with Clear "View Sample" & "Create @ ₹99" Buttons */}
                 <div className="p-4 bg-white flex flex-col justify-between flex-1 space-y-3.5">
                   <div>
                     <div className="flex items-center justify-between gap-2">
@@ -560,7 +560,7 @@ export default function LandingPage() {
                       href="/login"
                       className="w-full py-2.5 px-3 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
                     >
-                      <span>Create @ ₹79</span>
+                      <span>Create @ ₹99</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -602,7 +602,7 @@ export default function LandingPage() {
               },
               {
                 step: '03',
-                title: 'Publish at Flat ₹79',
+                title: 'Publish at Flat ₹99',
                 desc: 'Activate your card for 1 full month (30 days) and immediately unlock Priority WhatsApp Support inside your dashboard.',
               },
               {
@@ -722,7 +722,7 @@ export default function LandingPage() {
                 Enterprise API &amp; Payment Security
               </h3>
               <p className="text-sm text-[#8B7355] leading-relaxed">
-                Hardened with 256-bit SSL encryption, strict HTTP security headers, and server-side HMAC-SHA256 payment verification so every ₹79 checkout and guest RSVP stays protected.
+                Hardened with 256-bit SSL encryption, strict HTTP security headers, and server-side HMAC-SHA256 payment verification so every ₹99 checkout and guest RSVP stays protected.
               </p>
             </div>
 
@@ -746,7 +746,7 @@ export default function LandingPage() {
                 Post-Purchase WhatsApp Support
               </h3>
               <p className="text-sm text-[#8B7355] leading-relaxed">
-                Email us anytime at <strong className="text-[#291418] font-medium">mrsalman7307@gmail.com</strong>. As soon as you create or purchase your ₹79 card, direct <strong className="text-[#291418] font-medium">Priority WhatsApp Support</strong> unlocks inside your Host Dashboard.
+                Email us anytime at <strong className="text-[#291418] font-medium">mrsalman7307@gmail.com</strong>. As soon as you create or purchase your ₹99 card, direct <strong className="text-[#291418] font-medium">Priority WhatsApp Support</strong> unlocks inside your Host Dashboard.
               </p>
             </div>
           </div>
@@ -796,7 +796,7 @@ export default function LandingPage() {
                     <th className="py-6 px-6 bg-[#FAF4E6] w-[38%] border-l-2 border-[#C9A84C]/55">
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#C9A84C] text-white text-[10px] font-bold uppercase tracking-wider mb-1">
                         <Sparkles className="w-3 h-3" />
-                        <span>Recommended &bull; ₹79 / Card</span>
+                        <span>Recommended &bull; ₹99 / Card</span>
                       </span>
                       <span className="font-serif text-xl font-semibold text-[#291418] block">
                         Eternal Vowz Digital
@@ -872,7 +872,7 @@ export default function LandingPage() {
                     Save ₹15,000+ &amp; 3 Weeks of Printing Stress
                   </span>
                   <span className="text-xs text-[#8B7355]">
-                    Flat ₹79 per card &bull; 5 animated themes &bull; Active for 1 full month (30 days)
+                    Flat ₹99 per card &bull; 5 animated themes &bull; Active for 1 full month (30 days)
                   </span>
                 </div>
               </div>
@@ -891,7 +891,7 @@ export default function LandingPage() {
                   href="/login"
                   className="button-shine px-5 py-2.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors"
                 >
-                  <span>Create Card @ ₹79</span>
+                  <span>Create Card @ ₹99</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -1016,7 +1016,7 @@ export default function LandingPage() {
                       href="/login"
                       className="px-5 py-2.5 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
                     >
-                      <span>Create Your Card @ ₹79</span>
+                      <span>Create Your Card @ ₹99</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -1029,7 +1029,7 @@ export default function LandingPage() {
           <div className="mt-16 max-w-4xl mx-auto rounded-3xl cta-gold-banner p-10 sm:p-14 text-center space-y-5 shadow-[0_24px_60px_-20px_rgba(201,168,76,0.55)] relative overflow-hidden">
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/25 backdrop-blur-sm border border-white/35 text-xs text-white font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Flat ₹79 Per Card &bull; Active for 1 Month (30 Days)</span>
+              <span>Flat ₹99 Per Card &bull; Active for 1 Month (30 Days)</span>
             </span>
 
             <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-white">
@@ -1045,7 +1045,7 @@ export default function LandingPage() {
                 href="/login"
                 className="px-7 py-3.5 rounded-md bg-[#FAF7F2] hover:bg-white text-[#291418] text-sm font-semibold inline-flex items-center gap-2 transition-all shadow-md"
               >
-                <span>Create Your Card &mdash; ₹79</span>
+                <span>Create Your Card &mdash; ₹99</span>
                 <ArrowRight className="w-4 h-4 text-[#C9A84C]" />
               </Link>
               <a

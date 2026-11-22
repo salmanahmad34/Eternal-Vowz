@@ -100,7 +100,7 @@ export default function ContactPage() {
                       Post-Purchase WhatsApp Concierge
                     </span>
                     <span className="text-xs text-[#8B7355]">
-                      1-on-1 direct WhatsApp support is unlocked inside your Host Dashboard after activating your ₹79 card.
+                      1-on-1 direct WhatsApp support is unlocked inside your Host Dashboard after activating your ₹99 card.
                     </span>
                   </div>
                 </div>

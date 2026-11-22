@@ -162,7 +162,7 @@ export default function RazorpayCheckoutModal({
 
   const isCreateNew = mode === 'create-new';
   const coupleTitle = `${card.design_config.couple_names.partner1} & ${card.design_config.couple_names.partner2}`;
-  const baseInr = 79;
+  const baseInr = 99;
   const discountInr = appliedCoupon ? appliedCoupon.discount_inr : 0;
   const finalInr = appliedCoupon ? appliedCoupon.final_inr : baseInr;
   const isFree = appliedCoupon?.is_free === true;

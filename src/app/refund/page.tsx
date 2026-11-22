@@ -57,7 +57,7 @@ export default function RefundPolicyPage() {
                 1. Free Pre-Purchase Inspection
               </h2>
               <p>
-                At <strong>Eternal Vowz (E&amp;V)</strong>, customer satisfaction and trust are our top priorities. We provide full, interactive, unwatermarked demo previews for all 8 signature 3D digital wedding cards (including Lifafa animations, Shahi Palace Gate reveals, and Frosted Veil suites) so hosts can thoroughly experience each design before deciding to pay the flat <strong>₹79 per card</strong> activation fee.
+                At <strong>Eternal Vowz (E&amp;V)</strong>, customer satisfaction and trust are our top priorities. We provide full, interactive, unwatermarked demo previews for all 8 signature 3D digital wedding cards (including Lifafa animations, Shahi Palace Gate reveals, and Frosted Veil suites) so hosts can thoroughly experience each design before deciding to pay the flat <strong>₹99 per card</strong> activation fee.
               </p>
             </section>
 

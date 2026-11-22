@@ -107,7 +107,7 @@ export interface EvOrder {
   customer_email?: string | null;
   razorpay_order_id: string;
   razorpay_payment_id?: string | null;
-  amount: number; // in paise (7900 = ₹79.00)
+  amount: number; // in paise (9900 = ₹99.00)
   coupon_code?: string | null;
   discount_amount?: number; // in paise
   status: OrderStatus;

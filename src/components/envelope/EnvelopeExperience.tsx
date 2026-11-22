@@ -343,7 +343,7 @@ export default function EnvelopeExperience({
             href="/dashboard"
             className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#6E2E3A] text-white text-xs font-medium hover:bg-[#58222C] transition-colors"
           >
-            Host Dashboard &bull; Renew @ ₹79
+            Host Dashboard &bull; Renew @ ₹99
           </a>
         </div>
       </div>

@@ -571,7 +571,7 @@ function LoginFormContent() {
           <div className="mt-5 pt-4 border-t border-[#F2ECE1] text-center">
             <span className="text-[11px] text-[#8B7355] flex items-center justify-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
-              <span>Flat ₹79 per published wedding invitation card</span>
+              <span>Flat ₹99 per published wedding invitation card</span>
             </span>
           </div>
         </>

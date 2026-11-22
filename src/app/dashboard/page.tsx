@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem } from '@/types/database';
-import { DataService, INITIAL_DEMO_INVITATION } from '@/lib/data-service';
+import { DataService, INITIAL_DEMO_INVITATION, getCanonicalOrigin } from '@/lib/data-service';
 import { THEMES, MUSIC_TRACKS } from '@/lib/themes';
 import { luxuryAudio } from '@/lib/audio';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
@@ -359,12 +359,12 @@ export default function DashboardPage() {
 
   const getGuestInviteUrl = (guest: GuestWithRsvp, card: Invitation | null = selectedInvitation) => {
     if (!card) return '';
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+    const origin = getCanonicalOrigin();
     return `${origin}/invite/${card.slug}?guest=${guest.unique_token}`;
   };
 
   const getCardPublicUrl = (card: Invitation) => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+    const origin = getCanonicalOrigin();
     return `${origin}/invite/${card.slug}`;
   };
 
@@ -616,7 +616,7 @@ export default function DashboardPage() {
               }`}
             >
               <Plus className="w-3.5 h-3.5 shrink-0" />
-              <span>New Card (₹79)</span>
+              <span>New Card (₹99)</span>
             </button>
           </div>
 
@@ -664,7 +664,7 @@ export default function DashboardPage() {
               <div>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-[11px] font-medium text-[#8B7355] mb-2.5">
                   <Sparkles className="w-3 h-3 text-[#C9A84C]" />
-                  <span>Host Workspace &bull; Flat ₹79 / Card</span>
+                  <span>Host Workspace &bull; Flat ₹99 / Card</span>
                 </span>
                 <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#291418] leading-tight">
                   Your wedding{' '}
@@ -757,7 +757,7 @@ export default function DashboardPage() {
                     No wedding invitations yet
                   </h3>
                   <p className="text-sm text-[#8B7355]">
-                    Create your first bespoke 3D wedding card — customize your names, venue, and theme, then publish for flat ₹79 (valid 30 days).
+                    Create your first bespoke 3D wedding card — customize your names, venue, and theme, then publish for flat ₹99 (valid 30 days).
                   </p>
                 </div>
                 <div className="pt-2">
@@ -934,7 +934,7 @@ export default function DashboardPage() {
                             className="px-3.5 py-2 rounded-md bg-[#291418] hover:bg-[#3e1f25] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
                           >
                             <CreditCard className="w-3.5 h-3.5 text-[#E6CFA0]" />
-                            <span>Reactivate (₹79)</span>
+                            <span>Reactivate (₹99)</span>
                           </button>
                         )}
 
@@ -948,7 +948,7 @@ export default function DashboardPage() {
                             className="px-4 py-2 rounded-md bg-[#291418] hover:bg-[#3e1f25] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
                           >
                             <CreditCard className="w-3.5 h-3.5 text-[#E6CFA0]" />
-                            <span>Pay ₹79 &amp; Publish</span>
+                            <span>Pay ₹99 &amp; Publish</span>
                           </button>
                         )}
 
@@ -1306,7 +1306,7 @@ export default function DashboardPage() {
                 className="px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 {!editingCardId && <CreditCard className="w-3.5 h-3.5" />}
-                <span>{editingCardId ? 'Save Changes' : 'Pay ₹79 & Publish'}</span>
+                <span>{editingCardId ? 'Save Changes' : 'Pay ₹99 & Publish'}</span>
               </button>
             </div>
           </div>
@@ -2360,13 +2360,13 @@ export default function DashboardPage() {
                   >
                     {!editingCardId && <CreditCard className="w-4 h-4" />}
                     <span>
-                      {editingCardId ? 'Save Updated Card' : 'Pay ₹79 & Publish Wedding Card'}
+                      {editingCardId ? 'Save Updated Card' : 'Pay ₹99 & Publish Wedding Card'}
                     </span>
                   </button>
                 </div>
                 {!editingCardId && (
                   <p className="text-[11px] text-center text-[#8B7355]">
-                    Complete ₹79 Razorpay payment (or apply a coupon code) to create &amp; publish your 30-day card.
+                    Complete ₹99 Razorpay payment (or apply a coupon code) to create &amp; publish your 30-day card.
                   </p>
                 )}
               </div>

@@ -1,7 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export const BASE_CARD_PRICE_INR = 79;
-export const BASE_CARD_PRICE_PAISE = 7900;
+export const BASE_CARD_PRICE_INR = 99;
+export const BASE_CARD_PRICE_PAISE = 9900;
 
 export interface CouponValidationResult {
   valid: boolean;

@@ -733,6 +733,24 @@ function generateUUID(): string {
 }
 
 // Helper to safely access browser localStorage
+export function getCanonicalOrigin(): string {
+  if (typeof window !== 'undefined') {
+    const { hostname, origin } = window.location;
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.endsWith('.local') ||
+      hostname.startsWith('192.168.') ||
+      hostname.startsWith('10.') ||
+      hostname.startsWith('172.')
+    ) {
+      return 'https://eternal-vowz.onrender.com';
+    }
+    return origin;
+  }
+  return process.env.NEXT_PUBLIC_SITE_URL || 'https://eternal-vowz.onrender.com';
+}
+
 function getLocalItem<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
   try {
@@ -817,8 +835,7 @@ export const DataService = {
       return { error: 'Authentication service is not configured.' };
     }
     const cleanEmail = email.trim().toLowerCase();
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
+    const origin = getCanonicalOrigin();
     const { error } = await supabase.auth.signInWithOtp({
       email: cleanEmail,
       options: {
@@ -971,8 +988,7 @@ export const DataService = {
         error: 'Authentication service is not configured.',
       };
     }
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
+    const origin = getCanonicalOrigin();
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
@@ -1014,8 +1030,7 @@ export const DataService = {
     }
     const safeNext =
       nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/dashboard';
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
+    const origin = getCanonicalOrigin();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -1032,8 +1047,7 @@ export const DataService = {
     if (!isSupabaseConfigured || !supabase) {
       return { error: 'Authentication service is not configured.' };
     }
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://eternal-vowz.onrender.com';
+    const origin = getCanonicalOrigin();
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: `${origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`,
     });
