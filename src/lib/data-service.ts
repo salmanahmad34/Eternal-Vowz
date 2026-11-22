@@ -981,6 +981,15 @@ export const DataService = {
       return { user: null, needsConfirmation: false, error: error.message };
     }
 
+    // Supabase returns identities: [] if the user is already registered (no email sent)
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return {
+        user: null,
+        needsConfirmation: false,
+        error: 'This email is already registered! Please switch to "Sign In" with your password, or use "Forgot Password?" to set a new password.',
+      };
+    }
+
     // If Supabase returned an active session immediately, user is signed in
     if (data.session && data.user) {
       const mapped = mapSupabaseUser(data.user);
