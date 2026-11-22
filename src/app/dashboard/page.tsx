@@ -84,8 +84,8 @@ export default function DashboardPage() {
   const handleCustomAudioFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 15 * 1024 * 1024) {
-      setSaveToast('Audio file size must be less than 15MB.');
+    if (file.size > 25 * 1024 * 1024) {
+      setSaveToast('Audio file size must be less than 25MB.');
       return;
     }
     const reader = new FileReader();
@@ -1628,15 +1628,15 @@ export default function DashboardPage() {
                         <Upload className="w-4 h-4 text-neutral-600 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-medium text-neutral-800 truncate">
-                            Upload MP3 from Phone / PC
+                            Upload Song (MP3, M4A, etc.)
                           </div>
                           <div className="text-[10px] text-neutral-500">
-                            Select custom audio file (up to 15MB)
+                            Select custom audio file (up to 25MB)
                           </div>
                         </div>
                         <input
                           type="file"
-                          accept="audio/*"
+                          accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.opus,.webm,.weba,audio/mp3,audio/mpeg,audio/m4a,audio/x-m4a,audio/mp4,video/mp4"
                           className="hidden"
                           onChange={handleCustomAudioFileUpload}
                         />

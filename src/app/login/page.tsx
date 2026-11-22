@@ -29,29 +29,6 @@ function sanitizeNext(raw: string | null): string {
   return raw;
 }
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" aria-hidden="true">
-      <path
-        fill="#4285F4"
-        d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.08 3.56-5.15 3.56-8.86z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.87-3a7.17 7.17 0 0 1-10.67-3.77H1.39v3.1A12 12 0 0 0 12 24z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.39 14.33A7.2 7.2 0 0 1 5.01 12c0-.81.14-1.6.38-2.33v-3.1H1.39A12 12 0 0 0 0 12c0 1.94.46 3.77 1.39 5.43l4-3.1z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.39 6.57l4 3.1A7.17 7.17 0 0 1 12 4.77z"
-      />
-    </svg>
-  );
-}
-
 // =========================================================================
 // PER-USER DAILY OTP RATE LIMITER (Protects Gmail SMTP Quota)
 // =========================================================================
@@ -77,7 +54,7 @@ function checkEmailOtpLimit(email: string): { allowed: boolean; error?: string }
       const hoursRemaining = Math.ceil((oneDay - (now - start)) / (1000 * 60 * 60));
       return {
         allowed: false,
-        error: `Daily OTP limit reached for this email (${MAX_OTP_PER_DAY}/day). For security, please wait ${hoursRemaining} hour(s) or log in with Google / password.`,
+        error: `Daily OTP limit reached for this email (${MAX_OTP_PER_DAY}/day). For security, please wait ${hoursRemaining} hour(s) before requesting another code.`,
       };
     }
     return { allowed: true };
@@ -116,25 +93,26 @@ function LoginFormContent() {
   const nextPath = sanitizeNext(searchParams.get('next'));
   const authErrorParam = searchParams.get('error');
 
-  // Mode: 'signin' (no OTP, email+password) | 'signup' (first time with OTP) | 'forgot' (reset with OTP)
+  // Mode: 'signin' | 'signup' | 'forgot'
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
   // Signup step: 'form' | 'otp'
   const [signupStep, setSignupStep] = useState<'form' | 'otp'>('form');
-  // Forgot password step: 'email' | 'reset'
-  const [forgotStep, setForgotStep] = useState<'email' | 'reset'>('email');
+  // Forgot password step: 'email' | 'otp' | 'new_password'
+  const [forgotStep, setForgotStep] = useState<'email' | 'otp' | 'new_password'>('email');
 
   // Form Fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [checkingSession, setCheckingSession] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(authErrorParam);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -162,7 +140,7 @@ function LoginFormContent() {
 
   // Countdown timer for OTP resend
   useEffect(() => {
-    const isWaitingOtp = (mode === 'signup' && signupStep === 'otp') || (mode === 'forgot' && forgotStep === 'reset');
+    const isWaitingOtp = (mode === 'signup' && signupStep === 'otp') || (mode === 'forgot' && forgotStep === 'otp');
     if (!isWaitingOtp || countdown <= 0) {
       if (countdown <= 0) setCanResend(true);
       return;
@@ -185,20 +163,10 @@ function LoginFormContent() {
     setSignupStep('form');
     setForgotStep('email');
     setOtpCode('');
+    setNewPassword('');
+    setConfirmPassword('');
     setErrorMsg(null);
     setSuccessMsg(null);
-  };
-
-  // 1-Click Google OAuth
-  const handleGoogleSignIn = async () => {
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    setGoogleLoading(true);
-    const { error } = await DataService.signInWithGoogle(nextPath);
-    if (error) {
-      setErrorMsg(error);
-      setGoogleLoading(false);
-    }
   };
 
   // =========================================================================
@@ -274,7 +242,7 @@ function LoginFormContent() {
         error.toLowerCase().includes('over_email_send_rate_limit')
       ) {
         setErrorMsg(
-          'Supabase email hourly limit reached. Please wait a few minutes before requesting another code, or log in with your password / Google.'
+          'Supabase email hourly limit reached. Please wait a few minutes before requesting another code.'
         );
       } else {
         setErrorMsg(error);
@@ -301,7 +269,7 @@ function LoginFormContent() {
     const token = (codeToVerify || otpCode).trim();
 
     if (token.length < 6) {
-      setErrorMsg('Please enter the 6-digit verification code.');
+      setErrorMsg('Please enter the complete 6-digit verification code.');
       return;
     }
 
@@ -323,8 +291,10 @@ function LoginFormContent() {
   };
 
   // =========================================================================
-  // 3. FORGOT PASSWORD (Sends 6-digit Reset OTP -> Sets new password)
+  // 3. FORGOT PASSWORD (3-Step Flow: Email -> Verify OTP -> Set & Confirm New Password)
   // =========================================================================
+
+  // Step 1: Send Reset OTP to Email
   const handleSendResetEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -353,7 +323,7 @@ function LoginFormContent() {
         error.toLowerCase().includes('over_email_send_rate_limit')
       ) {
         setErrorMsg(
-          'Supabase email hourly limit reached. Please wait a few minutes before requesting another code, or log in with your password / Google.'
+          'Supabase email hourly limit reached. Please wait a few minutes before requesting another code.'
         );
       } else {
         setErrorMsg(error);
@@ -362,42 +332,69 @@ function LoginFormContent() {
     }
 
     recordEmailOtpSent(cleanEmail);
-    setForgotStep('reset');
+    setForgotStep('otp');
     setOtpCode('');
-    setNewPassword('');
     setCountdown(60);
     setCanResend(false);
-    setSuccessMsg(`Password reset code sent to ${cleanEmail}`);
+    setSuccessMsg(`A 6-digit password reset code was sent to ${cleanEmail}`);
     setTimeout(() => otpInputRef.current?.focus(), 150);
   };
 
-  const handleResetPasswordWithOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Step 2: Verify OTP Only (Advances to Next Screen only if OTP is correct!)
+  const handleVerifyResetOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
 
     const cleanEmail = email.trim().toLowerCase();
-    const token = otpCode.trim();
+    const cleanOtp = otpCode.trim();
 
-    if (token.length < 6) {
-      setErrorMsg('Please enter the 6-digit reset code sent to your email.');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setErrorMsg('New password must be at least 6 characters.');
+    if (cleanOtp.length < 6) {
+      setErrorMsg('Please enter the complete 6-digit reset code.');
       return;
     }
 
     setIsLoading(true);
-    const { user, error } = await DataService.resetPasswordWithOtp(cleanEmail, token, newPassword);
+    const { error } = await DataService.verifyResetOtp(cleanEmail, cleanOtp);
     setIsLoading(false);
 
-    if (error || !user) {
+    if (error) {
       setErrorMsg(error || 'Invalid or expired reset code. Please check and try again.');
       return;
     }
 
-    setSuccessMsg('Password successfully updated! Opening your dashboard...');
+    // OTP Verified! Advance to the dedicated Next Page for new password
+    setForgotStep('new_password');
+    setNewPassword('');
+    setConfirmPassword('');
+    setSuccessMsg('Code verified! Please enter your new password below.');
+  };
+
+  // Step 3: Set New Password & Confirm Password
+  const handleSetNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    if (newPassword.length < 6) {
+      setErrorMsg('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please ensure both password fields match.');
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await DataService.updatePassword(newPassword);
+    setIsLoading(false);
+
+    if (error) {
+      setErrorMsg(error || 'Failed to update password. Please try again.');
+      return;
+    }
+
+    setSuccessMsg('Password updated successfully! Opening your dashboard...');
     setTimeout(() => {
       router.replace(nextPath);
     }, 400);
@@ -457,7 +454,9 @@ function LoginFormContent() {
         <h1 className="font-serif text-3xl font-normal text-[#291418]">
           {mode === 'signin' && 'Welcome Back'}
           {mode === 'signup' && (signupStep === 'form' ? 'Create Host Account' : 'Verify Your Email')}
-          {mode === 'forgot' && (forgotStep === 'email' ? 'Forgot Password?' : 'Enter Reset Code')}
+          {mode === 'forgot' && forgotStep === 'email' && 'Forgot Password?'}
+          {mode === 'forgot' && forgotStep === 'otp' && 'Verify Reset Code'}
+          {mode === 'forgot' && forgotStep === 'new_password' && 'Set New Password'}
         </h1>
         <p className="text-xs text-[#8B7355] mt-1.5 leading-relaxed">
           {mode === 'signin' && 'Sign in with your email and password to access your dashboard.'}
@@ -467,12 +466,13 @@ function LoginFormContent() {
               Enter the 6-digit verification code sent to <strong className="text-[#291418]">{email}</strong>
             </>
           )}
-          {mode === 'forgot' && forgotStep === 'email' && 'Enter your registered email to receive a password reset code.'}
-          {mode === 'forgot' && forgotStep === 'reset' && (
+          {mode === 'forgot' && forgotStep === 'email' && 'Enter your registered email to receive a 6-digit password reset code.'}
+          {mode === 'forgot' && forgotStep === 'otp' && (
             <>
-              Enter the 6-digit code sent to <strong className="text-[#291418]">{email}</strong> and set your new password.
+              Enter the 6-digit code sent to <strong className="text-[#291418]">{email}</strong> to verify your identity.
             </>
           )}
+          {mode === 'forgot' && forgotStep === 'new_password' && 'Code verified! Enter and confirm your new password.'}
         </p>
       </div>
 
@@ -495,29 +495,6 @@ function LoginFormContent() {
       ========================================================================= */}
       {mode === 'signin' && (
         <>
-          {/* Optional Google Sign-In */}
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={googleLoading || isLoading}
-            className="w-full py-3 px-4 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#D8CBB3] text-[#291418] text-sm font-medium flex items-center justify-center gap-2.5 transition-all shadow-2xs cursor-pointer disabled:opacity-60 mb-5"
-          >
-            {googleLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-[#C9A84C]" />
-            ) : (
-              <GoogleIcon />
-            )}
-            <span>{googleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
-          </button>
-
-          <div className="relative my-4 flex items-center justify-center">
-            <span className="h-[1px] w-full bg-[#EFE7D8]" />
-            <span className="px-3 text-[11px] uppercase tracking-widest text-[#9C866A] bg-white shrink-0">
-              or sign in with password
-            </span>
-            <span className="h-[1px] w-full bg-[#EFE7D8]" />
-          </div>
-
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] mb-1.5">
@@ -776,8 +753,10 @@ function LoginFormContent() {
       )}
 
       {/* =========================================================================
-          MODE 3: FORGOT PASSWORD (OTP Verification & Reset)
+          MODE 3: FORGOT PASSWORD (STRICT 3-STEP FLOW)
       ========================================================================= */}
+
+      {/* STEP 1: Enter Registered Email */}
       {mode === 'forgot' && forgotStep === 'email' && (
         <form onSubmit={handleSendResetEmail} className="space-y-4">
           <div className="text-left">
@@ -822,7 +801,7 @@ function LoginFormContent() {
               </>
             ) : (
               <>
-                <span>Send Password Reset OTP</span>
+                <span>Send Password Reset Code</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -830,9 +809,9 @@ function LoginFormContent() {
         </form>
       )}
 
-      {/* FORGOT STEP 2: ENTER OTP & NEW PASSWORD */}
-      {mode === 'forgot' && forgotStep === 'reset' && (
-        <form onSubmit={handleResetPasswordWithOtp} className="space-y-4">
+      {/* STEP 2: Enter & Verify 6-Digit OTP Only (Next page ONLY opens if verified!) */}
+      {mode === 'forgot' && forgotStep === 'otp' && (
+        <form onSubmit={handleVerifyResetOtp} className="space-y-5">
           <div className="flex items-center justify-between text-xs px-1">
             <button
               type="button"
@@ -844,13 +823,13 @@ function LoginFormContent() {
               className="inline-flex items-center gap-1 text-[#8B7355] hover:text-[#291418] transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back</span>
+              <span>Change Email</span>
             </button>
             <span className="text-[#8B7355] font-mono font-medium">Valid for 10 mins</span>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] text-center mb-1.5">
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] text-center">
               Enter 6-Digit Password Reset Code
             </label>
             <input
@@ -863,52 +842,30 @@ function LoginFormContent() {
               value={otpCode}
               onChange={(e) => {
                 setErrorMsg(null);
-                setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                setOtpCode(val);
               }}
               placeholder="••••••"
-              className="w-full text-center font-mono text-2xl font-bold tracking-[0.3em] py-3 px-4 rounded-xl border-2 border-[#C9A84C] bg-white text-[#291418] placeholder:text-[#D8C7A8] focus:outline-none focus:ring-4 focus:ring-[#C9A84C]/20 shadow-xs transition-all"
+              className="w-full text-center font-mono text-3xl font-bold tracking-[0.3em] py-3.5 px-4 rounded-xl border-2 border-[#C9A84C] bg-white text-[#291418] placeholder:text-[#D8C7A8] focus:outline-none focus:ring-4 focus:ring-[#C9A84C]/20 shadow-xs transition-all"
             />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] mb-1.5">
-              New Password (min 6 characters)
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-[#8B7355] absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showNewPassword ? 'text' : 'password'}
-                required
-                minLength={6}
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-                className="w-full pl-10 pr-10 py-3 rounded-xl bg-[#FAF7F2] border border-[#E2D7BD] text-sm text-[#291418] placeholder:text-[#A89885] focus:outline-none focus:border-[#C9A84C] focus:bg-white transition-colors"
-              />
-              <button
-                type="button"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8B7355] hover:text-[#291418] transition-colors"
-              >
-                {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+            <p className="text-[11px] text-center text-[#8B7355]">
+              Check your inbox for the reset code sent to <strong className="text-[#291418]">{email}</strong>.
+            </p>
           </div>
 
           <button
             type="submit"
-            disabled={isLoading || otpCode.length < 6 || newPassword.length < 6}
+            disabled={isLoading || otpCode.length < 6}
             className="w-full py-3.5 px-4 rounded-xl font-sans font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-[#D4AF37] via-[#F3E2B3] to-[#C5A059] text-[#2A1408] shadow-md hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Resetting Password...</span>
+                <span>Verifying Code...</span>
               </>
             ) : (
               <>
-                <span>Reset Password & Sign In</span>
+                <span>Verify Code & Continue</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -932,6 +889,95 @@ function LoginFormContent() {
               </span>
             )}
           </div>
+        </form>
+      )}
+
+      {/* STEP 3: NEXT PAGE - Set New Password & Confirm New Password */}
+      {mode === 'forgot' && forgotStep === 'new_password' && (
+        <form onSubmit={handleSetNewPassword} className="space-y-4">
+          <div className="text-left">
+            <button
+              type="button"
+              onClick={() => switchMode('signin')}
+              className="inline-flex items-center gap-1 text-xs text-[#8B7355] hover:text-[#291418] transition-colors cursor-pointer mb-2"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Sign In</span>
+            </button>
+          </div>
+
+          {/* New Password */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] mb-1.5">
+              New Password (min 6 characters)
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[#8B7355] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                required
+                autoFocus
+                minLength={6}
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                className="w-full pl-10 pr-10 py-3 rounded-xl bg-[#FAF7F2] border border-[#E2D7BD] text-sm text-[#291418] placeholder:text-[#A89885] focus:outline-none focus:border-[#C9A84C] focus:bg-white transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8B7355] hover:text-[#291418] transition-colors"
+              >
+                {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm New Password (Separate input to confirm!) */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] mb-1.5">
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <KeyRound className="w-4 h-4 text-[#8B7355] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                required
+                minLength={6}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-type new password to confirm"
+                className="w-full pl-10 pr-10 py-3 rounded-xl bg-[#FAF7F2] border border-[#E2D7BD] text-sm text-[#291418] placeholder:text-[#A89885] focus:outline-none focus:border-[#C9A84C] focus:bg-white transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8B7355] hover:text-[#291418] transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading || newPassword.length < 6 || confirmPassword.length < 6}
+            className="w-full py-3.5 px-4 rounded-xl font-sans font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-[#D4AF37] via-[#F3E2B3] to-[#C5A059] text-[#2A1408] shadow-md hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Updating Password...</span>
+              </>
+            ) : (
+              <>
+                <span>Save Password & Sign In</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
         </form>
       )}
     </div>

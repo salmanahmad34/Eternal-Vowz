@@ -694,15 +694,15 @@ export default function InvitationEditorPage() {
                     <Upload className="w-4 h-4 text-stone-600 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-medium text-stone-800 truncate">
-                        Upload MP3 file from Device
+                        Upload Song (MP3, M4A, etc.)
                       </div>
                       <div className="text-[10px] text-stone-500">
-                        Select audio from phone / computer (up to 15MB)
+                        Select audio from phone / computer (up to 25MB)
                       </div>
                     </div>
                     <input
                       type="file"
-                      accept="audio/*"
+                      accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.opus,.webm,.weba,audio/mp3,audio/mpeg,audio/m4a,audio/x-m4a,audio/mp4,video/mp4"
                       className="hidden"
                       onChange={handleCustomAudioFileUpload}
                     />

@@ -228,6 +228,12 @@ export interface MusicTrackOption {
 
 export const MUSIC_TRACKS: MusicTrackOption[] = [
   {
+    id: 'dhadkan-rab-ne-milayi',
+    name: 'Dhadkan • Rab Ne Milayi Hai (Romantic Duet)',
+    mood: 'Emotional, Poetic & Soulful Wedding Song',
+    url: '/assets/audio/dhadkan-rab-ne-milayi.mp3',
+  },
+  {
     id: 'wedding-nasheed',
     name: 'Eternal Vowz Signature Nasheed',
     mood: 'Soulful, Serene & Halal Vocals',

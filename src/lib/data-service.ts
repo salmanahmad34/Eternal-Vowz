@@ -1044,8 +1044,37 @@ export const DataService = {
     if (!isSupabaseConfigured || !supabase) {
       return { error: 'Authentication service is not configured.' };
     }
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    return { error: error ? error.message : null };
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      return { error: error.message };
+    }
+    if (data.user) {
+      const mapped = mapSupabaseUser(data.user);
+      setLocalItem(STORAGE_KEY_USER, mapped);
+    }
+    return { error: null };
+  },
+
+  async verifyResetOtp(
+    email: string,
+    token: string
+  ): Promise<{ error: string | null }> {
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: 'Authentication service is not configured.' };
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim().replace(/\D/g, '');
+
+    const { error } = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanToken,
+      type: 'recovery',
+    });
+
+    if (error) {
+      return { error: error.message || 'Invalid or expired password reset code.' };
+    }
+    return { error: null };
   },
 
   async logoutHost(): Promise<void> {

@@ -6,6 +6,7 @@ export const DEFAULT_WEDDING_AUDIO = '/assets/audio/wedding-nasheed.mp3';
 
 export const TRACK_MAP: Record<string, string> = {
   'wedding-nasheed': '/assets/audio/wedding-nasheed.mp3',
+  'dhadkan-rab-ne-milayi': '/assets/audio/dhadkan-rab-ne-milayi.mp3',
   'royal-bansuri-flute': '/assets/audio/royal-bansuri-flute.mp3',
   'romantic-piano-strings': '/assets/audio/romantic-piano-strings.mp3',
   'shahi-sitar-melodies': '/assets/audio/shahi-sitar-melodies.mp3',
@@ -26,7 +27,7 @@ export function resolveTrackUrl(trackIdOrUrl?: string): string {
     trackIdOrUrl.startsWith('http://') ||
     trackIdOrUrl.startsWith('https://') ||
     (trackIdOrUrl.startsWith('/') && !trackIdOrUrl.startsWith('//')) ||
-    trackIdOrUrl.startsWith('data:audio/') ||
+    trackIdOrUrl.startsWith('data:') ||
     trackIdOrUrl.startsWith('blob:')
   ) {
     return trackIdOrUrl;

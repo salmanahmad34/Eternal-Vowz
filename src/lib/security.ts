@@ -89,7 +89,12 @@ export function safeAudioUrl(rawUrl: string | null | undefined): string | null {
     return trimmed;
   }
 
-  if (trimmed.startsWith('data:audio/')) {
+  if (
+    trimmed.startsWith('data:audio/') ||
+    trimmed.startsWith('data:video/mp4') ||
+    trimmed.startsWith('data:application/octet-stream') ||
+    (trimmed.startsWith('data:') && trimmed.includes('base64,'))
+  ) {
     if (trimmed.includes('base64,')) {
       return trimmed;
     }
