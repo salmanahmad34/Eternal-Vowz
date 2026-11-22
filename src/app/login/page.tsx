@@ -203,7 +203,16 @@ function LoginFormContent() {
     setIsLoading(false);
 
     if (error) {
-      setErrorMsg(error);
+      if (
+        error.toLowerCase().includes('rate limit') ||
+        error.toLowerCase().includes('over_email_send_rate_limit')
+      ) {
+        setErrorMsg(
+          'Supabase email hourly limit reached. Please wait a few minutes before requesting another code, or log in with your password / Google.'
+        );
+      } else {
+        setErrorMsg(error);
+      }
       return;
     }
 
@@ -265,7 +274,16 @@ function LoginFormContent() {
     setIsLoading(false);
 
     if (error) {
-      setErrorMsg(error);
+      if (
+        error.toLowerCase().includes('rate limit') ||
+        error.toLowerCase().includes('over_email_send_rate_limit')
+      ) {
+        setErrorMsg(
+          'Supabase email hourly limit reached. Please wait a few minutes before requesting another code, or log in with your password / Google.'
+        );
+      } else {
+        setErrorMsg(error);
+      }
       return;
     }
 

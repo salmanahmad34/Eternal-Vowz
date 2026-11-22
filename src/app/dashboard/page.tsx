@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem } from '@/types/database';
 import { DataService, INITIAL_DEMO_INVITATION } from '@/lib/data-service';
 import { THEMES, MUSIC_TRACKS } from '@/lib/themes';
@@ -45,6 +46,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [hostUser, setHostUser] = useState<HostUser | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [allGuests, setAllGuests] = useState<GuestWithRsvp[]>([]);
@@ -532,24 +534,26 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Right User Info */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right User Info & Always-Visible Logout Button */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {hostUser && (
-              <div className="text-right text-xs">
-                <span className="text-[#291418] font-semibold block">{hostUser.name}</span>
-                <span className="text-[11px] text-[#8B7355]">{hostUser.email}</span>
+              <div className="hidden lg:block text-right text-xs">
+                <span className="text-[#291418] font-semibold block truncate max-w-[150px]">{hostUser.name}</span>
+                <span className="text-[11px] text-[#8B7355] block truncate max-w-[150px]">{hostUser.email}</span>
               </div>
             )}
-            <Link
-              href="/login"
-              onClick={() => {
-                void DataService.logoutHost();
+            <button
+              type="button"
+              onClick={async () => {
+                await DataService.logoutHost();
+                router.replace('/login');
               }}
-              className="p-2.5 rounded-md bg-white border border-[#E2D7BD] hover:bg-[#F2ECE1] text-[#8B7355] hover:text-[#291418] transition-colors"
-              title="Log out"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white border border-[#E2D7BD] hover:bg-rose-50 hover:border-rose-200 text-[#8B7355] hover:text-rose-700 transition-all text-xs font-semibold shadow-2xs cursor-pointer"
+              title="Log out from dashboard"
             >
-              <LogOut className="w-4 h-4" />
-            </Link>
+              <LogOut className="w-3.5 h-3.5 text-rose-600" />
+              <span>Log Out</span>
+            </button>
           </div>
         </div>
       </header>
