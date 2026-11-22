@@ -52,6 +52,64 @@ function GoogleIcon() {
   );
 }
 
+// =========================================================================
+// PER-USER DAILY OTP RATE LIMITER (Protects Gmail SMTP Quota)
+// =========================================================================
+const OTP_LIMIT_KEY_PREFIX = 'ev_otp_daily_';
+const MAX_OTP_PER_DAY = 5;
+
+function checkEmailOtpLimit(email: string): { allowed: boolean; error?: string } {
+  if (typeof window === 'undefined') return { allowed: true };
+  const clean = email.toLowerCase().trim();
+  const key = OTP_LIMIT_KEY_PREFIX + clean;
+  const stored = localStorage.getItem(key);
+  if (!stored) return { allowed: true };
+
+  try {
+    const { count, start } = JSON.parse(stored);
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    if (now - start > oneDay) {
+      localStorage.removeItem(key);
+      return { allowed: true };
+    }
+    if (count >= MAX_OTP_PER_DAY) {
+      const hoursRemaining = Math.ceil((oneDay - (now - start)) / (1000 * 60 * 60));
+      return {
+        allowed: false,
+        error: `Daily OTP limit reached for this email (${MAX_OTP_PER_DAY}/day). For security, please wait ${hoursRemaining} hour(s) or log in with Google / password.`,
+      };
+    }
+    return { allowed: true };
+  } catch {
+    return { allowed: true };
+  }
+}
+
+function recordEmailOtpSent(email: string) {
+  if (typeof window === 'undefined') return;
+  const clean = email.toLowerCase().trim();
+  const key = OTP_LIMIT_KEY_PREFIX + clean;
+  const stored = localStorage.getItem(key);
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  if (!stored) {
+    localStorage.setItem(key, JSON.stringify({ count: 1, start: now }));
+    return;
+  }
+  try {
+    const { count, start } = JSON.parse(stored);
+    if (now - start > oneDay) {
+      localStorage.setItem(key, JSON.stringify({ count: 1, start: now }));
+    } else {
+      localStorage.setItem(key, JSON.stringify({ count: count + 1, start }));
+    }
+  } catch {
+    localStorage.setItem(key, JSON.stringify({ count: 1, start: now }));
+  }
+}
+
 function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -189,6 +247,14 @@ function LoginFormContent() {
       setErrorMsg('Please enter a valid email address.');
       return;
     }
+
+    // Check per-email daily limit (max 5 OTPs/day)
+    const rateCheck = checkEmailOtpLimit(cleanEmail);
+    if (!rateCheck.allowed) {
+      setErrorMsg(rateCheck.error || 'Daily OTP limit reached for this email.');
+      return;
+    }
+
     if (password.length < 6) {
       setErrorMsg('Password must be at least 6 characters.');
       return;
@@ -217,6 +283,7 @@ function LoginFormContent() {
     }
 
     if (needsConfirmation) {
+      recordEmailOtpSent(cleanEmail);
       setSignupStep('otp');
       setOtpCode('');
       setCountdown(60);
@@ -269,6 +336,13 @@ function LoginFormContent() {
       return;
     }
 
+    // Check per-email daily limit (max 5 OTPs/day)
+    const rateCheck = checkEmailOtpLimit(cleanEmail);
+    if (!rateCheck.allowed) {
+      setErrorMsg(rateCheck.error || 'Daily OTP limit reached for this email.');
+      return;
+    }
+
     setIsLoading(true);
     const { error } = await DataService.sendPasswordReset(cleanEmail);
     setIsLoading(false);
@@ -287,6 +361,7 @@ function LoginFormContent() {
       return;
     }
 
+    recordEmailOtpSent(cleanEmail);
     setForgotStep('reset');
     setOtpCode('');
     setNewPassword('');
