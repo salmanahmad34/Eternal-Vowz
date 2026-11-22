@@ -398,13 +398,31 @@ export default function DashboardPage() {
     if (!card) return;
     const url = getGuestInviteUrl(guest, card);
     const couple = `${card.design_config.couple_names.partner1} & ${card.design_config.couple_names.partner2}`;
+    const eventDateObj = card.event_date ? new Date(card.event_date) : null;
+    const formattedDate =
+      eventDateObj && !isNaN(eventDateObj.getTime())
+        ? eventDateObj.toLocaleDateString('en-US', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : '';
+    const venue = card.venue_details?.venue_name || card.venue_details?.city || '';
+
     const message =
-      `Assalamu Alaikum / Greetings *${guest.guest_name}*,\n\n` +
-      `We warmly invite you and your family to the wedding celebration of *${couple}*.\n\n` +
-      `Tap below to open your personalized 3D Digital Lifafa & submit your RSVP:\n` +
+      `💍 *Royal Wedding Invitation* 💍\n\n` +
+      `Dear *${guest.guest_name}*,\n\n` +
+      `With great joy and blessings of our families, we warmly invite you and your family to celebrate the blessed wedding union of:\n\n` +
+      `✨ *${couple}* ✨\n\n` +
+      (formattedDate ? `🗓 *Date:* ${formattedDate}\n` : '') +
+      (venue ? `📍 *Venue:* ${venue}\n` : '') +
+      `\n💌 *Tap below to open your personal 3D Royal Invitation & submit RSVP:*\n` +
       `${url}\n\n` +
-      `Warm regards,\n${couple}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+      `We eagerly look forward to celebrating this blessed occasion with you! 🌸\n` +
+      `— With warm regards,\n*${couple}*`;
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleAddGuest = async (e: React.FormEvent) => {
