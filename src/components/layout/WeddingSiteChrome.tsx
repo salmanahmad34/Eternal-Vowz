@@ -113,7 +113,7 @@ export function WeddingNavbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1]"
             >
-              5 Curated Card Themes (₹99 / Card)
+              8 Curated Card Themes (₹99 / Card)
             </Link>
             <Link
               href="/#how-it-works"

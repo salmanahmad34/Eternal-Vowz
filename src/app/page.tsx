@@ -121,16 +121,16 @@ const SIGNATURE_CARD_DESIGNS = [
     shortDesc: 'Tap anywhere as a wax-sealed emerald silk box opens into a mountaintop floral arch.',
   },
   {
-    id: 'jodhpur-sapphire',
-    category: '3D Royal Darbar',
-    badge: '✨ Royal Sapphire',
-    name: 'Jodhpur Sapphire Darbar',
-    couple: 'Zayn & Anaya',
-    slug: 'zayn-anaya-sapphire',
+    id: 'kashmir-lotus',
+    category: '3D Frosted Mist',
+    badge: '✨ Kashmiri Romance',
+    name: 'Kashmir Chinar Lotus',
+    couple: 'Mir & Falak',
+    slug: 'mir-falak-lotus',
     query: '',
     price: '₹99',
-    heroImg: '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg',
-    shortDesc: 'Royal sapphire velvet envelope opening into a 24K gold Jharokha archway with marigold garlands.',
+    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
+    shortDesc: 'Misty lavender silk veil opening into Dal Lake lotus blossoms and golden Chinar leaf filigree.',
   },
   {
     id: 'shahi-crimson',
@@ -145,16 +145,16 @@ const SIGNATURE_CARD_DESIGNS = [
     shortDesc: 'Heritage deep crimson velvet Lifafa with 24K gold zari borders, rose petals & sitar melodies.',
   },
   {
-    id: 'kashmir-lotus',
-    category: '3D Frosted Mist',
-    badge: '✨ Kashmiri Romance',
-    name: 'Kashmir Chinar Lotus',
-    couple: 'Mir & Falak',
-    slug: 'mir-falak-lotus',
+    id: 'jodhpur-sapphire',
+    category: '3D Royal Darbar',
+    badge: '✨ Royal Sapphire',
+    name: 'Jodhpur Sapphire Darbar',
+    couple: 'Zayn & Anaya',
+    slug: 'zayn-anaya-sapphire',
     query: '',
     price: '₹99',
-    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
-    shortDesc: 'Misty lavender silk veil opening into Dal Lake lotus blossoms and golden Chinar leaf filigree.',
+    heroImg: '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg',
+    shortDesc: 'Royal sapphire velvet envelope opening into a 24K gold Jharokha archway with marigold garlands.',
   },
 ];
 
@@ -234,7 +234,7 @@ const FAQ_ITEMS = [
     icon: 'sparkles' as const,
     bg: 'bg-[#EFF3FF]',
     border: 'border-[#DCE5FF]',
-    q: 'What makes the 5 animated designs different?',
+    q: 'What makes the 8 animated designs different?',
     a: 'Eternal Vowz offers three distinct reveal experiences across 5 unique designs: (1) Classic 3D Embossed Royal Lifafa envelopes with wax seals, (2) 3D Shahi Palace Double-Door Gates that unlock and swing open, and (3) our brand-new Frosted-Blur Veil design that starts completely blurred and melts into crystal-clear HD when tapped.',
   },
   {
@@ -330,7 +330,7 @@ export default function LandingPage() {
                   RSVP BUILT-IN &mdash; Effortless guest tracking
                 </p>
                 <p className="text-base text-[#8B7355] leading-relaxed max-w-lg">
-                  Create cinematic 3D wedding invitations in minutes — pick from <strong className="text-[#291418] font-medium">5 animated designs</strong>, add your details, and share instantly on WhatsApp.
+                  Create cinematic 3D wedding invitations in minutes — pick from <strong className="text-[#291418] font-medium">8 animated designs</strong>, add your details, and share instantly on WhatsApp.
                 </p>
               </div>
 
@@ -557,7 +557,7 @@ export default function LandingPage() {
                     </Link>
 
                     <Link
-                      href="/login"
+                      href={`/login?next=${encodeURIComponent('/dashboard?new=true&theme=' + design.id)}`}
                       className="w-full py-2.5 px-3 rounded-md bg-[#C9A84C] hover:bg-[#B8963B] text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
                     >
                       <span>Create @ ₹99</span>
@@ -872,7 +872,7 @@ export default function LandingPage() {
                     Save ₹15,000+ &amp; 3 Weeks of Printing Stress
                   </span>
                   <span className="text-xs text-[#8B7355]">
-                    Flat ₹99 per card &bull; 5 animated themes &bull; Active for 1 full month (30 days)
+                    Flat ₹99 per card &bull; 8 animated themes &bull; Active for 1 full month (30 days)
                   </span>
                 </div>
               </div>

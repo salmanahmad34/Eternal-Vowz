@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem } from '@/types/database';
 import { DataService, INITIAL_DEMO_INVITATION, getCanonicalOrigin } from '@/lib/data-service';
-import { THEMES, MUSIC_TRACKS } from '@/lib/themes';
+import { THEMES, MUSIC_TRACKS, ORDERED_THEME_IDS } from '@/lib/themes';
 import { luxuryAudio } from '@/lib/audio';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
 import { EternalLogoBadge } from '@/components/layout/EternalLoader';
@@ -140,14 +140,28 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadData();
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const themeParam = urlParams.get('theme') as ThemeId | null;
+      const isNew = urlParams.get('new') === 'true';
+      if (themeParam && THEMES[themeParam]) {
+        handleStartCreateNewCard(themeParam);
+      } else if (isNew) {
+        handleStartCreateNewCard();
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleStartCreateNewCard = () => {
+  const handleStartCreateNewCard = (themeOverride?: ThemeId | React.MouseEvent | unknown) => {
+    const selectedTheme =
+      typeof themeOverride === 'string' && THEMES[themeOverride as ThemeId]
+        ? (themeOverride as ThemeId)
+        : 'pearl-veil';
     const newBlankCard: Invitation = {
       id: `draft-${Date.now()}`,
       slug: `wedding-${Math.random().toString(36).substring(2, 7)}`,
-      theme_id: 'royal-emerald',
+      theme_id: selectedTheme,
       title: '',
       event_date: '2027-11-20T18:00:00Z',
       venue_details: {
@@ -168,6 +182,12 @@ export default function DashboardPage() {
         music_track: 'wedding-nasheed',
         accent_color: '#D4AF37',
         font_style: 'cormorant',
+        opening_style:
+          selectedTheme === 'pearl-veil' || selectedTheme === 'kashmir-lotus'
+            ? 'frosted-blur'
+            : selectedTheme === 'blush-floral'
+            ? 'palace-gates'
+            : 'lifafa',
         show_timeline: true,
         timeline: [
           {
@@ -1592,11 +1612,16 @@ export default function DashboardPage() {
                     </button>
                   </div>
 
-                  <label className="block text-xs font-medium text-neutral-700 mb-2">
-                    Card Color &amp; Hero Artwork Theme
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {(Object.keys(THEMES) as ThemeId[]).map((tKey) => {
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-semibold text-neutral-800">
+                      Card Color &amp; Hero Artwork Theme (8 Signature Designs)
+                    </label>
+                    <span className="text-[11px] text-[#8B7355]">
+                      Matches Landing Page Samples
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {ORDERED_THEME_IDS.map((tKey) => {
                       const t = THEMES[tKey];
                       const active = draftCard.theme_id === tKey;
                       return (
@@ -1619,18 +1644,56 @@ export default function DashboardPage() {
                             });
                             setReplayTrigger((p) => p + 1);
                           }}
-                          className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                          className={`group relative p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between overflow-hidden shadow-2xs ${
                             active
-                              ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
-                              : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                              ? 'border-[#C9A84C] bg-[#FAF6EE] ring-2 ring-[#C9A84C]'
+                              : 'border-neutral-200 hover:border-neutral-300 bg-white hover:shadow-xs'
                           }`}
                         >
-                          <div
-                            className="w-6 h-6 rounded-full mb-1.5"
-                            style={{ backgroundColor: t.previewColor }}
-                          />
-                          <div className="text-xs font-medium text-neutral-900 truncate">
-                            {t.name.split(' (')[0]}
+                          {/* 3D Visual Card Image Preview */}
+                          <div className="relative aspect-[16/10] w-full rounded-lg overflow-hidden bg-neutral-100 mb-2">
+                            <img
+                              src={t.heroImg || '/assets/tuscan-haveli/hero-haveli-courtyard.jpg'}
+                              alt={t.name}
+                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                            {t.badge && (
+                              <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/65 backdrop-blur-xs text-[8px] font-semibold text-[#FFF4CF]">
+                                {t.badge}
+                              </div>
+                            )}
+                            {active && (
+                              <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#C9A84C] text-white flex items-center justify-center shadow-xs">
+                                <Check className="w-2.5 h-2.5 stroke-[3]" />
+                              </div>
+                            )}
+                            <div className="absolute bottom-1 left-1 flex items-center gap-1 max-w-[90%]">
+                              <span
+                                className="w-2.5 h-2.5 rounded-full border border-white shadow-xs shrink-0"
+                                style={{ backgroundColor: t.previewColor }}
+                              />
+                              <span className="text-[10px] font-semibold text-white drop-shadow-xs truncate">
+                                {t.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="px-0.5 space-y-0.5">
+                            <div className="text-[11px] font-semibold text-neutral-900 truncate">
+                              {t.name}
+                            </div>
+                            <div className="text-[9px] text-neutral-500 line-clamp-1">
+                              {tKey === 'shahi-crimson'
+                                ? 'Crimson Velvet & 24K Gold'
+                                : tKey === 'jodhpur-sapphire'
+                                ? 'Royal Sapphire & Marigold'
+                                : tKey === 'pearl-veil' || tKey === 'kashmir-lotus'
+                                ? '3D Frosted-Blur Reveal'
+                                : tKey === 'blush-floral'
+                                ? '3D Palace Double Gates'
+                                : '3D Embossed Royal Lifafa'}
+                            </div>
                           </div>
                         </button>
                       );

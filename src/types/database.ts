@@ -165,6 +165,8 @@ export interface ThemeConfig {
   id: ThemeId;
   name: string;
   subtitle: string;
+  heroImg?: string;
+  badge?: string;
   previewColor: string;
   accentGold: string;
   colors: {
