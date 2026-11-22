@@ -12,10 +12,10 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle2,
-  KeyRound,
   RotateCcw,
   Sparkles,
   ArrowLeft,
+  KeyRound,
 } from 'lucide-react';
 
 function sanitizeNext(raw: string | null): string {
@@ -56,7 +56,7 @@ function LoginFormContent() {
 
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [email, setEmail] = useState('');
-  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [otpCode, setOtpCode] = useState('');
 
   const [checkingSession, setCheckingSession] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ function LoginFormContent() {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
-  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const otpInputRef = useRef<HTMLInputElement | null>(null);
 
   // Automatically redirect if user already has an active verified Supabase session
   useEffect(() => {
@@ -139,14 +139,13 @@ function LoginFormContent() {
     }
 
     setStep('otp');
-    setOtpDigits(['', '', '', '', '', '']);
+    setOtpCode('');
     setCountdown(60);
     setCanResend(false);
-    setSuccessMsg(`We sent a 6-digit login code to ${cleanEmail}`);
+    setSuccessMsg(`We sent a login verification code to ${cleanEmail}`);
 
-    // Focus first OTP input on next tick
     setTimeout(() => {
-      otpInputRefs.current[0]?.focus();
+      otpInputRef.current?.focus();
     }, 150);
   };
 
@@ -159,10 +158,10 @@ function LoginFormContent() {
   // STEP 2: Verify OTP
   const handleVerifyOtp = async (codeToVerify?: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    const token = (codeToVerify || otpDigits.join('')).trim();
+    const token = (codeToVerify || otpCode).trim();
 
-    if (token.length !== 6) {
-      setErrorMsg('Please enter the complete 6-digit code sent to your email.');
+    if (token.length < 6) {
+      setErrorMsg('Please enter the complete verification code sent to your email.');
       return;
     }
 
@@ -181,51 +180,6 @@ function LoginFormContent() {
     setTimeout(() => {
       router.replace(nextPath);
     }, 400);
-  };
-
-  // Handle individual OTP input changes
-  const handleOtpChange = (index: number, val: string) => {
-    setErrorMsg(null);
-    // Allow paste of 6 digits
-    if (val.length > 1) {
-      const cleanDigits = val.replace(/\D/g, '').slice(0, 6).split('');
-      const updated = [...otpDigits];
-      cleanDigits.forEach((digit, i) => {
-        if (i < 6) updated[i] = digit;
-      });
-      setOtpDigits(updated);
-      const nextFocus = Math.min(cleanDigits.length, 5);
-      otpInputRefs.current[nextFocus]?.focus();
-
-      if (cleanDigits.length === 6) {
-        handleVerifyOtp(cleanDigits.join(''));
-      }
-      return;
-    }
-
-    const digit = val.replace(/\D/g, '');
-    const updated = [...otpDigits];
-    updated[index] = digit;
-    setOtpDigits(updated);
-
-    // Auto-advance
-    if (digit && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto-submit when all 6 digits are typed
-    if (digit && index === 5) {
-      const full = updated.join('');
-      if (full.length === 6) {
-        handleVerifyOtp(full);
-      }
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
-      otpInputRefs.current[index - 1]?.focus();
-    }
   };
 
   if (checkingSession) {
@@ -256,13 +210,13 @@ function LoginFormContent() {
         <p className="text-xs text-[#8B7355] mt-1.5 leading-relaxed">
           {step === 'email' ? (
             <>
-              Enter your email to receive a secure 6-digit code.
+              Enter your email to receive a secure login code.
               <br />
               <span className="text-[#A27A2F] font-medium">First time here?</span> Your host account is created automatically!
             </>
           ) : (
             <>
-              Enter the 6-digit code sent to <strong className="text-[#291418]">{email}</strong>
+              Enter the code sent to <strong className="text-[#291418]">{email}</strong>
             </>
           )}
         </p>
@@ -358,7 +312,7 @@ function LoginFormContent() {
         </>
       ) : (
         /* =========================================================================
-            STEP 2: ENTER 6-DIGIT OTP
+            STEP 2: ENTER OTP
         ========================================================================= */
         <div className="space-y-5">
           <div className="flex items-center justify-between text-xs px-1">
@@ -377,40 +331,42 @@ function LoginFormContent() {
             <span className="text-[#8B7355] font-mono font-medium">Valid for 10 mins</span>
           </div>
 
-          {/* 6 Digit Input Boxes */}
-          <div className="grid grid-cols-6 gap-2 sm:gap-2.5">
-            {otpDigits.map((digit, idx) => (
+          {/* OTP Code Input (Supports 6 to 8 digits) */}
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#5A4636] text-center">
+              Enter Verification Code (OTP)
+            </label>
+            <div className="relative">
               <input
-                key={idx}
-                ref={(el) => {
-                  otpInputRefs.current[idx] = el;
-                }}
+                ref={otpInputRef}
                 type="text"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(idx, e.target.value)}
-                onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                onPaste={(e) => {
-                  e.preventDefault();
-                  const pastedData = e.clipboardData.getData('text');
-                  handleOtpChange(idx, pastedData);
+                autoFocus
+                autoComplete="one-time-code"
+                maxLength={8}
+                value={otpCode}
+                onChange={(e) => {
+                  setErrorMsg(null);
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 8);
+                  setOtpCode(val);
+                  if (val.length === 8) {
+                    handleVerifyOtp(val);
+                  }
                 }}
-                className={`w-full aspect-square text-center font-mono text-2xl font-bold rounded-xl border transition-all select-none ${
-                  digit
-                    ? 'border-[#C9A84C] bg-white text-[#291418] shadow-xs'
-                    : 'border-[#E2D7BD] bg-[#FAF7F2] text-[#8B7355]'
-                } focus:outline-none focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/25`}
+                placeholder="••••••••"
+                className="w-full text-center font-mono text-3xl font-bold tracking-[0.25em] py-3.5 px-4 rounded-xl border-2 border-[#C9A84C] bg-white text-[#291418] placeholder:text-[#D8C7A8] placeholder:tracking-[0.2em] focus:outline-none focus:ring-4 focus:ring-[#C9A84C]/20 shadow-xs transition-all"
               />
-            ))}
+            </div>
+            <p className="text-[11px] text-center text-[#8B7355]">
+              Type or paste the code received in your email (or click the button in your email)
+            </p>
           </div>
 
           {/* Verify Button */}
           <button
             type="button"
             onClick={() => handleVerifyOtp()}
-            disabled={isLoading || otpDigits.join('').length !== 6}
+            disabled={isLoading || otpCode.length < 6}
             className="w-full py-3.5 px-4 rounded-xl font-sans font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-[#D4AF37] via-[#F3E2B3] to-[#C5A059] text-[#2A1408] shadow-md hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
           >
             {isLoading ? (
@@ -427,7 +383,7 @@ function LoginFormContent() {
           </button>
 
           {/* Resend Code Countdown */}
-          <div className="text-center pt-2">
+          <div className="text-center pt-1">
             {canResend ? (
               <button
                 type="button"
