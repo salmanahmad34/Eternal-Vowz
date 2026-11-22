@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DataService } from '@/lib/data-service';
+import { SITE_CONFIG } from '@/config/site';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -47,7 +48,7 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const slug = params?.slug || 'wedding';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://eternal-vowz.onrender.com';
+  const baseUrl = SITE_CONFIG.url;
 
   const inv = await DataService.getInvitationBySlug(slug);
 
@@ -65,6 +66,9 @@ export async function generateMetadata({
           follow: false,
           noimageindex: true,
         },
+      },
+      alternates: {
+        canonical: null,
       },
       openGraph: {
         title: '💍 Royal Wedding Invitation | Eternal Vowz',
@@ -125,6 +129,9 @@ export async function generateMetadata({
         follow: false,
         noimageindex: true,
       },
+    },
+    alternates: {
+      canonical: null,
     },
     openGraph: {
       title,

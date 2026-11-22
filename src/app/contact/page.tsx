@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
+import { SITE_CONFIG } from '@/config/site';
 import { Mail, Clock, Check, Send, ShieldCheck, Sparkles, MapPin, Phone, UserCheck } from 'lucide-react';
 
 export default function ContactPage() {
@@ -46,7 +47,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-[#291418] block">Business / Legal Entity</span>
-                    <span className="text-xs text-[#8B7355]">Eternal Vowz (Salman Ahmad)</span>
+                    <span className="text-xs text-[#8B7355]">{SITE_CONFIG.name} ({SITE_CONFIG.founder.name})</span>
                   </div>
                 </div>
 
@@ -58,10 +59,10 @@ export default function ContactPage() {
                   <div>
                     <span className="text-xs font-semibold text-[#291418] block">Official Email</span>
                     <a
-                      href="mailto:mrsalman7307@gmail.com"
+                      href={`mailto:${SITE_CONFIG.contactEmail}`}
                       className="text-xs text-[#C9A84C] font-medium hover:underline break-all"
                     >
-                      mrsalman7307@gmail.com
+                      {SITE_CONFIG.contactEmail}
                     </a>
                   </div>
                 </div>

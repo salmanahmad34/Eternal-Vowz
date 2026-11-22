@@ -1,12 +1,13 @@
 import React from 'react';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
 import { ShieldCheck, Lock, Eye, Server, FileText } from 'lucide-react';
+import { SITE_CONFIG } from '@/config/site';
 
 export const metadata = {
-  title: 'Privacy Policy — Eternal Vowz (E&V)',
-  description: 'Learn how Eternal Vowz collects, stores, and protects host and wedding guest data.',
+  title: `Privacy Policy — ${SITE_CONFIG.name} (${SITE_CONFIG.shortName})`,
+  description: `Learn how ${SITE_CONFIG.name} collects, stores, and protects host and wedding guest data.`,
   alternates: {
-    canonical: 'https://eternal-vowz.onrender.com/privacy',
+    canonical: `${SITE_CONFIG.url}/privacy`,
   },
 };
 
@@ -35,7 +36,7 @@ export default function PrivacyPolicyPage() {
                 1. Introduction
               </h2>
               <p>
-                <strong>Eternal Vowz (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;)</strong> is committed to safeguarding the privacy and security of your personal data. This Privacy Policy outlines our practices regarding the collection, storage, use, and disclosure of information when you use our website (<code>https://eternal-vowz-in.vercel.app/</code>) and digital wedding invitation services.
+                <strong>{SITE_CONFIG.name} (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;)</strong> is committed to safeguarding the privacy and security of your personal data. This Privacy Policy outlines our practices regarding the collection, storage, use, and disclosure of information when you use our website (<code>{SITE_CONFIG.url}</code>) and digital wedding invitation services.
               </p>
             </section>
 
@@ -105,7 +106,7 @@ export default function PrivacyPolicyPage() {
                 5. Data Retention &amp; 30-Day Card Lifecycle
               </h2>
               <p>
-                Each digital invitation card remains live for <strong>1 month (30 days)</strong> from publication. Upon expiration, public guest access is closed automatically to protect personal wedding details. Hosts may request permanent deletion of their account and all associated guest data at any time by contacting our support desk.
+                Each digital invitation card remains live for <strong>30 days</strong> from publication. Upon expiration, public guest access is closed automatically to protect personal wedding details. Hosts may request permanent deletion of their account and all associated guest data at any time by contacting our support desk.
               </p>
             </section>
 
@@ -126,10 +127,10 @@ export default function PrivacyPolicyPage() {
                 In accordance with the Information Technology Act 2000 and the Digital Personal Data Protection Act (DPDPA 2023), the name and contact details of the Grievance Officer are provided below:
               </p>
               <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E8DFD1] text-xs space-y-1">
-                <p><strong>Grievance Officer:</strong> Salman Ahmad</p>
-                <p><strong>Entity Name:</strong> Eternal Vowz</p>
-                <p><strong>Official Email:</strong> <a href="mailto:mrsalman7307@gmail.com" className="text-[#C9A84C] font-semibold underline">mrsalman7307@gmail.com</a></p>
-                <p><strong>Address:</strong> India</p>
+                <p><strong>Grievance Officer:</strong> {SITE_CONFIG.founder.name}</p>
+                <p><strong>Entity Name:</strong> {SITE_CONFIG.name}</p>
+                <p><strong>Official Email:</strong> <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#C9A84C] font-semibold underline">{SITE_CONFIG.contactEmail}</a></p>
+                <p><strong>Address:</strong> {SITE_CONFIG.founder.location}</p>
                 <p><strong>Response Time:</strong> Within 48 hours</p>
               </div>
             </section>

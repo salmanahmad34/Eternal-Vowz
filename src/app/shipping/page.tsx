@@ -1,12 +1,13 @@
 import React from 'react';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
 import { Truck, CheckCircle2, Clock, Mail, ShieldCheck, Zap } from 'lucide-react';
+import { SITE_CONFIG } from '@/config/site';
 
 export const metadata = {
-  title: 'Shipping & Delivery Policy — Eternal Vowz (E&V)',
-  description: 'Instant digital delivery terms and timeline for Eternal Vowz digital wedding cards.',
+  title: `Shipping & Delivery Policy — ${SITE_CONFIG.name} (${SITE_CONFIG.shortName})`,
+  description: `Instant digital delivery terms and timeline for ${SITE_CONFIG.name} digital wedding cards.`,
   alternates: {
-    canonical: 'https://eternal-vowz.onrender.com/shipping',
+    canonical: `${SITE_CONFIG.url}/shipping`,
   },
 };
 
@@ -116,8 +117,8 @@ export default function ShippingPolicyPage() {
                 If you have completed your payment but have not received access to your published card within 15 minutes, please reach out to our dedicated support desk with your payment ID and registered email:
               </p>
               <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E8DFD1] text-xs space-y-1">
-                <p><strong>Customer Support Desk:</strong> Eternal Vowz</p>
-                <p><strong>Email:</strong> <a href="mailto:mrsalman7307@gmail.com" className="text-[#C9A84C] font-semibold underline">mrsalman7307@gmail.com</a></p>
+                <p><strong>Customer Support Desk:</strong> {SITE_CONFIG.name}</p>
+                <p><strong>Email:</strong> <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#C9A84C] font-semibold underline">{SITE_CONFIG.contactEmail}</a></p>
                 <p><strong>Support Window:</strong> Monday – Sunday, 9:00 AM – 10:00 PM IST</p>
                 <p><strong>Resolution SLA:</strong> Under 2 hours</p>
               </div>

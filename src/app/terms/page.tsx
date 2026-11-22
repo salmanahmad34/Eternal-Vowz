@@ -1,12 +1,13 @@
 import React from 'react';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
 import { FileText, ShieldCheck, CreditCard, Scale, HelpCircle } from 'lucide-react';
+import { SITE_CONFIG } from '@/config/site';
 
 export const metadata = {
-  title: 'Terms & Conditions — Eternal Vowz (E&V)',
-  description: 'Official terms and conditions governing the use of Eternal Vowz digital wedding invitation services.',
+  title: `Terms & Conditions — ${SITE_CONFIG.name} (${SITE_CONFIG.shortName})`,
+  description: `Official terms and conditions governing the use of ${SITE_CONFIG.name} digital wedding invitation services.`,
   alternates: {
-    canonical: 'https://eternal-vowz.onrender.com/terms',
+    canonical: `${SITE_CONFIG.url}/terms`,
   },
 };
 
@@ -35,7 +36,7 @@ export default function TermsPage() {
                 1. Acceptance of Terms
               </h2>
               <p>
-                By accessing, browsing, registering on, or purchasing digital wedding cards through <strong>Eternal Vowz (E&amp;V)</strong> (accessible at <code>https://eternal-vowz-in.vercel.app/</code>), you agree to be bound by these Terms and Conditions and our Privacy Policy. If you do not agree with any part of these terms, you must not use our platform.
+                By accessing, browsing, registering on, or purchasing digital wedding cards through <strong>{SITE_CONFIG.name} ({SITE_CONFIG.shortName})</strong> (accessible at <code>{SITE_CONFIG.url}</code>), you agree to be bound by these Terms and Conditions and our Privacy Policy. If you do not agree with any part of these terms, you must not use our platform.
               </p>
             </section>
 
@@ -132,9 +133,9 @@ export default function TermsPage() {
                 9. Contact &amp; Grievance Redressal
               </h2>
               <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E8DFD1] text-xs space-y-1">
-                <p><strong>Merchant Entity:</strong> Eternal Vowz (Operating under Salman Ahmad)</p>
-                <p><strong>Grievance Officer:</strong> Salman Ahmad</p>
-                <p><strong>Official Email:</strong> <a href="mailto:mrsalman7307@gmail.com" className="text-[#C9A84C] font-semibold underline">mrsalman7307@gmail.com</a></p>
+                <p><strong>Merchant Entity:</strong> {SITE_CONFIG.name} (Operating under {SITE_CONFIG.founder.name})</p>
+                <p><strong>Grievance Officer:</strong> {SITE_CONFIG.founder.name}</p>
+                <p><strong>Official Email:</strong> <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#C9A84C] font-semibold underline">{SITE_CONFIG.contactEmail}</a></p>
                 <p><strong>Hours of Operation:</strong> Monday – Sunday, 9:00 AM – 10:00 PM IST</p>
               </div>
             </section>

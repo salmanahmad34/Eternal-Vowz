@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
 import { INITIAL_DEMO_INVITATION } from '@/lib/data-service';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
+import { SITE_CONFIG } from '@/config/site';
+import { SHARED_FAQS } from '@/data/faqs';
 import {
   Check,
   X,
@@ -181,10 +183,10 @@ const FILTER_CATEGORIES = [
 const COMPARISON_ROWS = [
   {
     icon: 'zap' as const,
-    feature: 'Total Cost (300+ Guests)',
-    sub: 'Printing, envelopes & postage',
-    physical: '₹15,000 – ₹45,000+ printing & courier fees',
-    digital: 'Flat ₹99 per card — share with unlimited WhatsApp guests',
+    feature: 'Total Cost (300+ Guests Example)',
+    sub: 'Printing, envelopes & delivery',
+    physical: '₹6,900 for 300 cards (₹23/card tier 2 benchmark) + extra courier & sweet box costs',
+    digital: 'Flat ₹99 per wedding card — save ₹6,801 (~98% less in this real example)',
   },
   {
     icon: 'clock' as const,
@@ -202,16 +204,16 @@ const COMPARISON_ROWS = [
   },
   {
     icon: 'users' as const,
-    feature: 'RSVP & Halal Catering Count',
+    feature: 'RSVP & Catering Count',
     sub: 'Attendance & meal preferences',
     physical: 'Manual phone calls to confirm every family',
-    digital: 'Built-in live RSVP form, headcount & Halal meal summary',
+    digital: 'Built-in live RSVP form, headcount & meal preferences summary',
   },
   {
     icon: 'sliders' as const,
     feature: 'Smart Optional Builder',
     sub: 'Edits & custom sections',
-    physical: 'Fixed printed text — typos cannot be corrected later',
+    physical: 'Fixed printed text — typos or date changes require reprinting',
     digital: 'Fill only Main Details (Names, Date, Venue) — rest hides automatically',
   },
   {
@@ -230,78 +232,7 @@ const COMPARISON_ROWS = [
   },
 ];
 
-const FAQ_ITEMS = [
-  {
-    icon: 'sparkles' as const,
-    bg: 'bg-[#EFF3FF]',
-    border: 'border-[#DCE5FF]',
-    q: 'Eternal Vowz kya hai aur card kitne din active rehta hai?',
-    a: 'Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.',
-  },
-  {
-    icon: 'sparkles' as const,
-    bg: 'bg-[#FDF7EB]',
-    border: 'border-[#F3E4C6]',
-    q: '3D Shahi Palace wedding invitation kya hai?',
-    a: '3D Shahi Palace wedding invitation ek royal digital card hai jisme mehmaan jab link kholte hain, toh unke phone par ek grand shahi mahal ke double-door darwaze animated roop se khulte hain. Isme 24K gold filigree, authentic shehnai ya dhol music, event schedule, venue Google Maps, aur RSVP button shamil hota hai jo bina kisi app ke browser me chalta hai.',
-  },
-  {
-    icon: 'share' as const,
-    bg: 'bg-[#EEFCF3]',
-    border: 'border-[#D3F5DF]',
-    q: 'India me WhatsApp digital RSVP kaise kaam karta hai?',
-    a: 'India me WhatsApp digital RSVP me host apne dashboard se har mehmaan ke naam ka personalized WhatsApp link bhejta hai. Mehmaan bina kisi app download ke link khol kar \'Attending\' ya \'Declined\' select karte hain aur kitne log aayenge likh dete hain. Host ke live dashboard par attendance count aur guest details real-time update ho jaati hain.',
-  },
-  {
-    icon: 'clock' as const,
-    bg: 'bg-[#ECFCFA]',
-    border: 'border-[#D3F5F1]',
-    q: 'Digital wedding invitation paper card se sasta hai kya?',
-    a: 'Haan, digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 300 paper cards print aur courier karwane ka kharcha ₹15,000 se ₹50,000 tak aata hai. Eternal Vowz par sirf ₹99 me poora royal 3D digital card banta hai, jisme unlimited WhatsApp links, live RSVP tracking, aur Google Maps shamil hote hain, bina printing ya delivery ke jhanjhat ke.',
-  },
-  {
-    icon: 'clock' as const,
-    bg: 'bg-[#ECFCFA]',
-    border: 'border-[#D3F5F1]',
-    q: 'How long is my wedding invitation valid?',
-    a: 'Every wedding card remains active for 1 full month (30 days) from creation. After 30 days, the public guest link expires automatically to keep your family celebration private, with an option to renew anytime from your dashboard.',
-  },
-  {
-    icon: 'sparkles' as const,
-    bg: 'bg-[#EFF3FF]',
-    border: 'border-[#DCE5FF]',
-    q: 'What makes the 8 animated designs different?',
-    a: 'Eternal Vowz offers three distinct reveal experiences across 8 unique designs: (1) Classic 3D Embossed Royal Lifafa envelopes with wax seals, (2) 3D Shahi Palace Double-Door Gates that unlock and swing open, and (3) Frosted-Blur Botanical Veils that glide into crystal-clear HD palace halls.',
-  },
-  {
-    icon: 'share' as const,
-    bg: 'bg-[#EEFCF3]',
-    border: 'border-[#D3F5DF]',
-    q: 'How do I share my card & what is the price?',
-    a: 'Every signature wedding invitation card on Eternal Vowz is priced at a flat ₹99 per card (one-time fee). You receive unlimited personalized guest links ("For Honored Guest & Family") to share instantly via WhatsApp, SMS, or email with live read receipts.',
-  },
-  {
-    icon: 'sliders' as const,
-    bg: 'bg-[#F7F0FD]',
-    border: 'border-[#EAD9FA]',
-    q: 'Can I fill only basic details & edit later?',
-    a: 'Yes! Our Smart Conditional Card Builder only requires the main essentials — Couple Names, Event Date, and Venue. All other modules (Schedule, Dress Code, Halal Menu, Story, Gift Registry, Stay Info) are optional and stay hidden unless enabled. You can edit anytime live!',
-  },
-  {
-    icon: 'message' as const,
-    bg: 'bg-[#FDF7EB]',
-    border: 'border-[#F3E4C6]',
-    q: 'How do I reach support or WhatsApp concierge?',
-    a: 'For all pre-purchase or general inquiries, email our official support desk at mrsalman7307@gmail.com. Once you create or purchase a ₹99 card, direct Priority WhatsApp Support unlocks immediately inside your Host Dashboard.',
-  },
-  {
-    icon: 'shield' as const,
-    bg: 'bg-[#FDF0F3]',
-    border: 'border-[#F8D9E1]',
-    q: 'Is my wedding data & ₹99 payment secure?',
-    a: 'Yes. Eternal Vowz uses 256-bit SSL encryption, strict HTTP security headers, and server-side HMAC-SHA256 verification for payment and API integrations. We never sell or share guest data with third parties.',
-  },
-];
+const FAQ_ITEMS = SHARED_FAQS;
 
 export default function LandingPage() {
   const [replayTrigger, setReplayTrigger] = useState(0);
@@ -911,17 +842,17 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <span className="font-serif text-lg font-semibold text-[#291418] block leading-tight">
-                    Save ₹15,000+ &amp; 3 Weeks of Printing Stress
+                    Save ₹6,800+ on Card Costs &amp; 3 Weeks of Printing Stress
                   </span>
                   <span className="text-xs text-[#8B7355]">
-                    Flat ₹99 per card &bull; 8 animated themes &bull; Card 30 Days tak active rahega
+                    Based on 300 cards @ ₹23 tier 2 rate vs flat ₹99 &bull; Card 30 Days tak active rahega
                   </span>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                 <Link
-                  href="/invite/layla-omar-veil"
+                  href="/demo"
                   target="_blank"
                   className="px-4 py-2.5 rounded-md bg-white hover:bg-[#F6EEDB] text-[#291418] border border-[#C9A84C]/60 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
                 >
@@ -1045,6 +976,17 @@ export default function LandingPage() {
                   <p className="text-sm sm:text-base text-[#5A4636] leading-relaxed">
                     {FAQ_ITEMS[activeFaqIndex].a}
                   </p>
+
+                  {FAQ_ITEMS[activeFaqIndex].aHinglish && (
+                    <div className="pt-3 border-t border-black/10 text-xs text-[#6e5d4b] space-y-1">
+                      <span className="font-semibold text-[#8C6430] uppercase tracking-wider text-[10px] block">
+                        हिंदी / Hinglish:
+                      </span>
+                      <p className="leading-relaxed italic">
+                        {FAQ_ITEMS[activeFaqIndex].aHinglish}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="pt-4 border-t border-black/10 flex flex-wrap items-center justify-between gap-3">
                     <button

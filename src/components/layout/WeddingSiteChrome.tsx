@@ -133,7 +133,7 @@ export function WeddingNavbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1] text-[#9F7E28] font-semibold"
             >
-              Budget Guide (Save ₹50,000+)
+              Wedding Budget Guide
             </Link>
             <Link
               href="/about"

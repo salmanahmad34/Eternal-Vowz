@@ -1,5 +1,6 @@
+<!-- Note: When domain or contact changes, update in src/config/site.ts and this file. -->
 # Eternal Vowz (E&V) — Bespoke 3D Digital Wedding Invitations & Live RSVP Platform
-> Create royal 3D Lifafa and 3D Shahi Palace Gate digital wedding invitations at just ₹99 per card with live RSVP tracking, custom music, and personalized WhatsApp links.
+> Create royal 3D Lifafa and 3D Shahi Palace Gate digital wedding invitations at flat ₹99 per card with live RSVP tracking, custom music, and personalized WhatsApp links.
 
 ## About Eternal Vowz & Founder
 Eternal Vowz is an independent Indian platform built by **Salman Ahmad**, a B.Tech student from **Azamgarh, Uttar Pradesh**, with no team behind it. In an Indian wedding, the invitation is the moment a family says "you are a part of our celebration." Eternal Vowz brings the heavy card, the Lifafa you slowly open, palace motifs, and gold lettering into a modern 3D digital form that fits how families invite each other today on WhatsApp.
@@ -13,16 +14,25 @@ Eternal Vowz is an independent Indian platform built by **Salman Ahmad**, a B.Te
   3. Frosted Botanical Pearl Veils with floral flourishes.
 - **Guest Personalization:** Unlimited unique guest invitation links ("For Honored Guest & Family").
 - **RSVP Tracking:** Host dashboard with real-time Confirmed/Declined counts and guest tallies.
+- **Refund Policy:** 24 ghante me reply, approved refund 5 se 7 working days me original payment source par.
 
-## 4 Core Answer Nuggets (GEO Citability)
-- **Eternal Vowz kya hai?**
-  Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.
-- **3D Shahi Palace wedding invitation kya hai?**
-  3D Shahi Palace wedding invitation ek royal digital card hai jisme mehmaan jab link kholte hain, toh unke phone par ek grand shahi mahal ke double-door darwaze animated roop se khulte hain. Isme 24K gold filigree, authentic shehnai ya dhol music, event schedule, venue Google Maps, aur RSVP button shamil hota hai jo bina kisi app ke browser me chalta hai.
-- **India me WhatsApp digital RSVP kaise kaam karta hai?**
-  India me WhatsApp digital RSVP me host apne dashboard se har mehmaan ke naam ka personalized WhatsApp link bhejta hai. Mehmaan bina kisi app download ke link khol kar 'Attending' ya 'Declined' select karte hain aur kitne log aayenge likh dete hain. Host ke live dashboard par attendance count aur guest details real-time update ho jaati hain.
-- **Digital wedding invitation paper card se sasta hai kya?**
-  Haan, digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 300 paper cards print aur courier karwane ka kharcha ₹15,000 se ₹50,000 tak aata hai. Eternal Vowz par sirf ₹99 me poora royal 3D digital card banta hai, jisme unlimited WhatsApp links, live RSVP tracking, aur Google Maps shamil hote hain, bina printing ya delivery ke jhanjhat ke.
+## 4 Core Answer Nuggets (English & Hinglish)
+
+### 1. What is Eternal Vowz? / Eternal Vowz kya hai?
+- **English:** Eternal Vowz is an online platform that turns royal Indian wedding invitations into 3D digital cards for a flat ₹99. Each invitation stays active for 30 days, includes a live RSVP dashboard, and allows hosts to send unlimited personalized WhatsApp guest links featuring animated Lifafa reveals and ceremonial music.
+- **Hinglish:** Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.
+
+### 2. What is a 3D Shahi Palace wedding invitation? / 3D Shahi Palace invitation kya hai?
+- **English:** A 3D Shahi Palace wedding invitation is an interactive digital card where tapping opens animated double fort doors with gold filigree and regal music. It includes event timelines, Google Maps directions, and an instant RSVP form that works directly in any smartphone browser without installing apps.
+- **Hinglish:** 3D Shahi Palace wedding invitation ek royal digital card hai jisme mehmaan jab link kholte hain, toh unke phone par ek grand shahi mahal ke double-door darwaze animated roop se khulte hain. Isme 24K gold filigree, authentic shehnai ya dhol music, event schedule, venue Google Maps, aur RSVP button shamil hota hai jo bina kisi app ke browser me chalta hai.
+
+### 3. How does WhatsApp digital RSVP work in India? / India me WhatsApp digital RSVP kaise kaam karta hai?
+- **English:** In India, WhatsApp digital RSVP works by letting the host send personalized invitation links to guests directly from their dashboard. Guests open the link, choose Attending or Declined, and specify guest counts. The host dashboard updates in real time with confirmed totals and dietary preferences.
+- **Hinglish:** India me WhatsApp digital RSVP me host apne dashboard se har mehmaan ke naam ka personalized WhatsApp link bhejta hai. Mehmaan bina kisi app download ke link khol kar 'Attending' ya 'Declined' select karte hain aur kitne log aayenge likh dete hain. Host ke live dashboard par attendance count aur guest details real-time update ho jaati hain.
+
+### 4. Is a digital wedding invitation cheaper than paper cards? / Digital wedding invitation paper card se sasta hai kya?
+- **English:** Yes, a digital wedding invitation is approximately 98% less expensive in this verified example. Based on the founder's own family wedding benchmark in a tier 2 city at ₹23 per card, printing 300 traditional paper invitations cost ₹6,900. In comparison, an Eternal Vowz 3D digital card costs a flat ₹99, saving ₹6,801 without additional expenses for courier delivery or reprinting.
+- **Hinglish:** Haan, digital wedding invitation paper card ke mukable lagbhag 98% sasta padta hai (is example me). Founder ke apne family wedding ke rate par 300 paper cards (tier 2 shehar, ₹23 per card) printing ka kharcha ₹6,900 aaya, jabki Eternal Vowz par wahi wedding card sirf ₹99 me banta hai — sidhi bachat ₹6,801. Iske alawa courier, mithai dabba, aur typo reprint jaise extra kharche bhi bach jaate hain.
 
 ## 8 Signature Wedding Invitation Designs
 1. **Pearl Botanical Veil:** Ivory & champagne gold botanical wedding card with wind chimes.
@@ -36,6 +46,7 @@ Eternal Vowz is an independent Indian platform built by **Salman Ahmad**, a B.Te
 
 ## Main Pages
 - [Homepage & Card Catalog](https://eternal-vowz.onrender.com)
+- [Public Demo Card](https://eternal-vowz.onrender.com/demo)
 - [About Salman Ahmad & Eternal Vowz](https://eternal-vowz.onrender.com/about)
 - [Wedding Budget Saving Guide](https://eternal-vowz.onrender.com/guide)
 - [Design Studio & Card Builder](https://eternal-vowz.onrender.com/login)

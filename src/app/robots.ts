@@ -1,12 +1,14 @@
 import { MetadataRoute } from 'next';
+import { SITE_CONFIG } from '@/config/site';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://eternal-vowz.onrender.com';
+  const baseUrl = SITE_CONFIG.url;
 
   const publicRoutes = [
     '/',
     '/about',
     '/guide',
+    '/demo',
     '/llms.txt',
     '/llms-full.txt',
     '/google9d1eb35adfd63784.html',
@@ -18,14 +20,16 @@ export default function robots(): MetadataRoute.Robots {
     '/login',
   ];
 
+  const protectedRoutes = ['/dashboard', '/editor/', '/api/', '/auth/', '/invite/'];
+
   return {
     rules: [
-      // 1. Block aggressive scrapers entirely
+      // 1. Strictly block aggressive scrapers & indiscriminate crawlers
       {
-        userAgent: ['Bytespider', 'ByteDance'],
+        userAgent: ['Bytespider', 'ByteDance', 'CCBot'],
         disallow: ['/'],
       },
-      // 2. Allow verified AI crawlers only on public content (protect customer /invite/ cards)
+      // 2. Allow verified AI research crawlers only on public informational pages
       {
         userAgent: [
           'GPTBot',
@@ -35,16 +39,15 @@ export default function robots(): MetadataRoute.Robots {
           'Amazonbot',
           'Applebot-Extended',
           'cohere-ai',
-          'CCBot',
         ],
         allow: publicRoutes,
-        disallow: ['/dashboard', '/editor/', '/api/', '/auth/', '/invite/'],
+        disallow: protectedRoutes,
       },
-      // 3. Default search engines rule
+      // 3. Search engines (Googlebot, Bingbot, default *)
       {
-        userAgent: '*',
+        userAgent: ['Googlebot', 'Bingbot', '*'],
         allow: publicRoutes,
-        disallow: ['/dashboard', '/editor/', '/api/', '/auth/', '/invite/'],
+        disallow: protectedRoutes,
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

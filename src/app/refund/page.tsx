@@ -1,18 +1,20 @@
 import React from 'react';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
 import { RotateCcw, CheckCircle2, Clock, Mail, ShieldAlert, CreditCard } from 'lucide-react';
+import { SITE_CONFIG } from '@/config/site';
 
 export const metadata = {
   title: 'Cancellation & Refund Policy — Eternal Vowz (E&V)',
-  description: 'Official cancellation and refund policy for Eternal Vowz digital wedding card services with 100% money-back SLA and 24-hour window.',
+  description:
+    'Official cancellation and refund policy for Eternal Vowz digital wedding card services with reply within 24 hours and approved refund within 5 to 7 working days.',
   alternates: {
-    canonical: 'https://eternal-vowz.onrender.com/refund',
+    canonical: `${SITE_CONFIG.url}/refund`,
   },
   openGraph: {
     title: 'Cancellation & Refund Policy — Eternal Vowz',
     description: 'Official cancellation and refund policy for Eternal Vowz digital wedding card services.',
-    url: 'https://eternal-vowz.onrender.com/refund',
-    siteName: 'Eternal Vowz',
+    url: `${SITE_CONFIG.url}/refund`,
+    siteName: SITE_CONFIG.name,
   },
 };
 
@@ -132,10 +134,11 @@ export default function RefundPolicyPage() {
                 To request a refund, please send an email to our support team with the subject line <code>Refund Request — [Your Order ID / Registered Email]</code>:
               </p>
               <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E8DFD1] text-xs space-y-1">
-                <p><strong>Official Billing Desk:</strong> Eternal Vowz</p>
-                <p><strong>Email:</strong> <a href="mailto:mrsalman7307@gmail.com" className="text-[#C9A84C] font-semibold underline">mrsalman7307@gmail.com</a></p>
+                <p><strong>Official Billing Desk:</strong> {SITE_CONFIG.name}</p>
+                <p><strong>Email:</strong> <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#C9A84C] font-semibold underline">{SITE_CONFIG.contactEmail}</a></p>
                 <p><strong>Required Information:</strong> Registered Email Address, Razorpay Payment ID / Transaction ID, and Reason for Refund.</p>
-                <p><strong>Acknowledgement Time:</strong> Under 2 hours</p>
+                <p><strong>Response Time:</strong> 24 ghante me reply</p>
+                <p><strong>Refund Timeline:</strong> Approved refund 5 se 7 working days me original payment source par</p>
               </div>
             </section>
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
+import { SITE_CONFIG } from '@/config/site';
 import {
   Heart,
   Sparkles,
@@ -18,24 +19,24 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'About Eternal Vowz — Built by Salman Ahmad | 3D Digital Wedding Invitations',
+  title: `About ${SITE_CONFIG.name} — Built by ${SITE_CONFIG.founder.name} | 3D Digital Wedding Invitations`,
   description:
-    'Eternal Vowz is an independent Indian platform created by Salman Ahmad from Azamgarh, turning traditional royal wedding cards into 3D digital experiences for flat ₹99.',
+    `${SITE_CONFIG.name} is an independent Indian platform created by ${SITE_CONFIG.founder.name} from Azamgarh, turning traditional royal wedding cards into 3D digital experiences for flat ₹99.`,
   alternates: {
-    canonical: 'https://eternal-vowz.onrender.com/about',
+    canonical: `${SITE_CONFIG.url}/about`,
   },
   openGraph: {
-    title: 'About Eternal Vowz — Built by Salman Ahmad',
+    title: `About ${SITE_CONFIG.name} — Built by ${SITE_CONFIG.founder.name}`,
     description:
-      'Learn why Salman Ahmad built Eternal Vowz: bringing royal Lifafa & Shahi Palace gate traditions into 3D digital wedding cards for just ₹99.',
-    url: 'https://eternal-vowz.onrender.com/about',
-    siteName: 'Eternal Vowz',
+      `Learn why ${SITE_CONFIG.founder.name} built ${SITE_CONFIG.name}: bringing royal Lifafa & Shahi Palace gate traditions into 3D digital wedding cards for just ₹99.`,
+    url: `${SITE_CONFIG.url}/about`,
+    siteName: SITE_CONFIG.name,
     images: [
       {
-        url: 'https://eternal-vowz.onrender.com/assets/logo-circle.png',
+        url: `${SITE_CONFIG.url}/assets/logo-circle.png`,
         width: 1024,
         height: 1024,
-        alt: 'Eternal Vowz Monogram Emblem',
+        alt: `${SITE_CONFIG.name} Monogram Emblem`,
       },
     ],
     locale: 'en_US',
@@ -48,22 +49,23 @@ const aboutJsonLd = {
   '@type': 'AboutPage',
   mainEntity: {
     '@type': 'Organization',
-    name: 'Eternal Vowz',
-    alternateName: 'E&V',
-    url: 'https://eternal-vowz.onrender.com',
-    logo: 'https://eternal-vowz.onrender.com/assets/logo-circle.png',
+    name: SITE_CONFIG.name,
+    alternateName: SITE_CONFIG.shortName,
+    url: SITE_CONFIG.url,
+    logo: `${SITE_CONFIG.url}/assets/logo-circle.png`,
     founder: {
       '@type': 'Person',
-      name: 'Salman Ahmad',
-      jobTitle: 'Founder & Software Developer',
-      alumniOf: 'B.Tech Student',
+      '@id': SITE_CONFIG.founder.id,
+      name: SITE_CONFIG.founder.name,
+      jobTitle: SITE_CONFIG.founder.role,
+      alumniOf: SITE_CONFIG.founder.education,
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Azamgarh',
         addressRegion: 'Uttar Pradesh',
         addressCountry: 'India',
       },
-      email: 'mrsalman7307@gmail.com',
+      email: SITE_CONFIG.contactEmail,
     },
     description:
       'Independent Indian platform turning traditional royal wedding invitations into 3D digital cards with live RSVP tracking at flat ₹99.',
@@ -158,7 +160,7 @@ export default function AboutPage() {
         </div>
 
         {/* Founder Bio Card */}
-        <div className="rounded-3xl bg-white border border-[#E2D7BD] p-6 sm:p-10 editorial-card-shadow space-y-6">
+        <div id="salman" className="rounded-3xl bg-white border border-[#E2D7BD] p-6 sm:p-10 editorial-card-shadow space-y-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#F2ECE1]">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-[#C9A84C]/15 border-2 border-[#C9A84C] flex items-center justify-center text-[#9F7E28] shrink-0 font-serif text-xl font-bold">
@@ -169,7 +171,7 @@ export default function AboutPage() {
                   Solo Builder &amp; Creator
                 </span>
                 <h3 className="font-serif text-2xl font-bold text-[#291418]">
-                  Salman Ahmad
+                  {SITE_CONFIG.founder.name}
                 </h3>
                 <span className="text-xs text-[#7A6A5E] flex items-center gap-1.5 mt-0.5">
                   <MapPin className="w-3.5 h-3.5 text-[#C9A84C]" />
@@ -189,7 +191,7 @@ export default function AboutPage() {
               Who I am
             </h4>
             <p>
-              Hi, I&apos;m <strong>Salman Ahmad</strong>, a B.Tech student from <strong>Azamgarh, Uttar Pradesh</strong>. I built Eternal Vowz on my own, with no team behind it. Every design, from the Royal Lifafa to the Mughal Arch, is made with one idea: <em>your guests should feel invited, not just informed</em>.
+              Hi, I&apos;m <strong>{SITE_CONFIG.founder.name}</strong>, a B.Tech student from <strong>Azamgarh, Uttar Pradesh</strong>. I built Eternal Vowz on my own, with no team behind it. Every design, from the Royal Lifafa to the Mughal Arch, is made with one idea: <em>your guests should feel invited, not just informed</em>.
             </p>
           </div>
         </div>
@@ -264,16 +266,16 @@ export default function AboutPage() {
           <p className="text-sm sm:text-base text-white/90 max-w-xl mx-auto leading-relaxed">
             You are talking to the person who built this, so I read every message. Write to me directly at{' '}
             <a
-              href="mailto:mrsalman7307@gmail.com"
+              href={`mailto:${SITE_CONFIG.contactEmail}`}
               className="underline font-bold text-white hover:text-[#FFF4DD] transition-colors"
             >
-              mrsalman7307@gmail.com
+              {SITE_CONFIG.contactEmail}
             </a>
             .
           </p>
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="mailto:mrsalman7307@gmail.com"
+              href={`mailto:${SITE_CONFIG.contactEmail}`}
               className="px-6 py-3 rounded-md bg-white text-[#291418] text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 hover:bg-[#FAF7F2] transition-colors shadow-sm"
             >
               <Mail className="w-4 h-4 text-[#C9A84C]" />

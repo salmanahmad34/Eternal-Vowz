@@ -2,38 +2,34 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { WeddingNavbar, WeddingFooter } from '@/components/layout/WeddingSiteChrome';
+import { SITE_CONFIG } from '@/config/site';
 import {
   Sparkles,
   ArrowRight,
-  CheckCircle2,
   TrendingDown,
-  DollarSign,
   Clock,
   ShieldCheck,
-  Send,
-  HelpCircle,
-  AlertCircle,
-  FileText,
   Eye,
   Check,
+  AlertCircle,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Wedding Invitation Ka Budget Kaise Bachayein — Real Numbers & Cost Guide | Eternal Vowz',
   description:
-    'Janiye traditional paper wedding cards (₹50,000–₹1,00,000) ke mukable Eternal Vowz 3D digital invitation se ₹99 me lakho rupaye kaise bachayein. Real cost breakdown.',
+    'Real wedding stationery cost benchmark: 300 paper cards at ₹23 (₹6,900 in tier 2 city) versus Eternal Vowz at flat ₹99. Save ₹6,801 (~98% less in this example).',
   alternates: {
-    canonical: 'https://eternal-vowz.onrender.com/guide',
+    canonical: `${SITE_CONFIG.url}/guide`,
   },
   openGraph: {
     title: 'Wedding Invitation Ka Budget Kaise Bachayein — Real Numbers Guide',
     description:
-      'Save ₹50,000–₹1,00,000 on Indian wedding stationery with real cost breakdown and flat ₹99 3D digital cards.',
-    url: 'https://eternal-vowz.onrender.com/guide',
-    siteName: 'Eternal Vowz',
+      'Real wedding stationery cost benchmark: 300 paper cards at ₹23 (₹6,900) vs flat ₹99 digital card. Save ₹6,801 (~98% less in this example).',
+    url: `${SITE_CONFIG.url}/guide`,
+    siteName: SITE_CONFIG.name,
     images: [
       {
-        url: 'https://eternal-vowz.onrender.com/assets/logo-circle.png',
+        url: `${SITE_CONFIG.url}/assets/logo-circle.png`,
         width: 1024,
         height: 1024,
         alt: 'Wedding Budget Guide by Eternal Vowz',
@@ -50,21 +46,23 @@ const guideJsonLd = {
   headline: 'Wedding Invitation Ka Budget Kaise Bachayein — Real Numbers & Cost Guide',
   author: {
     '@type': 'Person',
-    name: 'Salman Ahmad',
-    jobTitle: 'Founder',
+    '@id': `${SITE_CONFIG.url}/about#salman`,
+    name: SITE_CONFIG.founder.name,
+    jobTitle: SITE_CONFIG.founder.role,
   },
   publisher: {
     '@type': 'Organization',
-    name: 'Eternal Vowz',
+    '@id': `${SITE_CONFIG.url}/#organization`,
+    name: SITE_CONFIG.name,
     logo: {
       '@type': 'ImageObject',
-      url: 'https://eternal-vowz.onrender.com/assets/logo-circle.png',
+      url: `${SITE_CONFIG.url}/assets/logo-circle.png`,
     },
   },
   datePublished: '2026-11-22',
   dateModified: '2026-11-22',
   description:
-    'A realistic cost comparison between traditional paper cards and ₹99 3D digital invitations in Indian weddings, showing families how to save ₹50,000+ without losing royal dignity.',
+    'A realistic cost comparison between traditional paper cards (₹23/card tier 2 benchmark, ₹6,900 for 300 cards) and ₹99 3D digital invitations in Indian weddings, showing net savings of ₹6,801 (~98% less).',
 };
 
 export default function GuidePage() {
@@ -90,8 +88,16 @@ export default function GuidePage() {
             Real Numbers &amp; Cost Breakdown: Traditional Paper Cards vs. ₹99 Royal 3D Digital Card
           </p>
           <div className="text-xs text-[#8B7355] pt-1">
-            Written by <strong>Salman Ahmad</strong> &bull; Updated November 2026
+            Written by <strong>Salman Ahmad</strong> &bull; Last updated: 22 November 2026
           </div>
+        </div>
+
+        {/* Real Benchmark Disclosure Note */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-[#FFF9ED] border border-[#E8DFD1] text-xs sm:text-sm text-[#5A4636] flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-[#C9A84C] shrink-0 mt-0.5" />
+          <p className="leading-relaxed">
+            <strong>Disclosure:</strong> Ye number founder ke apne family wedding ke rate par based hai (tier 2 shehar, ₹23 per card). Bade shehron me rate aam taur par zyada hota hai. 300 cards sirf ek example hai.
+          </p>
         </div>
 
         {/* Executive Summary Nugget Card (45-75 words GEO Answer Nugget) */}
@@ -101,7 +107,7 @@ export default function GuidePage() {
             <span>Quick Answer (Direct Summary)</span>
           </div>
           <p className="font-serif text-lg sm:text-xl text-[#291418] leading-relaxed italic">
-            &ldquo;Digital wedding invitation paper card se 99% sasta hai. Ek aam shaadi me 300 paper cards print aur courier karwane ka kharcha ₹15,000 se ₹50,000 tak aata hai. Eternal Vowz par sirf ₹99 me poora royal 3D digital card banta hai, jisme unlimited WhatsApp links, live RSVP tracking, aur Google Maps shamil hote hain, bina printing ya delivery ke jhanjhat ke.&rdquo;
+            &ldquo;Haan, digital wedding invitation paper card se bohot sasta padta hai. Real example ke mutabiq: tier 2 shehar me 300 paper cards ₹23 ke hisaab se print karwane me ₹6,900 kharch hote hain, jabki Eternal Vowz par wahi card sirf ₹99 me banta hai. Is example me direct ₹6,801 ki bachat hoti hai (lagbhag 98% sasta), aur courier ya reprint ka koi extra kharcha nahi lagta.&rdquo;
           </p>
         </div>
 
@@ -109,10 +115,10 @@ export default function GuidePage() {
         <div className="rounded-3xl bg-white border border-[#E2D7BD] overflow-hidden editorial-card-shadow">
           <div className="p-6 sm:p-8 border-b border-[#E2D7BD] bg-[#FAF8F5]">
             <h2 className="font-serif text-2xl font-semibold text-[#291418]">
-              Real Cost Comparison (For 300 Guests)
+              Real Cost Comparison (300 Cards Example)
             </h2>
             <p className="text-xs sm:text-sm text-[#7A6A5E] mt-1">
-              A honest look at what families actually spend on invitation distribution across India.
+              Founder ke parivar ki shaadi ke asli rates par aadharit benchmark.
             </p>
           </div>
 
@@ -130,23 +136,23 @@ export default function GuidePage() {
                   <td className="p-4 sm:p-5 font-semibold text-[#291418]">
                     Card Printing (300 Units)
                   </td>
-                  <td className="p-4 sm:p-5 text-red-700">
-                    ₹15,000 – ₹45,000 <span className="text-[11px] text-[#7A6A5E] block">(₹50–₹150 per card)</span>
+                  <td className="p-4 sm:p-5 text-red-700 font-semibold">
+                    ₹6,900 <span className="text-[11px] text-[#7A6A5E] block font-normal">(Tier 2 actual rate: ₹23 per card)</span>
                   </td>
                   <td className="p-4 sm:p-5 text-emerald-700 font-bold">
-                    ₹99 flat <span className="text-[11px] text-[#7A6A5E] block">(One-time activation)</span>
+                    ₹99 flat <span className="text-[11px] text-[#7A6A5E] block font-normal">(One-time card activation)</span>
                   </td>
                 </tr>
 
                 <tr className="hover:bg-[#FAF7F2] transition-colors">
                   <td className="p-4 sm:p-5 font-semibold text-[#291418]">
-                    Mithai / Dry Fruit Boxes
+                    Mithai / Sweet Boxes
                   </td>
                   <td className="p-4 sm:p-5 text-red-700">
-                    ₹30,000 – ₹60,000 <span className="text-[11px] text-[#7A6A5E] block">(₹100–₹200 per box)</span>
+                    Extra kharcha <span className="text-[11px] text-[#7A6A5E] block">(Har physical card ke sath mithai dabba)</span>
                   </td>
                   <td className="p-4 sm:p-5 text-emerald-700 font-bold">
-                    ₹0 Optional <span className="text-[11px] text-[#7A6A5E] block">(No compulsory box needed)</span>
+                    ₹0 Optional <span className="text-[11px] text-[#7A6A5E] block">(Koi compulsory mithai box nahi lagta)</span>
                   </td>
                 </tr>
 
@@ -155,10 +161,10 @@ export default function GuidePage() {
                     Courier &amp; Delivery Travel
                   </td>
                   <td className="p-4 sm:p-5 text-red-700">
-                    ₹5,000 – ₹12,000 <span className="text-[11px] text-[#7A6A5E] block">(Speed Post &amp; petrol)</span>
+                    Extra kharcha <span className="text-[11px] text-[#7A6A5E] block">(Speed post, courier aur travel petrol)</span>
                   </td>
                   <td className="p-4 sm:p-5 text-emerald-700 font-bold">
-                    ₹0 <span className="text-[11px] text-[#7A6A5E] block">(Instant 1-click WhatsApp)</span>
+                    ₹0 <span className="text-[11px] text-[#7A6A5E] block">(Instant 1-click WhatsApp delivery)</span>
                   </td>
                 </tr>
 
@@ -167,10 +173,10 @@ export default function GuidePage() {
                     Date/Venue Change or Typos
                   </td>
                   <td className="p-4 sm:p-5 text-red-700">
-                    ₹5,000+ Reprinting <span className="text-[11px] text-[#7A6A5E] block">(Waste of old cards)</span>
+                    Reprinting ka extra kharcha <span className="text-[11px] text-[#7A6A5E] block">(Purane cards bekar ho jate hain)</span>
                   </td>
                   <td className="p-4 sm:p-5 text-emerald-700 font-bold">
-                    ₹0 Free Live Updates <span className="text-[11px] text-[#7A6A5E] block">(Edit anytime on dashboard)</span>
+                    ₹0 Free Live Updates <span className="text-[11px] text-[#7A6A5E] block">(Dashboard se kabhi bhi live edit karein)</span>
                   </td>
                 </tr>
 
@@ -179,17 +185,17 @@ export default function GuidePage() {
                     RSVP Headcount &amp; Catering Calls
                   </td>
                   <td className="p-4 sm:p-5 text-red-700">
-                    25+ Hours Phone Calling <span className="text-[11px] text-[#7A6A5E] block">(Manual guessing of food)</span>
+                    Manual phone calling <span className="text-[11px] text-[#7A6A5E] block">(Khana waste hone ya kam padne ka risk)</span>
                   </td>
                   <td className="p-4 sm:p-5 text-emerald-700 font-bold">
-                    Automated Real-Time <span className="text-[11px] text-[#7A6A5E] block">(Built-in RSVP counts)</span>
+                    Automated Real-Time <span className="text-[11px] text-[#7A6A5E] block">(Live dashboard headcount &amp; meal counts)</span>
                   </td>
                 </tr>
 
                 <tr className="bg-[#FAF8F5] font-bold text-sm sm:text-base">
-                  <td className="p-4 sm:p-5 text-[#291418]">TOTAL ESTIMATED COST</td>
-                  <td className="p-4 sm:p-5 text-red-700">₹55,000 – ₹1,20,000+</td>
-                  <td className="p-4 sm:p-5 text-emerald-700 font-serif text-lg">Just ₹99</td>
+                  <td className="p-4 sm:p-5 text-[#291418]">TOTAL BASE PRINTING COST</td>
+                  <td className="p-4 sm:p-5 text-red-700">₹6,900 + extra kharche</td>
+                  <td className="p-4 sm:p-5 text-emerald-700 font-serif text-lg">Just ₹99 Flat</td>
                 </tr>
               </tbody>
             </table>
@@ -197,7 +203,7 @@ export default function GuidePage() {
 
           <div className="p-5 bg-[#FAF7F2] border-t border-[#E2D7BD] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-[#7A6A5E]">
             <span className="font-semibold text-emerald-800">
-              💰 Direct Net Saving: ₹50,000 to ₹1,00,000+ saved per wedding
+              💰 Direct Net Saving: ₹6,801 ki bachat &mdash; lagbhag 98% sasta (is example me)
             </span>
             <Link
               href="/login"
@@ -222,7 +228,7 @@ export default function GuidePage() {
                 <span>Badi Quantity Printing Se Bachein (The Hybrid Model)</span>
               </h3>
               <p>
-                Agar aapke ghar me buzurg hain jo physical card pasand karte hain, toh sirf 25–50 physical cards print karwayein jo bohot qareebi rishtedaaron ke liye hon. Baaqi 250–500 mehmaano ko royal <strong>3D Digital Lifafa</strong> bhejein. Isse aapka ₹40,000 ka printing kharcha turant bach jayega.
+                Agar aapke ghar me buzurg hain jo physical card pasand karte hain, toh sirf 25–50 physical cards print karwayein jo bohot qareebi rishtedaaron ke liye hon. Baaqi 250–500 mehmaano ko royal <strong>3D Digital Lifafa</strong> bhejein. Isse aapka bada printing kharcha turant bach jayega.
               </p>
             </div>
 
@@ -252,7 +258,7 @@ export default function GuidePage() {
                 <span>RSVP Count Se Catering Ka Kharcha Bachayein</span>
               </h3>
               <p>
-                Indian shaadi me sabse bada nuksan hota hai khana waste hone ka ya kam padne ka. Digital RSVP ke zariye aapko pehle hi pata chal jata hai ki kitne log &lsquo;Attending&rsquo; hain aur kitne &lsquo;Declined&rsquo;. Is data se aap caterer ko exact plates ka order de sakte hain aur ₹20,000–₹50,000 ka khana waste hone se bacha sakte hain.
+                Indian shaadi me bada nuksan hota hai khana waste hone ka ya kam padne ka. Digital RSVP ke zariye aapko pehle hi pata chal jata hai ki kitne log &lsquo;Attending&rsquo; hain aur kitne &lsquo;Declined&rsquo;. Is data se aap caterer ko exact plates ka order de sakte hain aur khana waste hone se bacha sakte hain.
               </p>
             </div>
 
@@ -262,7 +268,7 @@ export default function GuidePage() {
                 <span>Reprinting Ke Jhanjhat Aur Late Delivery Se Chhuti</span>
               </h3>
               <p>
-                Agar time ya venue me aakhri waqt par koi badlaav hota hai, toh printed card me safed fluid lagana padta hai ya naya card print karwana padta hai. Digital card me aap apne phone se 10 second me timing ya Google Maps update kar sakte hain, aur sabhi guests ko instantly update mil jata hai.
+                Agar time ya venue me aakhri waqt par koi badlaav hota hai, toh printed card me safed fluid lagana padta hai ya naya card print karwana padta hai. Digital card me aap apne phone se 10 second me timing ya Google Maps update kar sakte hain, aur sabhi guests ko instantly update mil jata hai bina kisi reprint kharche ke.
               </p>
             </div>
           </div>
@@ -298,7 +304,7 @@ export default function GuidePage() {
                 Eternal Vowz kya hai aur card kitne din active rehta hai?
               </h3>
               <p className="text-xs sm:text-sm text-[#4A3D34] leading-relaxed">
-                Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai.
+                Eternal Vowz ek online platform hai jahan aap ₹99 me 3D digital wedding invitation bana sakte hain. Card 30 din active rehta hai, usme live RSVP dashboard milta hai, aur aap unlimited guests ko personalized WhatsApp link bhej sakte hain. Isme Lifafa opening, wax seal crack, aur background wedding music ka cinematic royal experience milta hai bina kisi app download ke.
               </p>
             </div>
           </div>
@@ -311,7 +317,7 @@ export default function GuidePage() {
             <span>Flat ₹99 Per Card &bull; Instant WhatsApp Sharing</span>
           </span>
           <h3 className="font-serif text-3xl sm:text-4xl font-semibold">
-            Apni Shaadi Ka ₹50,000+ Bachayein
+            Shaadi Ke Card Ka Budget Bachayein
           </h3>
           <p className="text-sm sm:text-base text-white/90 max-w-xl mx-auto leading-relaxed">
             Sirf 3 minute me apna royal 3D digital wedding card banayein aur mehmaano ko shahi andaz me invite karein.
