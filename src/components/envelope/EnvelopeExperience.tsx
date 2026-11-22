@@ -1834,7 +1834,7 @@ export default function EnvelopeExperience({
                     id="rsvp"
                     className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-between py-8 px-4 text-center"
                   >
-                    <RsvpSection guest={guest} darkPalace={isDarkPalace} />
+                    <RsvpSection guest={guest} invitationId={invitation.id} darkPalace={isDarkPalace} />
 
                     <div className="pb-8 pt-4 text-center space-y-3 relative z-10">
                       <button

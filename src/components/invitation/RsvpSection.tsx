@@ -15,6 +15,7 @@ import { CheckCircle2, XCircle, QrCode, Edit3 } from 'lucide-react';
 
 interface RsvpSectionProps {
   guest: GuestWithRsvp | null;
+  invitationId?: string;
   accentColor?: string;
   darkPalace?: boolean;
   onRsvpSuccess?: () => void;
@@ -22,6 +23,7 @@ interface RsvpSectionProps {
 
 export default function RsvpSection({
   guest,
+  invitationId,
   darkPalace = false,
   onRsvpSuccess,
 }: RsvpSectionProps) {
@@ -49,8 +51,14 @@ export default function RsvpSection({
         .filter(Boolean)
         .join(' | ');
 
-      if (guest) {
-        await DataService.submitRsvp(guest.id, {
+      const cleanGuestName = fullName.trim() || guest?.guest_name || 'Honored Guest';
+
+      if (invitationId || guest) {
+        await DataService.submitPublicRsvp({
+          invitationId: invitationId || guest?.invitation_id || '',
+          guestId: guest?.id,
+          guestName: cleanGuestName,
+          phone: phone.trim() || undefined,
           status,
           headcount: status === 'attending' ? headcount : 0,
           message: combinedMessage || undefined,

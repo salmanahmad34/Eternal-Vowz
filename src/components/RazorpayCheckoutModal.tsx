@@ -280,7 +280,7 @@ export default function RazorpayCheckoutModal({
       if (data.failed && data.error_description) {
         setPaymentError(
           IS_TEST_MODE
-            ? `${data.error_description}. Tip: In Razorpay Test Mode, use UPI "success@razorpay" or Netbanking â†’ Success.`
+            ? `${data.error_description}. Tip: In Razorpay Test Mode, use UPI "success@razorpay" or Netbanking → Success.`
             : data.error_description
         );
       } else if (!silentIfUnpaid) {
@@ -488,7 +488,7 @@ export default function RazorpayCheckoutModal({
           'Payment could not be completed.';
         setPaymentError(
           IS_TEST_MODE
-            ? `${msg} In Razorpay Test Mode, please use UPI ID "success@razorpay" (under Pay using UPI ID) or Netbanking â†’ Success.`
+            ? `${msg} In Razorpay Test Mode, please use UPI ID "success@razorpay" (under Pay using UPI ID) or Netbanking → Success.`
             : msg
         );
         setPaying(false);
@@ -516,7 +516,7 @@ export default function RazorpayCheckoutModal({
           <div>
             <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#C9A84C]">
               <Sparkles className="w-3.5 h-3.5" />
-              {isCreateNew ? 'Pay to Publish Card â€¢ 30-Day Pass' : '30-Day Card Activation'}
+              {isCreateNew ? 'Pay to Publish Card • 30-Day Pass' : '30-Day Card Activation'}
             </span>
             <h3 className="font-serif text-2xl font-semibold text-[#291418] mt-1 leading-tight">
               {coupleTitle}
@@ -524,7 +524,7 @@ export default function RazorpayCheckoutModal({
             <p className="text-xs text-[#8B7355] mt-0.5">
               {isCreateNew
                 ? 'Your card will be created & published immediately after payment succeeds.'
-                : 'One-time activation â€¢ Unlimited WhatsApp guest links & RSVPs'}
+                : 'One-time activation • Unlimited WhatsApp guest links & RSVPs'}
             </p>
           </div>
           <button
@@ -560,7 +560,7 @@ export default function RazorpayCheckoutModal({
                     <code className="px-1 py-0.5 rounded bg-amber-100 font-mono text-[10px]">
                       success@razorpay
                     </code>{' '}
-                    (or <strong>Netbanking â†’ Success</strong>). Payment auto-confirms within 3 seconds.
+                    (or <strong>Netbanking → Success</strong>). Payment auto-confirms within 3 seconds.
                   </div>
                 </div>
               )}
@@ -596,8 +596,8 @@ export default function RazorpayCheckoutModal({
                           {appliedCoupon.is_free
                             ? '100% FREE'
                             : appliedCoupon.discount_type === 'percent'
-                            ? `${appliedCoupon.discount_value}% OFF â€¢ Saved â‚¹${appliedCoupon.discount_inr}`
-                            : `â‚¹${appliedCoupon.discount_inr} OFF`}
+                            ? `${appliedCoupon.discount_value}% OFF • Saved ₹${appliedCoupon.discount_inr}`
+                            : `₹${appliedCoupon.discount_inr} OFF`}
                           )
                         </span>
                       </div>
@@ -658,12 +658,12 @@ export default function RazorpayCheckoutModal({
               <div className="rounded-xl bg-white border border-[#E2D7BD]/90 p-4 space-y-2 text-sm">
                 <div className="flex items-center justify-between text-[#5A4636]">
                   <span>Eternal Vowz 3D Card (30 Days)</span>
-                  <span className="font-medium">â‚¹{baseInr}</span>
+                  <span className="font-medium">₹{baseInr}</span>
                 </div>
                 {discountInr > 0 && (
                   <div className="flex items-center justify-between text-emerald-700">
                     <span>Coupon Discount ({appliedCoupon?.code})</span>
-                    <span className="font-semibold">-â‚¹{discountInr}</span>
+                    <span className="font-semibold">-₹{discountInr}</span>
                   </div>
                 )}
                 <div className="pt-2 border-t border-[#E2D7BD]/70 flex items-center justify-between">
@@ -671,11 +671,11 @@ export default function RazorpayCheckoutModal({
                   <div className="text-right">
                     {discountInr > 0 && (
                       <span className="text-xs text-[#A5947E] line-through mr-2">
-                        â‚¹{baseInr}
+                        ₹{baseInr}
                       </span>
                     )}
                     <span className="font-serif text-2xl font-bold text-[#291418]">
-                      {isFree ? 'FREE' : `â‚¹${finalInr}`}
+                      {isFree ? 'FREE' : `₹${finalInr}`}
                     </span>
                   </div>
                 </div>
@@ -714,8 +714,8 @@ export default function RazorpayCheckoutModal({
                     <CreditCard className="w-4 h-4" />
                     <span>
                       {isCreateNew
-                        ? `Pay â‚¹${finalInr} & Publish Card`
-                        : `Pay â‚¹${finalInr} Securely via Razorpay`}
+                        ? `Pay ₹${finalInr} & Publish Card`
+                        : `Pay ₹${finalInr} Securely via Razorpay`}
                     </span>
                   </>
                 )}

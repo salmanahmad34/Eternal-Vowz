@@ -215,14 +215,80 @@ export default function DashboardPage() {
     };
 
     setEditingCardId(null);
-    setDraftCard(newBlankCard);
+    let initialCard = newBlankCard;
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ev_builder_draft_card');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed?.design_config?.couple_names?.partner1 || parsed?.design_config?.couple_names?.partner2) {
+            initialCard = { ...newBlankCard, ...parsed };
+          }
+        } catch {}
+      }
+    }
+    setDraftCard(initialCard);
     setActiveTab('builder');
   };
+
+  // Auto-save form draft to localStorage while editing so refreshes never lose work
+  useEffect(() => {
+    if (typeof window !== 'undefined' && activeTab === 'builder' && !editingCardId) {
+      try {
+        localStorage.setItem('ev_builder_draft_card', JSON.stringify(draftCard));
+      } catch {}
+    }
+  }, [draftCard, activeTab, editingCardId]);
 
   const handleEditExistingCard = (card: Invitation) => {
     setEditingCardId(card.id);
     setDraftCard(JSON.parse(JSON.stringify(card)));
     setActiveTab('builder');
+  };
+
+  const handleSaveDraft = async () => {
+    const p1 = draftCard.design_config.couple_names.partner1?.trim() || '';
+    const p2 = draftCard.design_config.couple_names.partner2?.trim() || '';
+    if (!p1 || !p2) {
+      setSaveToast('Please enter both Bride Name and Groom Name to save draft.');
+      setTimeout(() => setSaveToast(null), 3000);
+      return;
+    }
+
+    const cleanSlug =
+      `${p1}-${p2}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || `card-${Date.now()}`;
+
+    try {
+      if (editingCardId) {
+        await DataService.updateInvitation(editingCardId, {
+          ...draftCard,
+          slug: draftCard.slug || cleanSlug,
+        });
+      } else {
+        await DataService.createInvitation({
+          ...draftCard,
+          slug: cleanSlug,
+          title: draftCard.title?.trim() || `Wedding of ${p1} & ${p2}`,
+          is_published: false,
+          is_paid: false,
+        });
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('ev_builder_draft_card');
+      }
+      setSaveToast('Draft saved! Your card will always remain on your dashboard.');
+      await loadData();
+      setTimeout(() => {
+        setSaveToast(null);
+        setActiveTab('overview');
+      }, 800);
+    } catch (err: any) {
+      setSaveToast(err?.message || 'Failed to save draft.');
+      setTimeout(() => setSaveToast(null), 3000);
+    }
   };
 
   const handleSaveCard = async (e: React.FormEvent) => {
@@ -492,50 +558,70 @@ export default function DashboardPage() {
       {/* =========================================================================
           EDITORIAL CHAMPAGNE GOLD DASHBOARD HEADER (ETERNAL VOWZ • E&V)
       ========================================================================= */}
-      <header className="sticky top-0 z-40 bg-[#FAF7F2]/85 backdrop-blur-md border-b border-[#E2D7BD]/70">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <EternalLogoBadge size="md" animated />
-            <div>
-              <span className="font-serif text-2xl font-semibold tracking-tight text-[#291418] block leading-none">
-                Eternal Vowz
-              </span>
-              <span className="text-[9px] uppercase tracking-[0.22em] text-[#8B7355] font-medium block mt-0.5">
-                Host Wedding Studio
-              </span>
-            </div>
-          </Link>
+      <header className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E2D7BD]/80">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-0 sm:h-20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+          
+          {/* Top Row on Mobile: Logo/Brand on Left, Logout on Right */}
+          <div className="flex items-center justify-between w-full sm:w-auto">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+              <EternalLogoBadge size="sm" animated />
+              <div>
+                <span className="font-serif text-xl sm:text-2xl font-semibold tracking-tight text-[#291418] block leading-none">
+                  Eternal Vowz
+                </span>
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.22em] text-[#8B7355] font-medium block mt-0.5">
+                  Host Wedding Studio
+                </span>
+              </div>
+            </Link>
 
-          {/* Center Tabs */}
-          <div className="flex items-center bg-[#F2ECE1] p-1 rounded-full border border-[#E2D7BD]">
+            {/* Mobile-only Logout button placed neatly at top right */}
+            <div className="flex items-center gap-2 sm:hidden">
+              <button
+                type="button"
+                onClick={async () => {
+                  await DataService.logoutHost();
+                  router.replace('/login');
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E2D7BD] hover:bg-rose-50 hover:border-rose-200 text-[#8B7355] hover:text-rose-700 transition-all text-xs font-semibold shadow-2xs cursor-pointer"
+                title="Log out from dashboard"
+              >
+                <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                <span>Log Out</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Segmented Center Tabs (Full width on mobile, auto on desktop) */}
+          <div className="flex items-center justify-center bg-[#F2ECE1] p-1 rounded-full border border-[#E2D7BD] w-full sm:w-auto shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'overview'
                   ? 'bg-[#C9A84C] text-white shadow-xs'
                   : 'text-[#8B7355] hover:text-[#291418]'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-3.5 h-3.5 shrink-0" />
               <span>Cards &amp; RSVPs ({invitations.length})</span>
             </button>
             <button
               type="button"
               onClick={handleStartCreateNewCard}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'builder'
                   ? 'bg-[#C9A84C] text-white shadow-xs'
                   : 'text-[#8B7355] hover:text-[#291418]'
               }`}
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 shrink-0" />
               <span>New Card (₹79)</span>
             </button>
           </div>
 
-          {/* Right User Info & Always-Visible Logout Button */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Desktop-only User Info & Logout on Right */}
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3 shrink-0">
             {hostUser && (
               <div className="hidden lg:block text-right text-xs">
                 <span className="text-[#291418] font-semibold block truncate max-w-[150px]">{hostUser.name}</span>
@@ -748,18 +834,24 @@ export default function DashboardPage() {
                               {card.design_config.couple_names.partner1} &amp;{' '}
                               {card.design_config.couple_names.partner2}
                             </h3>
-                            {card.is_paid ? (
-                              <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
-                                Paid &bull; Active
-                              </span>
-                            ) : (
-                              <span className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider">
-                                Unpaid
+                            {card.is_paid && daysRemaining > 0 && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Live • Active ({daysRemaining}d left)</span>
                               </span>
                             )}
-                            <span className="px-2 py-0.5 rounded-full bg-[#F6EEDB] border border-[#E2D7BD] text-[#8B7355] text-[10px] font-semibold">
-                              ₹79 &bull; {daysRemaining}d left
-                            </span>
+                            {card.is_paid && daysRemaining <= 0 && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold uppercase tracking-wider">
+                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                <span>Expired (Pass Ended)</span>
+                              </span>
+                            )}
+                            {!card.is_paid && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                <span>Draft • Unpaid</span>
+                              </span>
+                            )}
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FAF7F2] border border-[#E2D7BD] text-[#5A4636] text-[10px] font-medium">
                               {isFrostedBlur ? (
                                 <>
@@ -832,6 +924,20 @@ export default function DashboardPage() {
                           <span>Edit</span>
                         </button>
 
+                        {card.is_paid && daysRemaining <= 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCheckoutMode('pay-existing');
+                              setCheckoutCard(card);
+                            }}
+                            className="px-3.5 py-2 rounded-md bg-[#291418] hover:bg-[#3e1f25] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                          >
+                            <CreditCard className="w-3.5 h-3.5 text-[#E6CFA0]" />
+                            <span>Reactivate (₹79)</span>
+                          </button>
+                        )}
+
                         {!card.is_paid && (
                           <button
                             type="button"
@@ -842,7 +948,7 @@ export default function DashboardPage() {
                             className="px-4 py-2 rounded-md bg-[#291418] hover:bg-[#3e1f25] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
                           >
                             <CreditCard className="w-3.5 h-3.5 text-[#E6CFA0]" />
-                            <span>Pay ₹79</span>
+                            <span>Pay ₹79 &amp; Publish</span>
                           </button>
                         )}
 
@@ -1183,6 +1289,15 @@ export default function DashboardPage() {
                 className="px-3.5 py-2 rounded-lg bg-white border border-neutral-300 text-neutral-700 text-xs font-medium cursor-pointer"
               >
                 Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                className="px-3.5 py-2 rounded-lg bg-white hover:bg-[#FAF7F2] border border-[#E2D7BD] text-[#5A4636] text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                title="Save draft to dashboard without paying now"
+              >
+                <span>Save Draft</span>
               </button>
 
               <button
@@ -2231,15 +2346,24 @@ export default function DashboardPage() {
               </div>
 
               <div className="pt-2 space-y-2">
-                <button
-                  type="submit"
-                  className="w-full py-3.5 rounded-lg bg-[#C9A84C] hover:bg-[#B8963B] text-white text-sm font-semibold cursor-pointer inline-flex items-center justify-center gap-2 shadow-sm transition-colors"
-                >
-                  {!editingCardId && <CreditCard className="w-4 h-4" />}
-                  <span>
-                    {editingCardId ? 'Save Updated Card' : 'Pay ₹79 & Publish Wedding Card'}
-                  </span>
-                </button>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleSaveDraft}
+                    className="w-full sm:w-auto px-5 py-3.5 rounded-lg bg-white hover:bg-[#FAF7F2] border border-[#E2D7BD] text-[#5A4636] text-xs font-semibold cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-2xs transition-colors shrink-0"
+                  >
+                    <span>Save Draft</span>
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 w-full py-3.5 rounded-lg bg-[#C9A84C] hover:bg-[#B8963B] text-white text-sm font-semibold cursor-pointer inline-flex items-center justify-center gap-2 shadow-sm transition-colors"
+                  >
+                    {!editingCardId && <CreditCard className="w-4 h-4" />}
+                    <span>
+                      {editingCardId ? 'Save Updated Card' : 'Pay ₹79 & Publish Wedding Card'}
+                    </span>
+                  </button>
+                </div>
                 {!editingCardId && (
                   <p className="text-[11px] text-center text-[#8B7355]">
                     Complete ₹79 Razorpay payment (or apply a coupon code) to create &amp; publish your 30-day card.
@@ -2414,6 +2538,9 @@ export default function DashboardPage() {
         defaultEmail={hostUser?.email || ''}
         onClose={() => setCheckoutCard(null)}
         onSuccess={async (createdCard) => {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('ev_builder_draft_card');
+          }
           await loadData();
           if (createdCard) {
             setSelectedInvitation(createdCard);

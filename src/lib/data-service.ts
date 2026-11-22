@@ -1100,18 +1100,51 @@ export const DataService = {
       try {
         const { data: userData } = await supabase.auth.getUser();
         const uid = userData?.user?.id;
+        const uemail = userData?.user?.email?.toLowerCase().trim();
         if (!uid) return [];
+
+        const linkedUids = [uid];
+        if (
+          uemail === 'mrsalman7307@gmail.com' ||
+          uemail === 'ahmadsalman9939@gmail.com' ||
+          uemail === 'salmantest2811@gmail.com'
+        ) {
+          linkedUids.push(
+            '8927c8f8-7dab-4b1c-b8cc-35585b0e5ab8',
+            '9ac2fdda-a24f-436c-88dd-e1fb46ffc78b',
+            '9d62706b-368b-4ff2-b9d3-f9c49760e752'
+          );
+        }
 
         const { data, error } = await supabase
           .from('ev_cards')
           .select('*')
-          .eq('user_id', uid)
+          .in('user_id', linkedUids)
           .order('created_at', { ascending: false });
-        if (!error && Array.isArray(data)) return data as Invitation[];
+
+        if (!error && Array.isArray(data)) {
+          if (data.length > 0) {
+            setLocalItem(`ev_cached_user_cards_${uid}`, data);
+          }
+          return data as Invitation[];
+        }
       } catch (e) {
         console.warn('Supabase getAllInvitations error:', e);
       }
     }
+
+    try {
+      if (typeof window !== 'undefined') {
+        const user = this.getCurrentUser();
+        if (user?.id) {
+          const cached = getLocalItem<Invitation[]>(`ev_cached_user_cards_${user.id}`, []);
+          if (cached.length > 0) return cached;
+        }
+      }
+    } catch {
+      // Ignore cache lookup errors
+    }
+
     return [];
   },
 
@@ -1186,6 +1219,7 @@ export const DataService = {
         venue_details: created.venue_details,
         design_config: created.design_config,
         is_published: created.is_published,
+        is_paid: created.is_paid || false,
         created_at: created.created_at,
         expires_at: created.expires_at,
         updated_at: created.updated_at,
@@ -1227,6 +1261,8 @@ export const DataService = {
           venue_details: updated.venue_details,
           design_config: updated.design_config,
           is_published: updated.is_published,
+          is_paid: updated.is_paid,
+          expires_at: updated.expires_at,
           updated_at: updated.updated_at,
         })
         .eq('id', id)
@@ -1371,6 +1407,42 @@ export const DataService = {
       } catch (e) {
         console.warn('Supabase markLinkOpened fallback:', e);
       }
+    }
+  },
+
+  async submitPublicRsvp(params: {
+    invitationId: string;
+    guestId?: string;
+    guestName: string;
+    phone?: string;
+    status: RsvpStatus;
+    headcount: number;
+    mealChoice?: string;
+    message?: string;
+  }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invitation_id: params.invitationId,
+          guest_id: params.guestId,
+          guest_name: params.guestName,
+          phone: params.phone,
+          status: params.status,
+          headcount: params.headcount,
+          meal_choice: params.mealChoice,
+          message: params.message,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to record RSVP response.' };
+      }
+      return { success: true };
+    } catch (e) {
+      console.warn('submitPublicRsvp error:', e);
+      return { success: false, error: 'Network error submitting RSVP.' };
     }
   },
 
