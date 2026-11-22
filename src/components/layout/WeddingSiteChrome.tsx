@@ -113,7 +113,7 @@ export function WeddingNavbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="px-3.5 py-2.5 rounded-lg hover:bg-[#F2ECE1]"
             >
-              5 Curated Card Themes (â‚¹79 / Card)
+              5 Curated Card Themes (₹79 / Card)
             </Link>
             <Link
               href="/#how-it-works"
@@ -168,7 +168,7 @@ export function WeddingNavbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full py-3 rounded-md bg-[#C9A84C] text-white text-sm font-medium text-center"
                 >
-                  Get Started &bull; â‚¹79 / Card
+                  Get Started &bull; ₹79 / Card
                 </Link>
                 <Link
                   href="/login"
@@ -210,7 +210,7 @@ export function WeddingFooter() {
             </div>
             <p className="text-sm text-[#BFAE92] max-w-sm leading-relaxed">
               Cinematic 3D wedding cards with built-in RSVP tracking. Flat{' '}
-              <span className="text-[#FFF4DD] font-medium">â‚¹79 per card</span>, live for 30 days.
+              <span className="text-[#FFF4DD] font-medium">₹79 per card</span>, live for 30 days.
             </p>
             <a
               href="mailto:mrsalman7307@gmail.com"
