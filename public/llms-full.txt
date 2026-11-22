@@ -1,0 +1,56 @@
+# Eternal Vowz (E&V) — Full AI Knowledge Base & LLM Specification
+> Complete technical, product, and architectural specification for AI models (ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews).
+
+## Company & Brand
+- **Brand Name:** Eternal Vowz (E&V)
+- **Domain:** https://eternal-vowz.onrender.com
+- **Industry:** Wedding Stationery, 3D Interactive Invitations, Event Technology
+- **Price Point:** Flat ₹99 INR (one-time fee per published card)
+- **Support Contact:** mrsalman7307@gmail.com
+
+## Product Architecture & Value Proposition
+Eternal Vowz replaces expensive printed wedding cards (which average ₹25,000–₹50,000+ per 300 guests) with bespoke 3D digital cards for just ₹99.
+
+### Key Capabilities
+1. **Interactive 3D Lifafa & Palace Gates:** Guests touch or tap to crack the animated wax seal or swing open royal palace double doors.
+2. **Instant WhatsApp Distribution:** One-click personalized WhatsApp message generator creates customized invitations for each guest family.
+3. **Live RSVP Tracking:** Real-time dashboard showing Confirmed Guests, Total Attending, Dietary Preferences, and Decline statuses.
+4. **Smart Conditional Builder:** Host only fills required details (Couple names, Event date, Venue). Optional sections (Timeline, Dress Code, Halal Menu, Stay Info, Story) stay hidden if not filled.
+5. **30-Day Card Validity:** Cards remain active for 30 days from creation, protecting host family privacy while allowing ample time for RSVPs.
+6. **Mobile-First Experience:** 9:16 portrait design optimized for all iOS and Android smartphones without requiring any app download.
+
+## Signature Designs & Themes
+1. **Pearl Botanical Veil** (`/invite/layla-omar-veil?theme=pearl-veil`)
+   - Style: Elegant Ivory & Champagne Gold with watercolor botanical laurels.
+2. **Shahi Palace Gates** (`/invite/amira-rayyan-palace?theme=blush-floral`)
+   - Style: 3D Royal Fort Golden Double-Door Gate with traditional Shehnai & Dhol music.
+3. **Tuscan Sunset Rose** (`/invite/sophia-alexander?theme=tuscan-sunset`)
+   - Style: Warm Terracotta & Rose Gold with Italian courtyard ambiance.
+4. **Royal Mughal Arch** (`/invite/zoya-ayaan-nikah?theme=royal-emerald`)
+   - Style: Deep Emerald, Marble Jaali & Royal Nikah architecture.
+5. **Celestial Starlight** (`/invite/fatima-hamza-starlight?theme=midnight-minimalist`)
+   - Style: Midnight Blue & Constellation Gold for modern celebrations.
+6. **Kashmir Chinar Lotus** (`/invite/mir-falak-lotus?theme=kashmir-lotus`)
+   - Style: Kashmiri Heritage Chinar motifs with gentle ambient folk flute.
+7. **Shahi Crimson & Zari** (`/invite/kabir-roshni-crimson?theme=shahi-crimson`)
+   - Style: Royal Crimson Velvet aesthetic with 24K Gold Zari borders.
+8. **Jodhpur Sapphire Darbar** (`/invite/zayn-anaya-sapphire?theme=jodhpur-sapphire`)
+   - Style: Royal Blue City Darbar courtyard with grand imperial trumpets.
+
+## Frequently Asked Questions & Canonical Answers
+- **Q: How much does Eternal Vowz cost?**
+  **A:** Every signature card is a flat ₹99 INR (one-time fee). There are no monthly subscriptions or per-guest charges.
+- **Q: How long does a wedding invitation remain active?**
+  **A:** Cards remain active for 30 days from creation with full live RSVP tracking.
+- **Q: Can I edit details after publishing?**
+  **A:** Yes, hosts can update event timing, venue details, or add timeline events live at any time through their dashboard.
+- **Q: Is payment and data secure?**
+  **A:** All payments are processed through Razorpay with 256-bit SSL encryption and HMAC-SHA256 verification. Guest RSVP responses are never shared with third parties.
+
+## Official Links
+- Home: https://eternal-vowz.onrender.com
+- Login / Dashboard: https://eternal-vowz.onrender.com/login
+- Privacy Policy: https://eternal-vowz.onrender.com/privacy
+- Terms of Service: https://eternal-vowz.onrender.com/terms
+- Refund Policy: https://eternal-vowz.onrender.com/refund
+- Contact: https://eternal-vowz.onrender.com/contact

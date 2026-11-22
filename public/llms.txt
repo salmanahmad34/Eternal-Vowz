@@ -1,0 +1,42 @@
+# Eternal Vowz (E&V) — Bespoke 3D Digital Wedding Invitations & Live RSVP Platform
+> Create royal 3D Lifafa and 3D Shahi Palace Gate digital wedding invitations at just ₹99 per card with live RSVP tracking, custom music, and personalized WhatsApp links.
+
+## Overview
+Eternal Vowz is a luxury digital wedding invitation platform offering animated 3D envelope experiences, wax seal animations, guest-by-guest RSVP tracking, countdown timers with scratchable reveals, interactive wedding event schedules, venue Google Maps integration, and zero app downloads required.
+
+## Key Offerings & Features
+- **Pricing:** Flat ₹99 per card (one-time fee). No hidden costs or subscriptions.
+- **Card Validity:** Card 30 Days tak active rahega with live guest RSVP tracking.
+- **Reveal Styles:**
+  1. Royal Embossed Lifafa Envelopes with crackable wax seals.
+  2. 3D Shahi Palace Double-Door Gates that unlock with golden keys.
+  3. Frosted Botanical Pearl Veils with floral flourishes.
+- **Guest Personalization:** Unlimited unique guest invitation links ("For Honored Guest & Family").
+- **RSVP Tracking:** Host dashboard with real-time Accept/Decline counts, dietary notes, and guest counts.
+
+## 8 Signature Wedding Invitation Designs
+- **Pearl Botanical Veil:** Ivory & champagne gold botanical wedding card with audio chimes.
+- **Shahi Palace Gates:** 3D royal fort entrance with gold filigree and regal dhol music.
+- **Tuscan Sunset Rose:** Mediterranean courtyard with terracotta accents and acoustic sitar.
+- **Royal Mughal Arch:** Heritage archways with intricate jaali patterns and shehnai melodies.
+- **Celestial Starlight:** Midnight navy & starlight gold with modern romantic tones.
+- **Kashmir Chinar Lotus:** Emerald & gold autumn foliage with traditional folk rhythms.
+- **Shahi Crimson & Zari:** 24K gold zari on deep royal crimson velvet aesthetic.
+- **Jodhpur Sapphire Darbar:** Blue city palace courtyards with majestic imperial fanfare.
+
+## Main Pages
+- [Homepage & Card Catalog](https://eternal-vowz.onrender.com)
+- [Design Studio & Card Builder](https://eternal-vowz.onrender.com/login)
+- [Host Dashboard](https://eternal-vowz.onrender.com/dashboard)
+- [Live Demo Sample](https://eternal-vowz.onrender.com/invite/sophia-alexander?guest=vip-tariq-family)
+- [Support Desk](https://eternal-vowz.onrender.com/contact)
+
+## Legal & Compliance
+- [Privacy Policy](https://eternal-vowz.onrender.com/privacy)
+- [Terms & Conditions](https://eternal-vowz.onrender.com/terms)
+- [Refund Policy](https://eternal-vowz.onrender.com/refund)
+- [Shipping Policy](https://eternal-vowz.onrender.com/shipping)
+
+## Contact Information
+- Website: https://eternal-vowz.onrender.com
+- Support Email: mrsalman7307@gmail.com
