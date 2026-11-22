@@ -7,7 +7,17 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/invite/', '/contact', '/privacy', '/terms', '/refund', '/shipping', '/login'],
+        allow: [
+          '/',
+          '/google9d1eb35adfd63784.html',
+          '/invite/',
+          '/contact',
+          '/privacy',
+          '/terms',
+          '/refund',
+          '/shipping',
+          '/login',
+        ],
         disallow: ['/dashboard', '/editor/', '/api/', '/auth/'],
       },
     ],
