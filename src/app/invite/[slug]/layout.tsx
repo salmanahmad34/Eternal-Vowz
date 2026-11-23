@@ -54,7 +54,7 @@ export async function generateMetadata({
 
   if (!inv) {
     return {
-      title: '💍 Royal Wedding Invitation | Eternal Vowz',
+      title: 'Royal Wedding Invitation | Eternal Vowz',
       description: 'You are cordially invited to celebrate this sacred union. Tap to open your 3D digital invitation.',
       robots: {
         index: false,
@@ -71,7 +71,7 @@ export async function generateMetadata({
         canonical: null,
       },
       openGraph: {
-        title: '💍 Royal Wedding Invitation | Eternal Vowz',
+        title: 'Royal Wedding Invitation | Eternal Vowz',
         description: 'You are cordially invited to celebrate this sacred union. Tap to open your 3D digital invitation.',
         images: [`${baseUrl}/assets/pearl-veil/hero-palace-corridor.jpg`],
       },
@@ -81,10 +81,10 @@ export async function generateMetadata({
   const couple = inv.design_config?.couple_names;
   const partner1 = couple?.partner1?.trim() || 'Bride';
   const partner2 = couple?.partner2?.trim() || 'Groom';
-  const coupleText = `${partner1} & ${partner2}`;
+  const coupleText = `${partner1} weds ${partner2}`;
 
-  // Attractive title with emojis and royal names
-  const title = `💍 Royal Wedding Invitation • ${coupleText} | Eternal Vowz`;
+  // Attractive title with royal names
+  const title = `Royal Wedding Invitation • ${coupleText} | Eternal Vowz`;
 
   // Attractive date and venue
   const eventDateObj = inv.event_date ? new Date(inv.event_date) : null;

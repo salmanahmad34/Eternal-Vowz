@@ -54,7 +54,7 @@ export async function generateMetadata({
 
   if (!inv) {
     return {
-      title: '💍 Royal Wedding Invitation | Eternal Vowz',
+      title: 'Royal Wedding Invitation | Eternal Vowz',
       description: 'You are cordially invited to celebrate this sacred union. Tap to open your 3D digital invitation.',
       robots: {
         index: false,
@@ -70,7 +70,7 @@ export async function generateMetadata({
   const partner2 = couple?.partner2?.trim() || 'Groom';
   const coupleText = `${partner1} weds ${partner2}`;
 
-  const title = `💍 Royal Wedding Invitation • ${coupleText} | Eternal Vowz`;
+  const title = `Royal Wedding Invitation • ${coupleText} | Eternal Vowz`;
 
   const eventDateObj = inv.event_date ? new Date(inv.event_date) : null;
   const formattedDate =

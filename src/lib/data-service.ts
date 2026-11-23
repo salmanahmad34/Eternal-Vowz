@@ -1210,6 +1210,12 @@ export const DataService = {
     if (normalized === 'meera-rohan' || normalized === 'meera-weds-rohan' || normalized === 'meera-rohan-starlight') {
       return FIFTH_DEMO_INVITATION;
     }
+    if (normalized === 'zayn-anaya' || normalized === 'zayn-weds-anaya' || normalized === 'zayn-anaya-sapphire') {
+      return SIXTH_DEMO_INVITATION;
+    }
+    if (normalized === 'kabir-roshni' || normalized === 'kabir-weds-roshni' || normalized === 'kabir-roshni-crimson') {
+      return SEVENTH_DEMO_INVITATION;
+    }
     if (normalized === 'noor-rayyan' || normalized === 'noor-weds-rayyan' || normalized === 'noor-rayyan-crimson') {
       return SIXTH_DEMO_INVITATION;
     }

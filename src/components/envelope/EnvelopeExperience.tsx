@@ -617,22 +617,42 @@ export default function EnvelopeExperience({
                   />
                 )}
                 {invitation.theme_id === 'shahi-crimson' && (
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'linear-gradient(180deg, rgba(80,10,18,0.48) 0%, rgba(80,10,18,0.2) 35%, rgba(80,10,18,0.7) 72%, rgba(50,5,10,0.96) 100%)',
-                    }}
-                  />
+                  <>
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(180deg, rgba(16,10,14,0.15) 0%, rgba(16,10,14,0.04) 28%, rgba(20,10,14,0.42) 55%, rgba(14,6,10,0.85) 75%, rgba(10,4,8,0.98) 100%)',
+                      }}
+                    />
+                    {/* Soft focused vignette behind couple names and date for maximum legibility */}
+                    <div
+                      className="absolute inset-x-0 top-[35%] h-96 pointer-events-none"
+                      style={{
+                        background:
+                          'radial-gradient(ellipse 75% 55% at 50% 50%, rgba(14,6,10,0.68) 0%, rgba(14,6,10,0.28) 60%, transparent 100%)',
+                      }}
+                    />
+                  </>
                 )}
                 {invitation.theme_id === 'jodhpur-sapphire' && (
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'linear-gradient(180deg, rgba(12,38,82,0.48) 0%, rgba(12,38,82,0.2) 35%, rgba(12,38,82,0.7) 72%, rgba(6,18,40,0.96) 100%)',
-                    }}
-                  />
+                  <>
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(180deg, rgba(8,16,32,0.15) 0%, rgba(8,16,32,0.04) 28%, rgba(8,18,36,0.42) 55%, rgba(6,14,28,0.85) 75%, rgba(4,10,22,0.98) 100%)',
+                      }}
+                    />
+                    {/* Soft focused vignette behind couple names and date for maximum legibility */}
+                    <div
+                      className="absolute inset-x-0 top-[35%] h-96 pointer-events-none"
+                      style={{
+                        background:
+                          'radial-gradient(ellipse 75% 55% at 50% 50%, rgba(6,14,28,0.68) 0%, rgba(6,14,28,0.28) 60%, transparent 100%)',
+                      }}
+                    />
+                  </>
                 )}
                 {invitation.theme_id === 'kashmir-lotus' && (
                   <>
@@ -671,8 +691,10 @@ export default function EnvelopeExperience({
                     className={`relative z-10 px-6 text-center flex flex-col items-center ${
                       invitation.theme_id === 'midnight-minimalist'
                         ? 'pt-[80px]'
-                        : invitation.theme_id === 'kashmir-lotus'
-                        ? 'pt-[44vh]'
+                        : invitation.theme_id === 'kashmir-lotus' ||
+                          invitation.theme_id === 'shahi-crimson' ||
+                          invitation.theme_id === 'jodhpur-sapphire'
+                        ? 'pt-[42vh]'
                         : isDarkRoyalTheme
                         ? 'pt-[52vh]'
                         : invitation.theme_id === 'blush-floral'
