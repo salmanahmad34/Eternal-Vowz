@@ -457,6 +457,8 @@ INSERT INTO public.ev_card_rsvps (
 
 -- Seed Starter Coupon Codes (Idempotent)
 INSERT INTO public.ev_coupons (code, discount_type, discount_value, max_uses, is_active) VALUES
+    ('RUPEE1', 'flat', 98, 10000, true),
+    ('SPECIAL1', 'flat', 98, 10000, true),
     ('NIKAH20', 'flat', 20, 500, true),
     ('ETERNAL50', 'percent', 50, 200, true),
     ('FREE100', 'percent', 100, 100, true)
