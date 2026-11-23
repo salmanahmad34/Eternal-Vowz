@@ -1187,7 +1187,37 @@ export const DataService = {
       SEVENTH_DEMO_INVITATION,
       EIGHTH_DEMO_INVITATION,
     ];
-    return demoSamples.find((inv) => inv.slug === slug) || null;
+    const found = demoSamples.find((inv) => inv.slug === slug);
+    if (found) return found;
+
+    // Couple-name friendly aliases (e.g. mir-falak, mir-weds-falak -> mir-falak-lotus)
+    const normalized = slug.toLowerCase().replace(/_|\s+/g, '-');
+    if (normalized === 'mir-falak' || normalized === 'mir-weds-falak' || normalized === 'mir-falak-lotus') {
+      return EIGHTH_DEMO_INVITATION;
+    }
+    if (normalized === 'layla-omar' || normalized === 'layla-weds-omar' || normalized === 'layla-omar-veil') {
+      return INITIAL_DEMO_INVITATION;
+    }
+    if (normalized === 'zoya-ayaan' || normalized === 'zoya-weds-ayaan' || normalized === 'zoya-ayaan-gold') {
+      return SECOND_DEMO_INVITATION;
+    }
+    if (normalized === 'ananya-kabir' || normalized === 'ananya-weds-kabir' || normalized === 'ananya-kabir-sunset') {
+      return THIRD_DEMO_INVITATION;
+    }
+    if (normalized === 'zara-farhan' || normalized === 'zara-weds-farhan' || normalized === 'zara-farhan-arch') {
+      return FOURTH_DEMO_INVITATION;
+    }
+    if (normalized === 'meera-rohan' || normalized === 'meera-weds-rohan' || normalized === 'meera-rohan-starlight') {
+      return FIFTH_DEMO_INVITATION;
+    }
+    if (normalized === 'noor-rayyan' || normalized === 'noor-weds-rayyan' || normalized === 'noor-rayyan-crimson') {
+      return SIXTH_DEMO_INVITATION;
+    }
+    if (normalized === 'aarav-diya' || normalized === 'aarav-weds-diya' || normalized === 'aarav-diya-sapphire') {
+      return SEVENTH_DEMO_INVITATION;
+    }
+
+    return null;
   },
 
   async getInvitationById(id: string): Promise<Invitation | null> {

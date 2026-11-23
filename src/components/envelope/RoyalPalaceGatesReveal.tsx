@@ -76,7 +76,7 @@ export default function RoyalPalaceGatesReveal({
           <h3 className="font-serif text-2xl tracking-[0.1em] text-[#2C221E] uppercase mt-3">
             {coupleNames.partner1}
           </h3>
-          <span className="font-great-vibes text-2xl text-[#6E2E3A] -my-1">and</span>
+          <span className="font-great-vibes text-2xl text-[#6E2E3A] -my-1">weds</span>
           <h3 className="font-serif text-2xl tracking-[0.1em] text-[#2C221E] uppercase">
             {coupleNames.partner2}
           </h3>

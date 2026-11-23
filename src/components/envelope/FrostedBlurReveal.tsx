@@ -7,6 +7,7 @@ import { Sparkles, Eye } from 'lucide-react';
 
 interface FrostedBlurRevealProps {
   themeId: ThemeId;
+  heroImageSrc?: string;
   guestName: string;
   waxSealInitial: string;
   coupleNames: { partner1: string; partner2: string };
@@ -18,6 +19,7 @@ interface FrostedBlurRevealProps {
 
 export default function FrostedBlurReveal({
   themeId,
+  heroImageSrc,
   guestName,
   waxSealInitial,
   coupleNames,
@@ -29,17 +31,22 @@ export default function FrostedBlurReveal({
   const isOpening = stage === 'opening';
 
   const heroImage =
-    themeId === 'pearl-veil'
-      ? '/assets/invitecraft/hero-pearl-botanical.jpg'
+    heroImageSrc ||
+    (themeId === 'pearl-veil'
+      ? '/assets/pearl-veil/hero-palace-corridor.jpg'
       : themeId === 'royal-emerald'
-      ? '/assets/invitecraft/hero-mughal-emerald.jpg'
+      ? '/assets/mughal-silk/hero-mughal-courtyard.jpg'
       : themeId === 'midnight-minimalist'
-      ? '/assets/invitecraft/hero-starlight-midnight.jpg'
+      ? '/assets/celestial-box/hero-celestial-stage.jpg'
       : themeId === 'blush-floral'
-      ? '/assets/invitecraft/venue-royal-palace.jpg'
+      ? '/assets/shahi-gold/hero-mountain-pavilion.jpg'
+      : themeId === 'shahi-crimson'
+      ? '/assets/shahi-crimson/hero-shahi-crimson.jpg'
+      : themeId === 'jodhpur-sapphire'
+      ? '/assets/jodhpur-sapphire/hero-jodhpur-sapphire.jpg'
       : themeId === 'kashmir-lotus'
       ? '/assets/kashmir-lotus/hero-kashmir-lotus.gif'
-      : '/assets/invitecraft/hero-palace-sunset.jpg';
+      : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg');
 
   return (
     <div
@@ -75,7 +82,7 @@ export default function FrostedBlurReveal({
           <span className="font-serif text-[30px] tracking-[0.12em] uppercase text-[#2C221E] leading-tight">
             {coupleNames.partner1}
           </span>
-          <span className="font-great-vibes text-[24px] text-[#7A6142] -my-1">and</span>
+          <span className="font-great-vibes text-[24px] text-[#7A6142] -my-1">weds</span>
           <span className="font-serif text-[30px] tracking-[0.12em] uppercase text-[#2C221E] leading-tight">
             {coupleNames.partner2}
           </span>

@@ -321,14 +321,14 @@ function SingleScratchBox({
         {/* Revealed Number and Live Digits */}
         <div className="relative z-0 flex flex-col items-center justify-center">
           <span
-            className={`font-serif font-bold tabular-nums text-[26px] sm:text-[30px] leading-none tracking-tight drop-shadow-sm transition-transform duration-300 ${
+            className={`font-serif font-bold tabular-nums text-[20px] sm:text-[22px] leading-none tracking-tight drop-shadow-sm transition-transform duration-300 ${
               isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2C1F14]'
             } ${isScratched ? 'scale-100' : 'scale-95 blur-[0.5px]'}`}
           >
             {String(unit.value).padStart(2, '0')}
           </span>
           <span
-            className={`font-sans font-bold text-[8.5px] sm:text-[9px] tracking-[0.2em] uppercase mt-1 transition-colors ${
+            className={`font-sans font-bold text-[7px] sm:text-[7.5px] tracking-[0.2em] uppercase mt-0.5 transition-colors ${
               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#8C6430]'
             }`}
           >
@@ -356,7 +356,7 @@ function SingleScratchBox({
 
       {/* Helper text below each box (NO check tick!) */}
       <span
-        className={`text-[8.5px] font-sans font-medium mt-1 tracking-wider uppercase transition-opacity ${
+        className={`text-[7px] font-sans font-medium mt-0.5 tracking-wider uppercase transition-opacity ${
           isScratched
             ? 'text-[#D4AF37] opacity-90'
             : isDarkPalace
@@ -421,15 +421,20 @@ export default function ScratchCountdownBoxes({
     { id: 'minutes', label: 'MINUTES', value: timeLeft.minutes },
   ];
 
-  // Fire Party Popper fireworks & audio celebration (party bom burst!)
+  // Fire Party Popper fireworks & audio celebration (party bom burst!) confined strictly to screen
   const triggerCelebration = useCallback(() => {
     playPartyPopperSound();
 
-    // 1. Center & high spread party popper
     try {
-      confetti({
-        particleCount: 110,
-        spread: 95,
+      const localCanvas = document.getElementById('card-confetti-canvas') as HTMLCanvasElement | null;
+      const fire = localCanvas
+        ? confetti.create(localCanvas, { resize: true, useWorker: false })
+        : confetti;
+
+      // 1. Center & high spread party popper
+      fire({
+        particleCount: 80,
+        spread: 80,
         origin: { y: 0.62 },
         colors: ['#FFD700', '#FFDF73', '#FF2D55', '#FFFFFF', '#4CD964', '#5856D6'],
         disableForReducedMotion: true,
@@ -437,32 +442,32 @@ export default function ScratchCountdownBoxes({
 
       // 2. Left and Right synchronized cannons
       setTimeout(() => {
-        confetti({
-          particleCount: 50,
+        fire({
+          particleCount: 40,
           angle: 55,
-          spread: 60,
-          origin: { x: 0.15, y: 0.72 },
+          spread: 50,
+          origin: { x: 0.2, y: 0.7 },
           colors: ['#FFD700', '#FFDF73', '#FFFFFF', '#FF3B30'],
         });
-        confetti({
-          particleCount: 50,
+        fire({
+          particleCount: 40,
           angle: 125,
-          spread: 60,
-          origin: { x: 0.85, y: 0.72 },
+          spread: 50,
+          origin: { x: 0.8, y: 0.7 },
           colors: ['#FFD700', '#FFDF73', '#FFFFFF', '#FF3B30'],
         });
-      }, 240);
+      }, 200);
 
       // 3. Falling gold star shower
       setTimeout(() => {
-        confetti({
-          particleCount: 35,
-          spread: 120,
+        fire({
+          particleCount: 25,
+          spread: 90,
           origin: { y: 0.35 },
           shapes: ['circle'],
           colors: ['#FFD700', '#FFF2D1', '#FFFFFF'],
         });
-      }, 550);
+      }, 450);
     } catch {
       // Confetti fallback
     }
@@ -518,13 +523,13 @@ export default function ScratchCountdownBoxes({
   const displayDate = readableDate || eventDate || 'Sunday, 24 October 2027';
 
   return (
-    <div className="w-full max-w-[290px] sm:max-w-[320px] mx-auto my-2.5 relative">
+    <div className="w-full max-w-[215px] sm:max-w-[230px] mx-auto my-2 relative">
       {/* Scratch Progress & Instruction Prompt */}
-      <div className="flex items-center justify-between px-1 mb-2">
+      <div className="flex items-center justify-between px-1 mb-1.5">
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-3 h-3 text-[#D4AF37] animate-pulse" />
           <span
-            className={`font-sans text-[10px] font-semibold tracking-wider uppercase ${
+            className={`font-sans text-[9px] font-semibold tracking-wider uppercase ${
               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7A5828]'
             }`}
           >
@@ -536,7 +541,7 @@ export default function ScratchCountdownBoxes({
           <button
             type="button"
             onClick={handleResetScratch}
-            className={`flex items-center gap-1 text-[9.5px] font-sans font-semibold tracking-wider transition-opacity hover:opacity-100 ${
+            className={`flex items-center gap-1 text-[9px] font-sans font-semibold tracking-wider transition-opacity hover:opacity-100 ${
               isDarkPalace ? 'text-[#C5A059] opacity-80' : 'text-[#8C6D46] opacity-75'
             }`}
             title="Scratch again"
@@ -548,7 +553,7 @@ export default function ScratchCountdownBoxes({
       </div>
 
       {/* 3 Interactive Compact Scratch Boxes */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
         {units.map((unit) => (
           <SingleScratchBox
             key={unit.id}

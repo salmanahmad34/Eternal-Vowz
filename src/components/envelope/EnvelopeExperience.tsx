@@ -478,6 +478,13 @@ export default function EnvelopeExperience({
           WebkitOverflowScrolling: 'touch',
         }}
       >
+        {/* Localized Confetti Canvas strictly confined within phone screen bounds */}
+        <canvas
+          id="card-confetti-canvas"
+          className="pointer-events-none absolute inset-0 w-full h-full z-50 overflow-hidden"
+          style={{ pointerEvents: 'none' }}
+        />
+
         <AnimatePresence>
           {/* =====================================================================
               STAGE 1 & 2: SEAMLESS 3D CINEMA OVERLAY (ZERO BLACK FLASH) OR LIFAFA/GATES
@@ -487,7 +494,7 @@ export default function EnvelopeExperience({
               key="original-opening-stage"
               initial={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.45, ease: 'easeOut' } }}
-              className={isCinemaVideo ? 'absolute inset-x-0 top-0 z-40' : 'relative z-40'}
+              className={isCinemaVideo || isFrostedBlur ? 'absolute inset-x-0 top-0 z-40' : 'relative z-40'}
             >
               {isCinemaVideo && cinemaConfig ? (
                 <CinemaVideoReveal
@@ -506,6 +513,7 @@ export default function EnvelopeExperience({
               ) : isFrostedBlur ? (
                 <FrostedBlurReveal
                   themeId={invitation.theme_id}
+                  heroImageSrc={heroImageSrc}
                   guestName={guest ? guest.guest_name : 'Honored Guest & Family'}
                   waxSealInitial={waxSealSymbol}
                   coupleNames={coupleNames}
@@ -545,10 +553,10 @@ export default function EnvelopeExperience({
             STAGE 3: OPENED INVITATION SUITE
             (Pre-mounted directly beneath cinema video so dissolve is 100% seamless — zero black screen!)
         ===================================================================== */}
-        {(stage === 'opened' || isCinemaVideo) && (
+        {(stage === 'opened' || isCinemaVideo || isFrostedBlur) && (
           <motion.div
             key="opened-original-scroll"
-            initial={isCinemaVideo ? { opacity: 1 } : { opacity: 0, y: 16 }}
+            initial={isCinemaVideo || isFrostedBlur ? { opacity: 1 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
             className={`relative w-full ${
@@ -692,7 +700,7 @@ export default function EnvelopeExperience({
                     immediate
                     delay={0.45}
                     duration={0.65}
-                    text="and"
+                    text="weds"
                     className={`font-great-vibes text-[25px] -my-1 block ${
                       isDarkRoyalTheme
                         ? 'text-[#F0CF7E] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_10px_rgba(0,0,0,0.92)]'
@@ -1200,7 +1208,7 @@ export default function EnvelopeExperience({
                         <img
                           src={
                             isKashmirLotus
-                              ? '/assets/kashmir-lotus/dresscode-kashmir-lotus.jpg'
+                              ? '/assets/kashmir-lotus/dresscode-kashmir-lotus.gif'
                               : isDarkPalace
                               ? '/assets/pearl-veil/dresscode-palace-couple.jpg'
                               : '/assets/invitecraft/dresscode-couple-art.jpg?v=loose-abaya'
@@ -1634,7 +1642,7 @@ export default function EnvelopeExperience({
                           <img
                             src={
                               isKashmirLotus
-                                ? '/assets/kashmir-lotus/portrait-kashmir-lotus.jpg'
+                                ? '/assets/kashmir-lotus/portrait-kashmir-lotus.gif'
                                 : isDarkPalace
                                 ? '/assets/pearl-veil/portrait-palace-nikah.jpg'
                                 : '/assets/invitecraft/couple-nikah-portrait.jpg?v=loose-abaya'
@@ -1904,7 +1912,7 @@ export default function EnvelopeExperience({
                           <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
                         </div>
                         <ScrollWordReveal
-                          text="Crafted with Love • Eternal Vowz Bespoke Wedding Suite"
+                          text="Crafted with Love • Eternal Vowz"
                           delay={0.1}
                           className={`font-sans text-[11px] tracking-wide ${
                             isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
@@ -1928,7 +1936,7 @@ export default function EnvelopeExperience({
                         <span className={`h-[1px] w-8 ${isDarkPalace ? 'bg-[#E5C17B]/60' : 'bg-[#8c7a65]/50'}`} />
                       </div>
                       <ScrollWordReveal
-                        text="Crafted with Love • Eternal Vowz Bespoke Wedding Suite"
+                        text="Crafted with Love • Eternal Vowz"
                         delay={0.1}
                         className={`font-sans text-[11px] tracking-wide ${
                           isDarkPalace ? 'text-[#D8C398]' : 'text-[#5c5246]'
