@@ -295,7 +295,9 @@ export default function EnvelopeExperience({
 
   const cinemaConfig = CINEMA_VIDEO_THEMES[invitation.theme_id];
   const isCinemaVideo = Boolean(cinemaConfig);
-  const isDarkPalace = invitation.theme_id === 'pearl-veil';
+  const isPearlVeil = invitation.theme_id === 'pearl-veil';
+  const isKashmirLotus = invitation.theme_id === 'kashmir-lotus';
+  const isDarkPalace = isPearlVeil || isKashmirLotus;
   const isDarkRoyalTheme =
     invitation.theme_id === 'midnight-minimalist' ||
     invitation.theme_id === 'pearl-veil' ||
@@ -386,8 +388,9 @@ export default function EnvelopeExperience({
               <div
                 className="absolute inset-0 opacity-35"
                 style={{
-                  background:
-                    'radial-gradient(circle at 14% 18%, rgba(229,193,123,0.28) 0%, transparent 45%), radial-gradient(circle at 86% 18%, rgba(229,193,123,0.28) 0%, transparent 45%), radial-gradient(circle at 50% 85%, rgba(168,112,48,0.18) 0%, transparent 55%)',
+                  background: isKashmirLotus
+                    ? 'radial-gradient(circle at 14% 18%, rgba(200,160,240,0.18) 0%, transparent 45%), radial-gradient(circle at 86% 18%, rgba(229,193,123,0.22) 0%, transparent 45%), radial-gradient(circle at 50% 85%, rgba(124,110,148,0.2) 0%, transparent 55%)'
+                    : 'radial-gradient(circle at 14% 18%, rgba(229,193,123,0.28) 0%, transparent 45%), radial-gradient(circle at 86% 18%, rgba(229,193,123,0.28) 0%, transparent 45%), radial-gradient(circle at 50% 85%, rgba(168,112,48,0.18) 0%, transparent 55%)',
                 }}
               />
             </>
@@ -813,7 +816,7 @@ export default function EnvelopeExperience({
                 className="relative w-full"
                 style={
                   isDarkPalace
-                    ? { backgroundColor: '#1A110B' }
+                    ? { backgroundColor: isKashmirLotus ? '#0F0914' : '#1A110B' }
                     : {
                         backgroundImage: "url('/assets/invitecraft/parchment-floral-frame.jpg')",
                         backgroundSize: '100% auto',
@@ -833,14 +836,17 @@ export default function EnvelopeExperience({
                     <div
                       className="absolute inset-0 bg-cover bg-center"
                       style={{
-                        backgroundImage: "url('/assets/pearl-veil/bg-corridor-scroll.jpg')",
+                        backgroundImage: isKashmirLotus
+                          ? "url('/assets/kashmir-lotus/bg-kashmir-scroll.jpg')"
+                          : "url('/assets/pearl-veil/bg-corridor-scroll.jpg')",
                       }}
                     />
                     <div
                       className="absolute inset-0"
                       style={{
-                        background:
-                          'linear-gradient(90deg, rgba(16,10,6,0.12) 0%, rgba(18,11,7,0.52) 18%, rgba(18,11,7,0.58) 50%, rgba(18,11,7,0.52) 82%, rgba(16,10,6,0.12) 100%)',
+                        background: isKashmirLotus
+                          ? 'linear-gradient(90deg, rgba(16,9,20,0.18) 0%, rgba(16,9,20,0.6) 18%, rgba(16,9,20,0.65) 50%, rgba(16,9,20,0.6) 82%, rgba(16,9,20,0.18) 100%)'
+                          : 'linear-gradient(90deg, rgba(16,10,6,0.12) 0%, rgba(18,11,7,0.52) 18%, rgba(18,11,7,0.58) 50%, rgba(18,11,7,0.52) 82%, rgba(16,10,6,0.12) 100%)',
                       }}
                     />
                   </div>
@@ -851,7 +857,7 @@ export default function EnvelopeExperience({
                   className="w-full h-12 -mt-6 relative z-10 pointer-events-none"
                   style={{
                     background: isDarkPalace
-                      ? 'linear-gradient(180deg, rgba(26,17,11,0) 0%, #1A110B 50%, rgba(26,17,11,0) 100%)'
+                      ? `linear-gradient(180deg, ${isKashmirLotus ? 'rgba(15,9,20,0)' : 'rgba(26,17,11,0)'} 0%, ${isKashmirLotus ? '#0F0914' : '#1A110B'} 50%, ${isKashmirLotus ? 'rgba(15,9,20,0)' : 'rgba(26,17,11,0)'} 100%)`
                       : 'linear-gradient(180deg, rgba(244,226,193,0) 0%, #f4e2c1 50%, rgba(244,226,193,0) 100%)',
                   }}
                 />
@@ -915,7 +921,9 @@ export default function EnvelopeExperience({
                     >
                       <img
                         src={
-                          isDarkPalace
+                          isKashmirLotus
+                            ? '/assets/kashmir-lotus/venue-kashmir-lotus.jpg'
+                            : isDarkPalace
                             ? '/assets/pearl-veil/venue-candlelit-palace.jpg'
                             : '/assets/invitecraft/venue-royal-palace.jpg'
                         }
@@ -1191,7 +1199,9 @@ export default function EnvelopeExperience({
                       >
                         <img
                           src={
-                            isDarkPalace
+                            isKashmirLotus
+                              ? '/assets/kashmir-lotus/dresscode-kashmir-lotus.jpg'
+                              : isDarkPalace
                               ? '/assets/pearl-veil/dresscode-palace-couple.jpg'
                               : '/assets/invitecraft/dresscode-couple-art.jpg?v=loose-abaya'
                           }
@@ -1623,7 +1633,9 @@ export default function EnvelopeExperience({
                         >
                           <img
                             src={
-                              isDarkPalace
+                              isKashmirLotus
+                                ? '/assets/kashmir-lotus/portrait-kashmir-lotus.jpg'
+                                : isDarkPalace
                                 ? '/assets/pearl-veil/portrait-palace-nikah.jpg'
                                 : '/assets/invitecraft/couple-nikah-portrait.jpg?v=loose-abaya'
                             }
@@ -1715,7 +1727,9 @@ export default function EnvelopeExperience({
                       >
                         <img
                           src={
-                            isDarkPalace
+                            isKashmirLotus
+                              ? '/assets/kashmir-lotus/venue-kashmir-lotus.jpg'
+                              : isDarkPalace
                               ? '/assets/pearl-veil/venue-candlelit-palace.jpg'
                               : '/assets/invitecraft/accommodation-palace-hotel.jpg'
                           }
