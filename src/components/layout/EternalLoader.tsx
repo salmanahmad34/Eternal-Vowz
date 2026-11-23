@@ -53,24 +53,24 @@ export function EternalLoader({
   return (
     <div
       className={`${
-        fullScreen ? 'fixed inset-0 z-[100]' : 'w-full py-16'
-      } bg-[#FAF7F2] flex flex-col items-center justify-center p-6 text-center select-none`}
+        fullScreen ? 'fixed inset-0 z-[100]' : 'w-full py-10'
+      } bg-[#FAF7F2] flex flex-col items-center justify-center p-4 text-center select-none`}
     >
-      <div className="relative w-24 h-24 flex items-center justify-center mb-5">
+      <div className="relative w-14 h-14 flex items-center justify-center mb-3">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-0 rounded-full border-2 border-dashed border-[#C9A84C]"
+          className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#C9A84C]"
         />
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-2 rounded-full border border-[#E2D7BD]"
+          className="absolute inset-1 rounded-full border border-[#E2D7BD]"
         />
         <motion.div
-          animate={{ scale: [0.95, 1.05, 0.95] }}
+          animate={{ scale: [0.95, 1.04, 0.95] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#C9A84C] shadow-md flex items-center justify-center bg-[#FAF7F2]"
+          className="w-10 h-10 rounded-full overflow-hidden border-[1.5px] border-[#C9A84C] shadow-xs flex items-center justify-center bg-[#FAF7F2]"
         >
           <img
             src="/assets/logo-circle.png"
@@ -81,13 +81,13 @@ export function EternalLoader({
       </div>
 
       <motion.p
-        animate={{ opacity: [0.55, 1, 0.55] }}
+        animate={{ opacity: [0.6, 1, 0.6] }}
         transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-        className="font-serif text-2xl font-normal text-[#291418] tracking-wide"
+        className="font-serif text-base font-normal text-[#291418] tracking-wide"
       >
         Eternal Vowz
       </motion.p>
-      <p className="text-[11px] uppercase tracking-[0.22em] text-[#8B7355] mt-1">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[#8B7355] mt-0.5">
         {label}
       </p>
     </div>
@@ -100,7 +100,7 @@ export function InitialSplashOverlay() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 650);
+    }, 550);
     return () => clearTimeout(timer);
   }, []);
 
@@ -110,29 +110,31 @@ export function InitialSplashOverlay() {
         <motion.div
           key="eternal-vowz-splash"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.4, ease: 'easeOut' } }}
-          className="fixed inset-0 z-[120] bg-[#FAF7F2] flex flex-col items-center justify-center pointer-events-none"
+          exit={{ opacity: 0, transition: { duration: 0.35, ease: 'easeOut' } }}
+          className="fixed inset-0 z-[120] bg-[#FAF7F2] flex flex-col items-center justify-center pointer-events-none p-4"
         >
-          <div className="relative w-24 h-24 flex items-center justify-center mb-4">
+          <div className="relative w-14 h-14 flex items-center justify-center mb-3">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-              className="absolute inset-0 rounded-full border-2 border-dashed border-[#C9A84C]"
+              className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#C9A84C]"
             />
             <motion.div
-              animate={{ scale: [0.93, 1.05, 0.93] }}
+              animate={{ scale: [0.94, 1.04, 0.94] }}
               transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFFDF8] to-[#F6EEDB] border-2 border-[#C9A84C] shadow-md flex items-center justify-center"
+              className="w-10 h-10 rounded-full overflow-hidden border-[1.5px] border-[#C9A84C] shadow-xs flex items-center justify-center bg-[#FAF7F2]"
             >
-              <span className="font-serif text-lg font-bold tracking-widest text-[#C9A84C]">
-                E&amp;V
-              </span>
+              <img
+                src="/assets/logo-circle.png"
+                alt="Eternal Vowz (E&V)"
+                className="w-full h-full object-cover rounded-full"
+              />
             </motion.div>
           </div>
-          <span className="font-serif text-2xl font-normal text-[#291418] tracking-wide">
+          <span className="font-serif text-base font-normal text-[#291418] tracking-wide">
             Eternal Vowz
           </span>
-          <span className="text-[10px] uppercase tracking-[0.24em] text-[#8B7355] mt-1">
+          <span className="text-[9px] uppercase tracking-[0.22em] text-[#8B7355] mt-0.5">
             Bespoke 3D Digital Wedding Invitations
           </span>
         </motion.div>
