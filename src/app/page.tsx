@@ -131,7 +131,7 @@ const SIGNATURE_CARD_DESIGNS = [
     slug: 'mir-falak-lotus',
     query: '',
     price: '₹99',
-    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
+    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.gif',
     shortDesc: 'Misty lavender silk veil opening into Dal Lake lotus blossoms and golden Chinar leaf filigree.',
   },
   {

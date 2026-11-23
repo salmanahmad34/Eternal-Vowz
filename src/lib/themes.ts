@@ -161,7 +161,7 @@ export const THEMES: Record<ThemeId, ThemeConfig> = {
     id: 'kashmir-lotus',
     name: 'Kashmir Chinar Lotus',
     subtitle: 'Misty lavender silk veil, Chinar gold leaf filigree, floating white lotus blossoms & serene Kashmiri romance',
-    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
+    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.gif',
     badge: '✨ Kashmiri Romance',
     previewColor: '#7C6E94',
     accentGold: '#C5A059',

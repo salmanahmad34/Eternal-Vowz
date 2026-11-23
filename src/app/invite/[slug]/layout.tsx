@@ -30,7 +30,7 @@ const THEME_PREVIEW_MAP: Record<string, { name: string; heroImg: string }> = {
   },
   'kashmir-lotus': {
     name: 'Kashmir Chinar Lotus',
-    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.jpg',
+    heroImg: '/assets/kashmir-lotus/hero-kashmir-lotus.gif',
   },
   'shahi-crimson': {
     name: 'Shahi Crimson & Zari',

@@ -319,7 +319,7 @@ export default function EnvelopeExperience({
       : invitation.theme_id === 'shahi-crimson'
       ? '/assets/shahi-crimson/hero-shahi-crimson.jpg'
       : invitation.theme_id === 'kashmir-lotus'
-      ? '/assets/kashmir-lotus/hero-kashmir-lotus.jpg'
+      ? '/assets/kashmir-lotus/hero-kashmir-lotus.gif'
       : '/assets/tuscan-haveli/hero-haveli-courtyard.jpg';
 
   const isFrostedBlur =
@@ -624,13 +624,23 @@ export default function EnvelopeExperience({
                   />
                 )}
                 {invitation.theme_id === 'kashmir-lotus' && (
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'linear-gradient(180deg, rgba(65,50,80,0.38) 0%, rgba(65,50,80,0.15) 35%, rgba(65,50,80,0.65) 72%, rgba(38,28,50,0.95) 100%)',
-                    }}
-                  />
+                  <>
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(180deg, rgba(20,12,24,0.18) 0%, rgba(20,12,24,0.06) 28%, rgba(20,12,24,0.48) 46%, rgba(18,10,22,0.82) 70%, rgba(14,8,18,0.96) 100%)',
+                      }}
+                    />
+                    {/* Soft focused vignette behind couple names and date for maximum legibility */}
+                    <div
+                      className="absolute inset-x-0 top-[36%] h-96 pointer-events-none"
+                      style={{
+                        background:
+                          'radial-gradient(ellipse 75% 55% at 50% 50%, rgba(16,10,20,0.7) 0%, rgba(16,10,20,0.35) 60%, transparent 100%)',
+                      }}
+                    />
+                  </>
                 )}
 
                 {/* Animated Twinkling String Light Glow Overlay */}
@@ -650,6 +660,8 @@ export default function EnvelopeExperience({
                     className={`relative z-10 px-6 text-center flex flex-col items-center ${
                       invitation.theme_id === 'midnight-minimalist'
                         ? 'pt-[80px]'
+                        : invitation.theme_id === 'kashmir-lotus'
+                        ? 'pt-[44vh]'
                         : isDarkRoyalTheme
                         ? 'pt-[52vh]'
                         : invitation.theme_id === 'blush-floral'
@@ -665,7 +677,7 @@ export default function EnvelopeExperience({
                     text={coupleNames.partner1 || 'ZOYA'}
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
                       isDarkRoyalTheme
-                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.92)]'
+                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#2E1A14] drop-shadow-[0_1px_10px_rgba(255,250,238,0.95)]'
                         : 'text-[#2f2a24]'
@@ -678,9 +690,9 @@ export default function EnvelopeExperience({
                     delay={0.45}
                     duration={0.65}
                     text="and"
-                    className={`font-great-vibes text-[24px] -my-1 block ${
+                    className={`font-great-vibes text-[25px] -my-1 block ${
                       isDarkRoyalTheme
-                        ? 'text-[#F0CF7E] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
+                        ? 'text-[#F0CF7E] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_10px_rgba(0,0,0,0.92)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#8C5B32] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
                         : 'text-[#7a5c3e]'
@@ -695,7 +707,7 @@ export default function EnvelopeExperience({
                     text={coupleNames.partner2 || 'AYAAN'}
                     className={`font-serif text-[31px] tracking-[0.1em] uppercase font-normal leading-tight ${
                       isDarkRoyalTheme
-                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.92)]'
+                        ? 'text-[#FFF4CF] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]'
                         : invitation.theme_id === 'blush-floral'
                         ? 'text-[#2E1A14] drop-shadow-[0_1px_10px_rgba(255,250,238,0.95)]'
                         : 'text-[#2f2a24]'
@@ -709,9 +721,9 @@ export default function EnvelopeExperience({
                       delay={0.95}
                       stagger={0.055}
                       text={cfg.subtitle}
-                      className={`font-serif text-[10px] tracking-[0.16em] uppercase mt-1.5 max-w-[250px] ${
+                      className={`font-serif text-[10.5px] tracking-[0.16em] uppercase mt-2 max-w-[290px] leading-relaxed ${
                         isDarkRoyalTheme
-                          ? 'text-[#F5E8C8] drop-shadow-[0_1px_6px_rgba(0,0,0,0.92)]'
+                          ? 'text-[#F5E8C8] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]'
                           : invitation.theme_id === 'blush-floral'
                           ? 'text-[#4A2E20] font-semibold drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
                           : 'text-[#5a5044]'
@@ -748,12 +760,12 @@ export default function EnvelopeExperience({
                       delay={0.1}
                       duration={0.8}
                       text={dotDate}
-                      className={`font-serif text-[18px] tracking-[0.14em] font-semibold ${
+                      className={`font-serif text-[13px] tracking-[0.22em] font-normal uppercase ${
                         isDarkRoyalTheme
-                          ? 'text-[#FFF6D6] drop-shadow-[0_2px_8px_rgba(0,0,0,0.92)]'
+                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_10px_rgba(0,0,0,0.92)]'
                           : invitation.theme_id === 'blush-floral'
                           ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
-                          : 'text-[#2f2a24]'
+                          : 'text-[#3d342a]'
                       }`}
                     />
                   </div>

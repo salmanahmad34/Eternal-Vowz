@@ -37,6 +37,8 @@ export default function FrostedBlurReveal({
       ? '/assets/invitecraft/hero-starlight-midnight.jpg'
       : themeId === 'blush-floral'
       ? '/assets/invitecraft/venue-royal-palace.jpg'
+      : themeId === 'kashmir-lotus'
+      ? '/assets/kashmir-lotus/hero-kashmir-lotus.gif'
       : '/assets/invitecraft/hero-palace-sunset.jpg';
 
   return (
