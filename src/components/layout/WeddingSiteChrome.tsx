@@ -253,7 +253,6 @@ export function WeddingFooter() {
               <li><Link href="/#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
               <li><Link href="/#comparison" className="hover:text-white transition-colors">Paper vs Digital</Link></li>
               <li><Link href="/login" className="hover:text-white transition-colors">Host Login</Link></li>
-              <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
             </ul>
           </div>
 
