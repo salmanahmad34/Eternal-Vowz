@@ -91,7 +91,9 @@ function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
-const IS_TEST_MODE = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').startsWith('rzp_test_');
+const IS_TEST_MODE = (
+  process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_U3UbEnGvyBQBqs'
+).startsWith('rzp_test_');
 
 async function authHeaders(): Promise<Record<string, string>> {
   const token = await DataService.getAccessToken();

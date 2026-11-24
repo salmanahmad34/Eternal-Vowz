@@ -50,7 +50,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const keyId = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '').trim();
+    const keyId = (
+      process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_U3UbEnGvyBQBqs'
+    ).trim();
     const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
     if (!keyId || !keySecret || keyId.includes('your_') || keySecret.includes('your_')) {
       return NextResponse.json(
