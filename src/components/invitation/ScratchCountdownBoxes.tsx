@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, PartyPopper, RotateCcw } from 'lucide-react';
+import { PartyPopper, RotateCcw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ScratchCountdownBoxesProps {
@@ -14,9 +14,12 @@ interface ScratchCountdownBoxesProps {
   };
   invitationSlug?: string;
   isDarkPalace?: boolean;
+  isPreview?: boolean;
+  resetTrigger?: number;
   eventDate?: string;
   readableDate?: string;
   onAllScratched?: () => void;
+  onResetScratch?: () => void;
   onExploreNext?: () => void;
 }
 
@@ -107,11 +110,13 @@ function SingleScratchBox({
   unit,
   isScratched,
   onScratched,
+  onFirstInteract,
   isDarkPalace,
 }: {
   unit: BoxUnit;
   isScratched: boolean;
   onScratched: () => void;
+  onFirstInteract?: () => void;
   isDarkPalace: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -121,7 +126,17 @@ function SingleScratchBox({
   const strokeCountRef = useRef(0);
   const [fading, setFading] = useState(false);
 
-  // Initialize and paint metallic gold scratch foil on the canvas
+  // Reset internal draw counters whenever box returns to unscratched state
+  useEffect(() => {
+    if (!isScratched) {
+      setFading(false);
+      strokeCountRef.current = 0;
+      lastPointRef.current = null;
+      isDrawingRef.current = false;
+    }
+  }, [isScratched]);
+
+  // Initialize and paint clean metallic gold scratch foil (zero text, zero icons/logos)
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || isScratched) return;
@@ -138,51 +153,39 @@ function SingleScratchBox({
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    // Luxurious gold shimmer gradient
+    // Pure normal metallic gold / champagne scratch-off foil surface
     const grad = ctx.createLinearGradient(0, 0, width, height);
     if (isDarkPalace) {
-      grad.addColorStop(0, '#D4AF37');
-      grad.addColorStop(0.25, '#FFF2D1');
-      grad.addColorStop(0.5, '#C5A059');
-      grad.addColorStop(0.75, '#9C7A38');
-      grad.addColorStop(1, '#5C4015');
+      grad.addColorStop(0, '#C9A23F');
+      grad.addColorStop(0.28, '#F4E3AD');
+      grad.addColorStop(0.55, '#D2AA48');
+      grad.addColorStop(0.82, '#AA832E');
+      grad.addColorStop(1, '#8C6820');
     } else {
-      grad.addColorStop(0, '#E5C17B');
-      grad.addColorStop(0.3, '#FFF7E6');
-      grad.addColorStop(0.65, '#D4AF37');
-      grad.addColorStop(1, '#A67C2E');
+      grad.addColorStop(0, '#E2BE74');
+      grad.addColorStop(0.32, '#FFF4D4');
+      grad.addColorStop(0.65, '#D4AC53');
+      grad.addColorStop(1, '#B38832');
     }
 
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
-    // Elegant inner border
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
-    ctx.lineWidth = 1.2;
+    // Subtle metallic foil micro-grain lines (purely tactile texture, no text or logo)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+    ctx.lineWidth = 0.75;
+    for (let i = -height; i < width + height; i += 6) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + height * 0.5, height);
+      ctx.stroke();
+    }
+
+    // Minimal clean inner hairline frame
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.lineWidth = 1;
     ctx.strokeRect(3, 3, width - 6, height - 6);
-
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-    ctx.lineWidth = 0.8;
-    ctx.strokeRect(5, 5, width - 10, height - 10);
-
-    // Sparkle icon
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('✨', width / 2, height / 2 - 12);
-
-    // "SCRATCH" text
-    ctx.fillStyle = isDarkPalace ? '#2A1706' : '#3E250A';
-    ctx.font = 'bold 9.5px system-ui, -apple-system, sans-serif';
-    ctx.letterSpacing = '1px';
-    ctx.fillText('SCRATCH', width / 2, height / 2 + 4);
-
-    // Unit label hint (DAYS, HOURS, MINUTES)
-    ctx.font = '600 8px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = isDarkPalace ? '#4A2F0F' : '#6A441B';
-    ctx.letterSpacing = '0.8px';
-    ctx.fillText(unit.label, width / 2, height / 2 + 16);
-  }, [isDarkPalace, isScratched, unit.label]);
+  }, [isDarkPalace, isScratched]);
 
   useEffect(() => {
     initCanvas();
@@ -261,6 +264,7 @@ function SingleScratchBox({
 
   // Mouse Handlers
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    onFirstInteract?.();
     isDrawingRef.current = true;
     lastPointRef.current = null;
     doScratch(e.clientX, e.clientY);
@@ -279,6 +283,7 @@ function SingleScratchBox({
 
   // Touch Handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    onFirstInteract?.();
     isDrawingRef.current = true;
     lastPointRef.current = null;
     if (e.touches.length > 0) {
@@ -318,25 +323,25 @@ function SingleScratchBox({
           }}
         />
 
-        {/* Revealed Number and Live Digits */}
+        {/* Revealed Number and Live Digits (Hidden behind opaque foil until scratched) */}
         <div className="relative z-0 flex flex-col items-center justify-center">
           <span
             className={`font-serif font-bold tabular-nums text-[20px] sm:text-[22px] leading-none tracking-tight drop-shadow-sm transition-transform duration-300 ${
               isDarkPalace ? 'text-[#FFF4CF]' : 'text-[#2C1F14]'
-            } ${isScratched ? 'scale-100' : 'scale-95 blur-[0.5px]'}`}
+            } ${isScratched ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
           >
             {String(unit.value).padStart(2, '0')}
           </span>
           <span
-            className={`font-sans font-bold text-[7px] sm:text-[7.5px] tracking-[0.2em] uppercase mt-0.5 transition-colors ${
+            className={`font-sans font-bold text-[7px] sm:text-[7.5px] tracking-[0.2em] uppercase mt-0.5 transition-all ${
               isDarkPalace ? 'text-[#E5C17B]' : 'text-[#8C6430]'
-            }`}
+            } ${isScratched ? 'opacity-100' : 'opacity-0'}`}
           >
             {unit.label}
           </span>
         </div>
 
-        {/* Scratch Canvas Overlay */}
+        {/* Clean Scratch Foil Canvas (Zero Text & Zero Logo on top) */}
         {!isScratched && (
           <canvas
             ref={canvasRef}
@@ -353,19 +358,6 @@ function SingleScratchBox({
           />
         )}
       </div>
-
-      {/* Helper text below each box (NO check tick!) */}
-      <span
-        className={`text-[7px] font-sans font-medium mt-0.5 tracking-wider uppercase transition-opacity ${
-          isScratched
-            ? 'text-[#D4AF37] opacity-90'
-            : isDarkPalace
-            ? 'text-[#C5A059]/75'
-            : 'text-[#8C6D46]/80'
-        }`}
-      >
-        {isScratched ? '✦ Revealed' : 'Scratch Me'}
-      </span>
     </div>
   );
 }
@@ -374,10 +366,12 @@ export default function ScratchCountdownBoxes({
   timeLeft,
   invitationSlug = 'wedding',
   isDarkPalace = true,
+  isPreview = false,
+  resetTrigger = 0,
   eventDate,
   readableDate,
   onAllScratched,
-  onExploreNext,
+  onResetScratch,
 }: ScratchCountdownBoxesProps) {
   const [scratchedState, setScratchedState] = useState<{
     days: boolean;
@@ -390,22 +384,27 @@ export default function ScratchCountdownBoxes({
   });
 
   const [hasCelebrated, setHasCelebrated] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Restore scratched state from localStorage
+  // Restore scratched state from localStorage on real invite pages
   useEffect(() => {
+    if (isPreview) return;
     try {
       if (typeof window !== 'undefined' && invitationSlug) {
         const stored = localStorage.getItem(`ev_scratch_boxes_${invitationSlug}`);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed && typeof parsed === 'object') {
+            const anyDone = Boolean(parsed.days || parsed.hours || parsed.minutes);
             setScratchedState({
               days: !!parsed.days,
               hours: !!parsed.hours,
               minutes: !!parsed.minutes,
             });
+            if (anyDone) setHasInteracted(true);
             if (parsed.days && parsed.hours && parsed.minutes) {
               setHasCelebrated(true);
+              if (onAllScratched) onAllScratched();
             }
           }
         }
@@ -413,7 +412,16 @@ export default function ScratchCountdownBoxes({
     } catch {
       // Ignore storage errors in private mode
     }
-  }, [invitationSlug]);
+  }, [invitationSlug, isPreview, onAllScratched]);
+
+  // Reset when builder/studio triggers Replay Animation
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      setScratchedState({ days: false, hours: false, minutes: false });
+      setHasCelebrated(false);
+      setHasInteracted(false);
+    }
+  }, [resetTrigger]);
 
   const units: BoxUnit[] = [
     { id: 'days', label: 'DAYS', value: timeLeft.days },
@@ -421,7 +429,7 @@ export default function ScratchCountdownBoxes({
     { id: 'minutes', label: 'MINUTES', value: timeLeft.minutes },
   ];
 
-  // Fire Party Popper fireworks & audio celebration (party bom burst!) confined strictly to screen
+  // Fire Party Popper fireworks & audio celebration confined strictly to phone screen
   const triggerCelebration = useCallback(() => {
     playPartyPopperSound();
 
@@ -481,10 +489,11 @@ export default function ScratchCountdownBoxes({
   // Handle box scratch completion
   const handleBoxScratched = useCallback(
     (boxId: 'days' | 'hours' | 'minutes') => {
+      setHasInteracted(true);
       setScratchedState((prev) => {
         const next = { ...prev, [boxId]: true };
         try {
-          if (typeof window !== 'undefined' && invitationSlug) {
+          if (!isPreview && typeof window !== 'undefined' && invitationSlug) {
             localStorage.setItem(`ev_scratch_boxes_${invitationSlug}`, JSON.stringify(next));
           }
         } catch {}
@@ -499,19 +508,24 @@ export default function ScratchCountdownBoxes({
         return next;
       });
     },
-    [hasCelebrated, invitationSlug, triggerCelebration]
+    [hasCelebrated, invitationSlug, isPreview, triggerCelebration]
   );
 
-  // Scratch All / Reset Handler for replayability
+  // Reset Handler for replayability
   const handleResetScratch = () => {
     const fresh = { days: false, hours: false, minutes: false };
     setScratchedState(fresh);
     setHasCelebrated(false);
+    setHasInteracted(false);
     try {
       if (typeof window !== 'undefined' && invitationSlug) {
         localStorage.removeItem(`ev_scratch_boxes_${invitationSlug}`);
+        localStorage.removeItem(`ev_date_scratched_${invitationSlug}`);
       }
     } catch {}
+    if (onResetScratch) {
+      onResetScratch();
+    }
   };
 
   const scratchedCount =
@@ -524,24 +538,13 @@ export default function ScratchCountdownBoxes({
 
   return (
     <div className="w-full max-w-[215px] sm:max-w-[230px] mx-auto my-2 relative">
-      {/* Scratch Progress & Instruction Prompt */}
-      <div className="flex items-center justify-between px-1 mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <Sparkles className="w-3 h-3 text-[#D4AF37] animate-pulse" />
-          <span
-            className={`font-sans text-[9px] font-semibold tracking-wider uppercase ${
-              isDarkPalace ? 'text-[#E5C17B]' : 'text-[#7A5828]'
-            }`}
-          >
-            {allScratched ? '✦ All 3 Moments Unlocked ✦' : `Scratch 3 Boxes (${scratchedCount}/3)`}
-          </span>
-        </div>
-
-        {allScratched && (
+      {/* Subtle Replay Button shown ONLY after reveal */}
+      {allScratched && (
+        <div className="flex items-center justify-end px-1 mb-1.5">
           <button
             type="button"
             onClick={handleResetScratch}
-            className={`flex items-center gap-1 text-[9px] font-sans font-semibold tracking-wider transition-opacity hover:opacity-100 ${
+            className={`flex items-center gap-1 text-[9px] font-sans font-semibold tracking-wider transition-opacity hover:opacity-100 cursor-pointer ${
               isDarkPalace ? 'text-[#C5A059] opacity-80' : 'text-[#8C6D46] opacity-75'
             }`}
             title="Scratch again"
@@ -549,35 +552,85 @@ export default function ScratchCountdownBoxes({
             <RotateCcw className="w-2.5 h-2.5" />
             <span>Replay</span>
           </button>
-        )}
+        </div>
+      )}
+
+      {/* 3 Clean Metallic Gold Scratch Boxes (No text or logo on foil) */}
+      <div className="relative">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+          {units.map((unit) => (
+            <SingleScratchBox
+              key={unit.id}
+              unit={unit}
+              isScratched={scratchedState[unit.id]}
+              onScratched={() => handleBoxScratched(unit.id)}
+              onFirstInteract={() => setHasInteracted(true)}
+              isDarkPalace={isDarkPalace}
+            />
+          ))}
+        </div>
+
+        {/* First-Time Animated Scratch Gesture Hint ONLY (No text, no logo — vanishes on first touch/drag) */}
+        <AnimatePresence>
+          {!hasInteracted && !allScratched && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.25 } }}
+              className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-xl flex items-center justify-center"
+            >
+              {/* Soft Diagonal Shimmer Reflection Passing Over Foil */}
+              <motion.div
+                animate={{ x: ['-120%', '220%'] }}
+                transition={{ duration: 2.2, repeat: Infinity, repeatDelay: 0.9, ease: 'easeInOut' }}
+                className="absolute inset-y-0 w-16 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              />
+
+              {/* Subtle Animated Scratch Finger Gesture Sweeping Left-to-Right */}
+              <motion.div
+                animate={{
+                  x: [-52, 52, -52],
+                  y: [5, -5, 5],
+                  rotate: [-8, 8, -8],
+                }}
+                transition={{
+                  duration: 2.0,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className="relative flex items-center justify-center drop-shadow-[0_3px_6px_rgba(0,0,0,0.45)]"
+              >
+                {/* Soft glowing rub halo */}
+                <span className="absolute -inset-2 rounded-full bg-white/45 blur-[4px] animate-pulse" />
+                {/* Clean minimalist hand/finger pointer silhouette (no logo, no text) */}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-6 h-6 text-white relative z-10"
+                >
+                  <path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z" />
+                </svg>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* 3 Interactive Compact Scratch Boxes */}
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-        {units.map((unit) => (
-          <SingleScratchBox
-            key={unit.id}
-            unit={unit}
-            isScratched={scratchedState[unit.id]}
-            onScratched={() => handleBoxScratched(unit.id)}
-            isDarkPalace={isDarkPalace}
-          />
-        ))}
-      </div>
-
-      {/* Live seconds ticking subtle reminder */}
-      <div className="text-center mt-2.5">
-        <span
-          className={`font-mono text-[9.5px] tracking-[0.22em] uppercase tabular-nums ${
-            isDarkPalace ? 'text-[#E5C17B]/60' : 'text-[#8C6D46]/70'
-          }`}
-        >
-          ⏱ {String(timeLeft.seconds).padStart(2, '0')}s ticking
-        </span>
-      </div>
+      {/* Live seconds shown only after boxes are scratched */}
+      {allScratched && (
+        <div className="text-center mt-2.5">
+          <span
+            className={`font-mono text-[9.5px] tracking-[0.22em] uppercase tabular-nums ${
+              isDarkPalace ? 'text-[#E5C17B]/60' : 'text-[#8C6D46]/70'
+            }`}
+          >
+            ⏱ {String(timeLeft.seconds).padStart(2, '0')}s ticking
+          </span>
+        </div>
+      )}
 
       {/* ===============================================================
-          INLINE CELEBRATION DATE REVEAL (NO BLOCKING POPUP DIALOG!)
+          INLINE CELEBRATION DATE REVEAL
           Appears right below the boxes when scratched, with party popper
       =============================================================== */}
       <AnimatePresence>
@@ -596,7 +649,7 @@ export default function ScratchCountdownBoxes({
             <div className="flex items-center justify-center gap-1.5 mb-1 text-[#D4AF37]">
               <PartyPopper className="w-4 h-4 animate-bounce" />
               <span className="font-serif font-bold text-xs sm:text-sm tracking-wide">
-                🎉 Countdown Unlocked! 🎉
+                🎉 Wedding Date Revealed! 🎉
               </span>
             </div>
             <div

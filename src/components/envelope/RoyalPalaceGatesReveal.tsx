@@ -80,10 +80,14 @@ export default function RoyalPalaceGatesReveal({
           <h3 className="font-serif text-2xl tracking-[0.1em] text-[#2C221E] uppercase">
             {coupleNames.partner2}
           </h3>
-          <div className="w-16 h-[1px] bg-[#D4AF37] my-3" />
-          <span className="font-serif text-xs tracking-[0.22em] text-[#6E5D53]">
-            {eventDateFormatted}
-          </span>
+          {eventDateFormatted && (
+            <>
+              <div className="w-16 h-[1px] bg-[#D4AF37] my-3" />
+              <span className="font-serif text-xs tracking-[0.22em] text-[#6E5D53]">
+                {eventDateFormatted}
+              </span>
+            </>
+          )}
         </div>
       </motion.div>
 

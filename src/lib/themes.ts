@@ -253,44 +253,8 @@ export interface MusicTrackOption {
   url: string;
 }
 
-export const MUSIC_TRACKS: MusicTrackOption[] = [
-  {
-    id: 'dhadkan-rab-ne-milayi',
-    name: 'Dhadkan • Rab Ne Milayi Hai (Romantic Duet)',
-    mood: 'Emotional, Poetic & Soulful Wedding Song',
-    url: '/assets/audio/dhadkan-rab-ne-milayi.mp3',
-  },
-  {
-    id: 'wedding-nasheed',
-    name: 'Eternal Vowz Signature Nasheed',
-    mood: 'Soulful, Serene & Halal Vocals',
-    url: '/assets/audio/wedding-nasheed.mp3',
-  },
-  {
-    id: 'royal-bansuri-flute',
-    name: 'Royal Mughal Bansuri & Flute',
-    mood: 'Warm, Spiritual & Ethereal Indian Melody',
-    url: '/assets/audio/royal-bansuri-flute.mp3',
-  },
-  {
-    id: 'romantic-piano-strings',
-    name: 'Romantic Candlelight Piano & Strings',
-    mood: 'Heartfelt, Gentle & Poetic Romance',
-    url: '/assets/audio/romantic-piano-strings.mp3',
-  },
-  {
-    id: 'shahi-sitar-melodies',
-    name: 'Shahi Darbar Sitar & Classical Raag',
-    mood: 'Royal Court Sitar & Classical Atmosphere',
-    url: '/assets/audio/shahi-sitar-melodies.mp3',
-  },
-  {
-    id: 'ethereal-harp-strings',
-    name: 'Ethereal Celesta & Golden Harp',
-    mood: 'Fairytale, Pure & Celestial Harmony',
-    url: '/assets/audio/ethereal-harp-strings.mp3',
-  },
-];
+// All built-in/preset music tracks removed — users may upload or link their own custom audio track only.
+export const MUSIC_TRACKS: MusicTrackOption[] = [];
 
 export const MEAL_OPTIONS = [
   'Vegetarian Gourmet (Truffle & Forest Mushroom)',

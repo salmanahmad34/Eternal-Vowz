@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { DataService } from '@/lib/data-service';
 import { Invitation, ThemeId, TimelineItem } from '@/types/database';
-import { THEMES, MUSIC_TRACKS } from '@/lib/themes';
+import { THEMES } from '@/lib/themes';
 import { luxuryAudio } from '@/lib/audio';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
 import { 
@@ -40,6 +40,18 @@ export default function InvitationEditorPage() {
   const [replayCount, setReplayCount] = useState(0);
   const [previewMode, setPreviewMode] = useState<'mobile' | 'full'>('mobile');
   const [audioPreviewPlaying, setAudioPreviewPlaying] = useState<string | null>(null);
+  const [phoneScale, setPhoneScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (typeof window === 'undefined') return;
+      const availH = window.innerHeight - 156; // Header 64px + top action bar + caption + padding
+      setPhoneScale(Math.min(1, Math.max(0.58, availH / 688)));
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   // Load invitation
   useEffect(() => {
@@ -151,7 +163,7 @@ export default function InvitationEditorPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F7F5F0] flex flex-col font-sans">
+    <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden bg-[#F7F5F0] flex flex-col font-sans">
       {/* =========================================================================
           TOP STUDIO NAVIGATION BAR
       ========================================================================= */}
@@ -615,62 +627,16 @@ export default function InvitationEditorPage() {
             </div>
           )}
 
-          {/* TAB 4: MUSIC & AUDIO */}
+          {/* TAB 4: CUSTOM MUSIC ONLY */}
           {activeTab === 'music' && (
             <div className="p-6 space-y-6">
               <div>
                 <h3 className="font-serif text-lg font-semibold text-stone-900 mb-1">
-                  Ambient Background Music
+                  Custom Background Music (Optional)
                 </h3>
                 <p className="text-xs text-stone-500">
-                  Select an instrumental acoustic soundscape that begins playing smoothly as the envelope unfolds.
+                  Preset tracks have been removed. Cards stay silent unless you upload your own MP3/M4A file or paste an audio URL.
                 </p>
-              </div>
-
-              {/* Music Tracks List */}
-              <div className="space-y-3">
-                {MUSIC_TRACKS.map((track) => {
-                  const isSelected = (invitation.design_config.music_track || 'royal-harp') === track.id;
-                  const isPlaying = audioPreviewPlaying === track.id;
-
-                  return (
-                    <div
-                      key={track.id}
-                      className={`p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${
-                        isSelected
-                          ? 'border-[#C5A059] bg-[#C5A059]/5 shadow-xs'
-                          : 'border-stone-200 bg-white hover:border-stone-300'
-                      }`}
-                    >
-                      <div
-                        onClick={() => handleUpdateDesign({ music_track: track.id })}
-                        className="flex-1 cursor-pointer pr-3"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <Music className={`w-4 h-4 ${isSelected ? 'text-[#C5A059]' : 'text-stone-400'}`} />
-                          <h4 className="font-serif font-medium text-sm text-stone-900">
-                            {track.name}
-                          </h4>
-                        </div>
-                        <p className="text-xs text-stone-500">{track.mood}</p>
-                      </div>
-
-                      {/* Play Preview Button */}
-                      <button
-                        type="button"
-                        onClick={() => testMusicTrack(track.id)}
-                        className={`p-2.5 rounded-full border transition-all ${
-                          isPlaying
-                            ? 'bg-[#C5A059] text-white border-[#C5A059] scale-105 shadow-xs'
-                            : 'bg-white text-stone-700 border-stone-200 hover:border-[#C5A059]'
-                        }`}
-                        title={isPlaying ? 'Pause Sample' : 'Listen Sample'}
-                      >
-                        <Volume2 className={`w-4 h-4 ${isPlaying ? 'animate-pulse' : ''}`} />
-                      </button>
-                    </div>
-                  );
-                })}
               </div>
 
               {/* Custom Wedding Music Section */}
@@ -683,9 +649,17 @@ export default function InvitationEditorPage() {
                     </h4>
                   </div>
                   {invitation.design_config.custom_music_url && (
-                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">
-                      Custom Song Active
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        luxuryAudio.stopPreview();
+                        setAudioPreviewPlaying(null);
+                        handleUpdateDesign({ music_track: '', custom_music_url: '' });
+                      }}
+                      className="text-[10px] px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 font-medium hover:bg-rose-100 cursor-pointer"
+                    >
+                      Remove Song
+                    </button>
                   )}
                 </div>
 
@@ -727,10 +701,10 @@ export default function InvitationEditorPage() {
                       <button
                         type="button"
                         onClick={() => testMusicTrack(invitation.design_config.custom_music_url!)}
-                        className="p-2 rounded-xl bg-[#C5A059] text-white hover:bg-[#B38F46] shrink-0"
+                        className="p-2 rounded-xl bg-[#C5A059] text-white hover:bg-[#B38F46] shrink-0 cursor-pointer"
                         title="Listen to Custom Song"
                       >
-                        <Volume2 className="w-4 h-4" />
+                        <Volume2 className={`w-4 h-4 ${audioPreviewPlaying ? 'animate-pulse' : ''}`} />
                       </button>
                     )}
                   </div>
@@ -740,7 +714,7 @@ export default function InvitationEditorPage() {
               <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900 space-y-1">
                 <span className="font-semibold block">Auto-play &amp; Mobile Compatibility:</span>
                 <p className="leading-relaxed text-amber-800">
-                  Browsers require a user interaction to begin audio. Because guests tap the interactive wax seal to open the envelope, ambient music begins seamlessly right as the card slides open!
+                  Browsers require a user interaction to begin audio. When a custom track is set, music begins smoothly as soon as the guest taps to open your invitation.
                 </p>
               </div>
             </div>
@@ -750,10 +724,10 @@ export default function InvitationEditorPage() {
         {/* ---------------------------------------------------------------------
             RIGHT PANEL: REAL-TIME INTERACTIVE MOBILE PHONE PREVIEW
         --------------------------------------------------------------------- */}
-        <div className="flex-1 bg-stone-900/5 p-4 sm:p-8 flex flex-col items-center justify-center overflow-y-auto relative">
+        <div className="flex-1 bg-stone-900/5 p-3 sm:p-4 flex flex-col items-center justify-center overflow-y-auto relative">
           
           {/* Top Frame Action Bar */}
-          <div className="mb-4 flex items-center justify-between w-full max-w-[420px] px-2">
+          <div className="mb-2.5 flex items-center justify-between w-full max-w-[420px] px-2">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPreviewMode('mobile')}
@@ -792,37 +766,50 @@ export default function InvitationEditorPage() {
             </button>
           </div>
 
-          {/* Device Mockup Shell */}
+          {/* Device Mockup Shell (Dynamically scaled for laptop viewport fit) */}
           {previewMode === 'mobile' ? (
-            <div className="relative w-full max-w-[400px] h-[780px] bg-stone-900 rounded-[50px] p-3 shadow-2xl ring-1 ring-stone-900/50 flex flex-col shrink-0">
-              {/* iPhone Titanium Perimeter Buttons */}
-              <div className="absolute -left-[3px] top-[115px] w-[3px] h-[26px] bg-stone-700 rounded-l-sm" />
-              <div className="absolute -left-[3px] top-[160px] w-[3px] h-[50px] bg-stone-700 rounded-l-sm" />
-              <div className="absolute -left-[3px] top-[225px] w-[3px] h-[50px] bg-stone-700 rounded-l-sm" />
-              <div className="absolute -right-[3px] top-[170px] w-[3px] h-[65px] bg-stone-700 rounded-r-sm" />
+            <div
+              style={{
+                width: 376,
+                height: Math.round(688 * phoneScale),
+                position: 'relative',
+              }}
+              className="shrink-0"
+            >
+              <div
+                style={{
+                  width: 376,
+                  transform: `scale(${phoneScale})`,
+                  transformOrigin: 'top center',
+                }}
+                className="relative h-[688px] bg-stone-900 rounded-[46px] p-3 shadow-2xl ring-1 ring-stone-900/50 flex flex-col"
+              >
+                {/* iPhone Titanium Perimeter Buttons */}
+                <div className="absolute -left-[3px] top-[105px] w-[3px] h-[24px] bg-stone-700 rounded-l-sm" />
+                <div className="absolute -left-[3px] top-[145px] w-[3px] h-[44px] bg-stone-700 rounded-l-sm" />
+                <div className="absolute -left-[3px] top-[202px] w-[3px] h-[44px] bg-stone-700 rounded-l-sm" />
+                <div className="absolute -right-[3px] top-[155px] w-[3px] h-[56px] bg-stone-700 rounded-r-sm" />
 
-              {/* iPhone Inner Bezel Screen */}
-              <div className="w-full h-full bg-[#FAF8F5] rounded-[40px] overflow-hidden relative flex flex-col shadow-inner">
-                {/* Dynamic Island Notch */}
-                <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-28 h-6 bg-stone-950 rounded-full z-50 flex items-center justify-between px-2.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-stone-800" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-900/40" />
-                </div>
+                {/* iPhone Inner Bezel Screen */}
+                <div className="w-full h-full bg-[#FAF8F5] rounded-[36px] overflow-hidden relative flex flex-col shadow-inner">
+                  {/* Dynamic Island Notch */}
+                  <div className="w-24 h-1.5 bg-stone-800 rounded-full mx-auto mt-2 mb-1 shrink-0" />
 
-                {/* Live Synchronized Envelope Experience */}
-                <div className="w-full h-full overflow-y-auto pt-6">
-                  <EnvelopeExperience
-                    invitation={invitation}
-                    guest={{
-                      id: 'preview-guest',
-                      invitation_id: invitation.id,
-                      guest_name: 'Rahul & Priya Sharma',
-                      unique_token: 'preview-token',
-                      max_allowed_guests: 2,
-                    }}
-                    isPreview={true}
-                    replayTrigger={replayCount}
-                  />
+                  {/* Live Synchronized Envelope Experience */}
+                  <div className="w-full h-[640px] overflow-y-auto overflow-x-hidden relative">
+                    <EnvelopeExperience
+                      invitation={invitation}
+                      guest={{
+                        id: 'preview-guest',
+                        invitation_id: invitation.id,
+                        guest_name: 'Rahul & Priya Sharma',
+                        unique_token: 'preview-token',
+                        max_allowed_guests: 2,
+                      }}
+                      isPreview={true}
+                      replayTrigger={replayCount}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

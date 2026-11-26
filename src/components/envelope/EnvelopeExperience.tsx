@@ -80,6 +80,29 @@ const CINEMA_VIDEO_THEMES: Partial<Record<string, { videoSrc: string; posterSrc:
   },
 };
 
+// Strictly faceless, ultra-modest loose-fitting South Asian Muslim couple watercolor illustrations per theme
+const THEME_DRESSCODE_ART: Record<string, string> = {
+  'pearl-veil': '/assets/pearl-veil/dresscode-palace-couple.jpg',
+  'jodhpur-sapphire': '/assets/jodhpur-sapphire/dresscode-jodhpur-sapphire.jpg',
+  'kashmir-lotus': '/assets/kashmir-lotus/dresscode-kashmir-lotus.jpg',
+  'blush-floral': '/assets/invitecraft/dresscode-couple-art.jpg',
+  'tuscan-sunset': '/assets/invitecraft/dresscode-couple-art.jpg',
+  'royal-emerald': '/assets/invitecraft/dresscode-couple-art.jpg',
+  'midnight-minimalist': '/assets/invitecraft/dresscode-couple-art.jpg',
+  'shahi-crimson': '/assets/invitecraft/dresscode-couple-art.jpg',
+};
+
+const THEME_PORTRAIT_ART: Record<string, string> = {
+  'pearl-veil': '/assets/pearl-veil/portrait-palace-nikah.jpg',
+  'blush-floral': '/assets/shahi-gold/couple-blush-floral.jpg',
+  'tuscan-sunset': '/assets/tuscan-haveli/couple-tuscan-sunset.jpg',
+  'royal-emerald': '/assets/mughal-silk/couple-royal-emerald.jpg',
+  'midnight-minimalist': '/assets/celestial-box/couple-midnight-starlight.jpg',
+  'kashmir-lotus': '/assets/kashmir-lotus/portrait-kashmir-lotus.jpg',
+  'shahi-crimson': '/assets/shahi-crimson/couple-shahi-crimson.jpg',
+  'jodhpur-sapphire': '/assets/jodhpur-sapphire/portrait-jodhpur-sapphire.jpg',
+};
+
 export default function EnvelopeExperience({
   invitation,
   guest = null,
@@ -96,19 +119,46 @@ export default function EnvelopeExperience({
   const [timeLeft, setTimeLeft] = useState({ days: 165, hours: 18, minutes: 14, seconds: 32 });
   const [isDateRevealed, setIsDateRevealed] = useState(false);
 
-  // Restore scratched/revealed date status from localStorage (persists across page reloads)
+  // Restore scratched/revealed date status from localStorage on real invite pages
   useEffect(() => {
+    if (isPreview) return;
     try {
       if (typeof window !== 'undefined') {
-        const key = `ev_date_scratched_${invitation.slug || invitation.id}`;
-        if (localStorage.getItem(key) === 'true') {
+        const slugKey = invitation.slug || invitation.id;
+        if (localStorage.getItem(`ev_date_scratched_${slugKey}`) === 'true') {
           setIsDateRevealed(true);
+          return;
+        }
+        const rawBoxes = localStorage.getItem(`ev_scratch_boxes_${slugKey}`);
+        if (rawBoxes) {
+          const parsed = JSON.parse(rawBoxes);
+          if (parsed?.days && parsed?.hours && parsed?.minutes) {
+            setIsDateRevealed(true);
+          }
         }
       }
     } catch {
       // Storage unavailable in private browsing
     }
-  }, [invitation.slug, invitation.id]);
+  }, [invitation.slug, invitation.id, isPreview]);
+
+  const handleDateRevealed = () => {
+    setIsDateRevealed(true);
+    try {
+      if (!isPreview && typeof window !== 'undefined') {
+        localStorage.setItem(`ev_date_scratched_${invitation.slug || invitation.id}`, 'true');
+      }
+    } catch {}
+  };
+
+  const handleDateReset = () => {
+    setIsDateRevealed(false);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(`ev_date_scratched_${invitation.slug || invitation.id}`);
+      }
+    } catch {}
+  };
 
   // Forward desktop wheel events to the phone frame container for seamless snap scrolling
   useEffect(() => {
@@ -164,6 +214,7 @@ export default function EnvelopeExperience({
   useEffect(() => {
     if (replayTrigger > 0) {
       setStage('closed');
+      setIsDateRevealed(false);
       luxuryAudio.stop();
     }
   }, [replayTrigger]);
@@ -175,16 +226,26 @@ export default function EnvelopeExperience({
     };
   }, []);
 
+  const customMusicUrl = invitation.design_config.custom_music_url?.trim() || '';
+  const hasCustomMusic = Boolean(
+    customMusicUrl &&
+      (customMusicUrl.startsWith('http://') ||
+        customMusicUrl.startsWith('https://') ||
+        customMusicUrl.startsWith('data:') ||
+        customMusicUrl.startsWith('blob:'))
+  );
+
   const handleOpenEnvelope = () => {
     if (stage !== 'closed') return;
 
     luxuryAudio.playWaxSealCrack();
     setStage('opening');
 
-    // Start signature wedding music synchronously within the user tap gesture for 100% mobile compatibility
-    if (autoPlayAudio) {
-      const activeTrack = invitation.design_config.custom_music_url || invitation.design_config.music_track || 'wedding-nasheed';
-      luxuryAudio.startAmbientMusic(activeTrack);
+    // Play ONLY if host uploaded/linked a custom song (zero preset music)
+    if (autoPlayAudio && hasCustomMusic) {
+      luxuryAudio.startAmbientMusic(customMusicUrl);
+    } else {
+      luxuryAudio.stop();
     }
 
     setTimeout(() => {
@@ -193,21 +254,21 @@ export default function EnvelopeExperience({
     }, 1850);
   };
 
-  // Starts ambient wedding music right from the first tap across all cards (including 3D Cinema Video cards):
+  // Starts custom wedding music (if added) on tap across all cards:
   const handleCinemaStart = () => {
     if (stage !== 'closed') return;
     setStage('opening');
-    if (autoPlayAudio) {
-      const activeTrack = invitation.design_config.custom_music_url || invitation.design_config.music_track || 'wedding-nasheed';
-      luxuryAudio.startAmbientMusic(activeTrack);
+    if (autoPlayAudio && hasCustomMusic) {
+      luxuryAudio.startAmbientMusic(customMusicUrl);
+    } else {
+      luxuryAudio.stop();
     }
   };
 
   const handleCinemaComplete = () => {
     setStage('opened');
-    if (autoPlayAudio) {
-      const activeTrack = invitation.design_config.custom_music_url || invitation.design_config.music_track || 'wedding-nasheed';
-      luxuryAudio.startAmbientMusic(activeTrack);
+    if (autoPlayAudio && hasCustomMusic) {
+      luxuryAudio.startAmbientMusic(customMusicUrl);
     }
     if (onAnimationComplete) onAnimationComplete();
   };
@@ -440,6 +501,7 @@ export default function EnvelopeExperience({
             </button>
           </div>
 
+          {hasCustomMusic && (
           <button
             type="button"
             onClick={handleToggleMute}
@@ -456,6 +518,7 @@ export default function EnvelopeExperience({
               <Volume2 className={`w-5 h-5 animate-pulse ${isDarkPalace ? 'text-[#E5C17B]' : 'text-white'}`} />
             )}
           </button>
+          )}
         </>
       )}
 
@@ -504,7 +567,7 @@ export default function EnvelopeExperience({
                   guestName={guest ? guest.guest_name : 'Honored Guest & Family'}
                   waxSealInitial={waxSealSymbol}
                   coupleNames={coupleNames}
-                  eventDateFormatted={dotDate}
+                  eventDateFormatted={isDateRevealed ? dotDate : ''}
                   stage={stage}
                   isPreview={isPreview}
                   onStartPlay={handleCinemaStart}
@@ -517,7 +580,7 @@ export default function EnvelopeExperience({
                   guestName={guest ? guest.guest_name : 'Honored Guest & Family'}
                   waxSealInitial={waxSealSymbol}
                   coupleNames={coupleNames}
-                  eventDateFormatted={dotDate}
+                  eventDateFormatted={isDateRevealed ? dotDate : ''}
                   stage={stage}
                   isPreview={isPreview}
                   onOpen={handleOpenEnvelope}
@@ -528,7 +591,7 @@ export default function EnvelopeExperience({
                   guestName={guest ? guest.guest_name : 'Honored Guest & Family'}
                   waxSealInitial={waxSealSymbol}
                   coupleNames={coupleNames}
-                  eventDateFormatted={dotDate}
+                  eventDateFormatted={isDateRevealed ? dotDate : ''}
                   stage={stage}
                   isPreview={isPreview}
                   onOpen={handleOpenEnvelope}
@@ -539,7 +602,7 @@ export default function EnvelopeExperience({
                   guestName={guest ? guest.guest_name : 'Honored Guest & Family'}
                   waxSealInitial={waxSealSymbol}
                   coupleNames={coupleNames}
-                  eventDateFormatted={dotDate}
+                  eventDateFormatted={isDateRevealed ? dotDate : ''}
                   stage={stage}
                   isPreview={isPreview}
                   onOpen={handleOpenEnvelope}
@@ -573,7 +636,7 @@ export default function EnvelopeExperience({
             {/* -----------------------------------------------------------------
                 HERO SECTION: UNIQUE THEME-SPECIFIC WATERCOLOR / PALACE SCENE (full viewport height matches video)
             ----------------------------------------------------------------- */}
-            <div className="relative w-full h-[100dvh] snap-start snap-always shrink-0 overflow-hidden">
+            <div className={`relative w-full ${isPreview ? 'h-[640px]' : 'h-[100dvh]'} snap-start snap-always shrink-0 overflow-hidden`}>
               <img
                 src={heroImageSrc}
                 alt="Wedding Card Hero Scene"
@@ -786,22 +849,29 @@ export default function EnvelopeExperience({
                     }
                   />
 
-                  <div className="mt-1">
-                    <ScrollInkHeading
-                      as="div"
-                      immediate
-                      delay={0.1}
-                      duration={0.8}
-                      text={dotDate}
-                      className={`font-serif text-[13px] tracking-[0.22em] font-normal uppercase ${
-                        isDarkRoyalTheme
-                          ? 'text-[#FFF4CF] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_10px_rgba(0,0,0,0.92)]'
-                          : invitation.theme_id === 'blush-floral'
-                          ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
-                          : 'text-[#3d342a]'
-                      }`}
-                    />
-                  </div>
+                  {isDateRevealed && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6 }}
+                      className="mt-1"
+                    >
+                      <ScrollInkHeading
+                        as="div"
+                        immediate
+                        delay={0.1}
+                        duration={0.8}
+                        text={dotDate}
+                        className={`font-serif text-[13px] tracking-[0.22em] font-normal uppercase ${
+                          isDarkRoyalTheme
+                            ? 'text-[#FFF4CF] drop-shadow-[0_2px_4px_rgba(0,0,0,0.98)] drop-shadow-[0_4px_10px_rgba(0,0,0,0.92)]'
+                            : invitation.theme_id === 'blush-floral'
+                            ? 'text-[#2E1A14] drop-shadow-[0_1px_8px_rgba(255,250,238,0.95)]'
+                            : 'text-[#3d342a]'
+                        }`}
+                      />
+                    </motion.div>
+                  )}
                   </div>
                 )}
 
@@ -897,7 +967,7 @@ export default function EnvelopeExperience({
                 =============================================================== */}
                 <section
                   id="card-section-countdown"
-                  className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-8 px-4 text-center"
+                  className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-8 px-4 text-center`}
                 >
                   <ScrollInkHeading
                     text="Countdown"
@@ -920,8 +990,12 @@ export default function EnvelopeExperience({
                     timeLeft={timeLeft}
                     invitationSlug={invitation.slug || invitation.id}
                     isDarkPalace={isDarkPalace}
+                    isPreview={isPreview}
+                    resetTrigger={replayTrigger}
                     readableDate={readableEventDate}
                     eventDate={dotDate}
+                    onAllScratched={handleDateRevealed}
+                    onResetScratch={handleDateReset}
                     onExploreNext={() => scrollToNextSection(hasVenue ? 'card-section-venue' : 'card-section-schedule')}
                   />
                 </section>
@@ -930,7 +1004,7 @@ export default function EnvelopeExperience({
                     BLOCK 2: THE VENUE (Shown if Venue Name or Address is filled)
                 =============================================================== */}
                 {hasVenue && (
-                  <section id="card-section-venue" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-venue" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollInkHeading
                       text="The Venue"
                       className={`font-great-vibes text-[46px] leading-tight mb-3 ${
@@ -1058,7 +1132,7 @@ export default function EnvelopeExperience({
                     BLOCK 3: SCHEDULE TIMELINE (Clear, High-Readability Luxury Cards)
                 =============================================================== */}
                 {showTimeline && (
-                  <section id="card-section-timeline" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-timeline" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollOrnamentDivider
                       lineColorClass={isDarkPalace ? 'bg-[#E5C17B]/70' : undefined}
                       dotColorClass={isDarkPalace ? 'bg-[#E5C17B]' : undefined}
@@ -1192,7 +1266,7 @@ export default function EnvelopeExperience({
                     BLOCK 4: DRESS CODE (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showDressCode && (
-                  <section id="card-section-dresscode" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-dresscode" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollOrnamentDivider
                       className={`flex items-center justify-center gap-3 mb-4 ${
                         isDarkPalace ? 'opacity-80' : 'opacity-45'
@@ -1223,21 +1297,18 @@ export default function EnvelopeExperience({
                         delay={0.08}
                         className={`w-60 mx-auto mb-3 rounded-2xl overflow-hidden ${
                           isDarkPalace
-                            ? 'border border-[#E5C17B]/40 shadow-[0_12px_32px_rgba(0,0,0,0.6)]'
+                            ? 'bg-[#FAF8F5] border border-[#E5C17B]/45 shadow-[0_12px_32px_rgba(0,0,0,0.6)]'
                             : ''
                         }`}
                       >
                         <img
                           src={
-                            isKashmirLotus
-                              ? '/assets/kashmir-lotus/dresscode-kashmir-lotus.gif'
-                              : isDarkPalace
-                              ? '/assets/pearl-veil/dresscode-palace-couple.jpg'
-                              : '/assets/invitecraft/dresscode-couple-art.jpg?v=loose-abaya'
+                            THEME_DRESSCODE_ART[invitation.theme_id] ||
+                            '/assets/invitecraft/dresscode-couple-art.jpg'
                           }
                           alt="Modest Loose Abaya Muslim Bride and Groom Attire Illustration"
                           className={`w-full h-auto mx-auto ${
-                            isDarkPalace ? 'object-cover' : 'object-contain mix-blend-multiply'
+                            isDarkPalace ? 'object-contain' : 'object-contain mix-blend-multiply'
                           }`}
                         />
                       </ScrollRevealBlock>
@@ -1330,7 +1401,7 @@ export default function EnvelopeExperience({
                     BLOCK 5: BLESSINGS & GIFTS (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showGifts && (
-                  <section id="card-section-gifts" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-gifts" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollRevealBlock direction="scale">
                       <SectionHeaderBadge type="gift" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
@@ -1485,7 +1556,7 @@ export default function EnvelopeExperience({
                     BLOCK 6: ROYAL HALAL MENU (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showMenu && (
-                  <section id="card-section-menu" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-menu" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollRevealBlock
                       direction="up"
                       className={`relative mx-auto w-full flex flex-col items-center justify-start ${
@@ -1626,7 +1697,7 @@ export default function EnvelopeExperience({
                     BLOCK 7: BLESSED UNION PORTRAIT & OUR STORY (Optional)
                 =============================================================== */}
                 {showStoryOrPortrait && (
-                  <section id="card-section-story" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-story" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollInkHeading
                       text="Blessed Union"
                       className={`font-great-vibes text-[42px] leading-tight ${
@@ -1657,21 +1728,18 @@ export default function EnvelopeExperience({
                           delay={0.08}
                           className={`w-60 mx-auto rounded-2xl overflow-hidden ${
                             isDarkPalace
-                              ? 'border border-[#E5C17B]/40 shadow-[0_12px_32px_rgba(0,0,0,0.65)]'
+                              ? 'bg-[#FAF8F5] border border-[#E5C17B]/45 shadow-[0_12px_32px_rgba(0,0,0,0.65)]'
                               : ''
                           }`}
                         >
                           <img
                             src={
-                              isKashmirLotus
-                                ? '/assets/kashmir-lotus/portrait-kashmir-lotus.gif'
-                                : isDarkPalace
-                                ? '/assets/pearl-veil/portrait-palace-nikah.jpg'
-                                : '/assets/invitecraft/couple-nikah-portrait.jpg?v=loose-abaya'
+                              THEME_PORTRAIT_ART[invitation.theme_id] ||
+                              '/assets/invitecraft/couple-nikah-portrait.jpg'
                             }
                             alt="Modest Loose Abaya Muslim Bride and Groom Under Floral Arch"
                             className={`w-full h-auto mx-auto ${
-                              isDarkPalace ? 'object-cover' : 'object-contain mix-blend-multiply'
+                              isDarkPalace ? 'object-contain' : 'object-contain mix-blend-multiply'
                             }`}
                           />
                         </ScrollRevealBlock>
@@ -1715,7 +1783,7 @@ export default function EnvelopeExperience({
                     BLOCK 8: ACCOMMODATION (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showAccommodation && (
-                  <section id="card-section-accommodation" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-accommodation" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollOrnamentDivider
                       className={`flex items-center justify-center gap-3 mb-4 ${
                         isDarkPalace ? 'opacity-80' : 'opacity-45'
@@ -1820,7 +1888,7 @@ export default function EnvelopeExperience({
                     BLOCK 9: FAQ ACCORDION (Optional — Only if filled & enabled)
                 =============================================================== */}
                 {showFaq && (
-                  <section id="card-section-faq" className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-center py-6 px-4 text-center">
+                  <section id="card-section-faq" className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-center py-6 px-4 text-center`}>
                     <ScrollRevealBlock direction="scale">
                       <SectionHeaderBadge type="faq" darkPalace={isDarkPalace} />
                     </ScrollRevealBlock>
@@ -1899,9 +1967,16 @@ export default function EnvelopeExperience({
                 {showRsvp ? (
                   <section
                     id="rsvp"
-                    className="relative z-10 min-h-[100dvh] snap-start snap-always flex flex-col justify-between py-8 px-4 text-center"
+                    className={`relative z-10 ${isPreview ? 'min-h-[640px]' : 'min-h-[100dvh]'} snap-start snap-always flex flex-col justify-between py-8 px-4 text-center`}
                   >
-                    <RsvpSection guest={guest} invitationId={invitation.id} darkPalace={isDarkPalace} />
+                    <RsvpSection
+                      guest={guest}
+                      invitationId={invitation.id}
+                      darkPalace={isDarkPalace}
+                      rsvpConfig={cfg.rsvp_config}
+                      timeline={scheduleItems}
+                      isPreview={isPreview}
+                    />
 
                     <div className="pb-8 pt-4 text-center space-y-3 relative z-10">
                       <button

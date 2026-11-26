@@ -30,7 +30,7 @@ export const INITIAL_DEMO_INVITATION: Invitation = {
     subtitle: 'TOGETHER WITH THEIR FAMILIES INVITE YOU',
     story:
       'With the blessings of the Almighty and our beloved parents, we begin our journey together in faith, love, and companionship. Your prayers and presence will make our celebration complete.',
-    music_track: 'royal-harp',
+    music_track: '',
     wax_seal_initial: 'S&A',
     accent_color: '#C5A059',
     font_style: 'cormorant',
@@ -143,7 +143,7 @@ export const SECOND_DEMO_INVITATION: Invitation = {
     subtitle: 'BISMILLAHIR RAHMANIR RAHIM • NIKAH INVITATION',
     story:
       'Alhamdulillah, with the prayers of our parents, we invite your family to join us for our blessed Nikah ceremony and Walima feast.',
-    music_track: 'royal-harp',
+    music_track: '',
     wax_seal_initial: 'Z&A',
     accent_color: '#D4AF37',
     font_style: 'cormorant',
@@ -203,7 +203,7 @@ export const THIRD_DEMO_INVITATION: Invitation = {
     subtitle: 'UNDER THE STARS • WALIMA RECEPTION',
     story:
       'And We created you in pairs. Join our families under the starlit sky for an evening of prayers, love, and our Royal Walima dinner.',
-    music_track: 'candlelight-strings',
+    music_track: '',
     wax_seal_initial: 'F&H',
     accent_color: '#E2C275',
     font_style: 'cormorant',
@@ -270,7 +270,7 @@ export const FOURTH_DEMO_INVITATION: Invitation = {
     subtitle: 'BISMILLAH • ROYAL PALACE NIKAH & WALIMA',
     story:
       'As the Shahi Palace Gates open, our families warmly welcome you to celebrate the blessed union of Amira and Rayyan with your prayers and presence.',
-    music_track: 'royal-harp',
+    music_track: '',
     wax_seal_initial: 'A&R',
     opening_style: 'palace-gates',
     accent_color: '#D49B88',
@@ -345,7 +345,7 @@ export const FIFTH_DEMO_INVITATION: Invitation = {
     subtitle: 'TOGETHER WITH THEIR FAMILIES • INVITE YOU TO CELEBRATE',
     story:
       'With gratitude in our hearts and the blessings of our parents, we joyfully invite you to witness the beginning of our forever beneath the ivory orchids.',
-    music_track: 'cinematic-piano',
+    music_track: '',
     wax_seal_initial: 'L&O',
     opening_style: 'frosted-blur',
     accent_color: '#C5A059',
@@ -420,7 +420,7 @@ export const SIXTH_DEMO_INVITATION: Invitation = {
     subtitle: 'IN THE NAME OF ALLAH • ROYAL DARBAR NIKAH',
     story:
       'Under the majestic indigo arches of Jodhpur and surrounded by golden marigolds, we invite you to celebrate our Nikah with heartfelt prayers and love.',
-    music_track: 'royal-bansuri-flute',
+    music_track: '',
     wax_seal_initial: 'Z&A',
     accent_color: '#E5C17B',
     font_style: 'cormorant',
@@ -494,7 +494,7 @@ export const SEVENTH_DEMO_INVITATION: Invitation = {
     subtitle: 'TWO SOULS, ONE SACRED VOW • SHAHI VIVAH CELEBRATION',
     story:
       'Woven with threads of love, devotion, and centuries of tradition, we warmly welcome you to witness our sacred pheras and grand wedding celebration.',
-    music_track: 'shahi-sitar-melodies',
+    music_track: '',
     wax_seal_initial: 'K&R',
     accent_color: '#D4AF37',
     font_style: 'cormorant',
@@ -568,7 +568,7 @@ export const EIGHTH_DEMO_INVITATION: Invitation = {
     subtitle: 'AMONGST THE CHINARS & LOTUS BLOSSOMS • NIKAH & DAWAT',
     story:
       'Like the tranquil waters of Dal Lake and the gentle rustle of golden Chinar leaves, we begin our lifelong journey with your blessings and heartfelt prayers.',
-    music_track: 'ethereal-harp-strings',
+    music_track: '',
     wax_seal_initial: 'M&F',
     opening_style: 'frosted-blur',
     accent_color: '#C5A059',
@@ -1348,6 +1348,26 @@ export const DataService = {
   // GUESTS & RSVP TRACKING (SCOPED TO OWNER'S CARDS)
   // =========================================================================
   async getAllGuests(): Promise<GuestWithRsvp[]> {
+    // Primary path: Server-verified endpoint (bypasses flaky client RLS joins & fetches all RSVPs reliably)
+    try {
+      const token = await this.getAccessToken();
+      if (token) {
+        const res = await fetch('/api/rsvp', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.success && Array.isArray(data.guests)) {
+            return data.guests as GuestWithRsvp[];
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('API getAllGuests fallback to direct query:', e);
+    }
+
     if (isSupabaseConfigured && supabase) {
       try {
         const myCards = await this.getAllInvitations();
@@ -1465,11 +1485,12 @@ export const DataService = {
     guestId?: string;
     guestName: string;
     phone?: string;
+    email?: string;
     status: RsvpStatus;
     headcount: number;
     mealChoice?: string;
     message?: string;
-  }): Promise<{ success: boolean; error?: string }> {
+  }): Promise<{ success: boolean; guest_id?: string; error?: string }> {
     try {
       const res = await fetch('/api/rsvp', {
         method: 'POST',
@@ -1479,6 +1500,7 @@ export const DataService = {
           guest_id: params.guestId,
           guest_name: params.guestName,
           phone: params.phone,
+          email: params.email,
           status: params.status,
           headcount: params.headcount,
           meal_choice: params.mealChoice,
@@ -1489,7 +1511,7 @@ export const DataService = {
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || 'Failed to record RSVP response.' };
       }
-      return { success: true };
+      return { success: true, guest_id: data.guest_id };
     } catch (e) {
       console.warn('submitPublicRsvp error:', e);
       return { success: false, error: 'Network error submitting RSVP.' };

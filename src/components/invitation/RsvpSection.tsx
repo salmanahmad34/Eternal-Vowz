@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { GuestWithRsvp, RsvpStatus } from '@/types/database';
+import { GuestWithRsvp, RsvpStatus, RsvpConfig, TimelineItem } from '@/types/database';
 import { DataService } from '@/lib/data-service';
 import {
   ScrollInkHeading,
@@ -11,42 +11,92 @@ import {
   ScrollOrnamentDivider,
   ScrollRevealBlock,
 } from './ScrollRevealText';
-import { CheckCircle2, XCircle, QrCode, Edit3 } from 'lucide-react';
+import { CheckCircle2, XCircle, QrCode, Edit3, AlertCircle } from 'lucide-react';
 
 interface RsvpSectionProps {
   guest: GuestWithRsvp | null;
   invitationId?: string;
   accentColor?: string;
   darkPalace?: boolean;
+  rsvpConfig?: RsvpConfig;
+  timeline?: TimelineItem[];
+  isPreview?: boolean;
   onRsvpSuccess?: () => void;
 }
+
+const DEFAULT_MEAL_CHOICES = [
+  'Halal Royal Non-Veg Feast',
+  'Vegetarian Gourmet',
+  'Jain / Pure Veg',
+  'Kids Menu',
+];
 
 export default function RsvpSection({
   guest,
   invitationId,
   darkPalace = false,
+  rsvpConfig,
+  timeline = [],
+  isPreview = false,
   onRsvpSuccess,
 }: RsvpSectionProps) {
-  const maxGuests = guest?.max_allowed_guests || 6;
+  const askPhone = rsvpConfig?.ask_phone !== false;
+  const askEmail = rsvpConfig?.ask_email === true;
+  const askHeadcount = rsvpConfig?.ask_headcount !== false;
+  const askMeal = rsvpConfig?.ask_meal === true;
+  const askEvents = rsvpConfig?.ask_events === true && timeline.length > 0;
+  const askMessage = rsvpConfig?.ask_message !== false;
+  const customFields = rsvpConfig?.custom_fields || [];
+  const mealOptions =
+    rsvpConfig?.meal_options && rsvpConfig.meal_options.length > 0
+      ? rsvpConfig.meal_options
+      : DEFAULT_MEAL_CHOICES;
+
+  const maxGuests = guest?.max_allowed_guests || rsvpConfig?.max_guests || 6;
   const existingRsvp = guest?.rsvp;
 
+  const [savedGuestId, setSavedGuestId] = useState<string | undefined>(guest?.id);
   const [fullName, setFullName] = useState<string>(guest?.guest_name || '');
   const [phone, setPhone] = useState<string>(guest?.phone || '');
+  const [email, setEmail] = useState<string>(guest?.email || '');
   const [status, setStatus] = useState<RsvpStatus>(existingRsvp?.status || 'attending');
   const [headcount, setHeadcount] = useState<number>(existingRsvp?.headcount || 1);
+  const [mealChoice, setMealChoice] = useState<string>(existingRsvp?.meal_choice || '');
+  const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string>(existingRsvp?.message || '');
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(Boolean(existingRsvp));
   const [isEditing, setIsEditing] = useState(false);
 
+  const toggleEventSelection = (title: string) => {
+    setSelectedEvents((prev) =>
+      prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     setIsSubmitting(true);
 
     try {
+      const customLines = customFields
+        .map((field) => {
+          const val = (customAnswers[field.id] || '').trim();
+          return val ? `${field.label}: ${val}` : '';
+        })
+        .filter(Boolean);
+
       const combinedMessage = [
-        message.trim(),
-        phone.trim() ? `Phone: ${phone.trim()}` : '',
+        askMessage && message.trim() ? message.trim() : '',
+        status === 'attending' && askEvents && selectedEvents.length > 0
+          ? `Events: ${selectedEvents.join(', ')}`
+          : '',
+        ...customLines,
+        askPhone && phone.trim() ? `Phone: ${phone.trim()}` : '',
+        askEmail && email.trim() ? `Email: ${email.trim()}` : '',
       ]
         .filter(Boolean)
         .join(' | ');
@@ -54,20 +104,35 @@ export default function RsvpSection({
       const cleanGuestName = fullName.trim() || guest?.guest_name || 'Honored Guest';
 
       if (invitationId || guest) {
-        await DataService.submitPublicRsvp({
+        const res = await DataService.submitPublicRsvp({
           invitationId: invitationId || guest?.invitation_id || '',
-          guestId: guest?.id,
+          guestId: savedGuestId || guest?.id,
           guestName: cleanGuestName,
-          phone: phone.trim() || undefined,
+          phone: askPhone && phone.trim() ? phone.trim() : undefined,
+          email: askEmail && email.trim() ? email.trim() : undefined,
           status,
-          headcount: status === 'attending' ? headcount : 0,
+          headcount: status === 'attending' ? (askHeadcount ? headcount : 1) : 0,
+          mealChoice: status === 'attending' && askMeal && mealChoice ? mealChoice : undefined,
           message: combinedMessage || undefined,
         });
+
+        if (!res.success && !isPreview) {
+          setSubmitError(res.error || 'Could not submit RSVP. Please try again.');
+          setIsSubmitting(false);
+          return;
+        }
+        if (res.guest_id) {
+          setSavedGuestId(res.guest_id);
+        }
       }
 
       if (status === 'attending') {
         try {
-          confetti({
+          const localCanvas = document.getElementById('card-confetti-canvas') as HTMLCanvasElement | null;
+          const fire = localCanvas
+            ? confetti.create(localCanvas, { resize: true, useWorker: false })
+            : confetti;
+          fire({
             particleCount: 80,
             spread: 70,
             origin: { y: 0.65 },
@@ -83,6 +148,9 @@ export default function RsvpSection({
       if (onRsvpSuccess) onRsvpSuccess();
     } catch (err) {
       console.error('RSVP submission error:', err);
+      if (!isPreview) {
+        setSubmitError('Something went wrong while sending your RSVP.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -260,17 +328,33 @@ export default function RsvpSection({
               />
             </div>
 
-            {/* Phone / WhatsApp */}
-            <div className="space-y-1">
-              <label className={labelCls}>Phone / WhatsApp</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                className={inputCls}
-              />
-            </div>
+            {/* Phone / WhatsApp (Optional based on host configuration) */}
+            {askPhone && (
+              <div className="space-y-1">
+                <label className={labelCls}>Phone / WhatsApp</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className={inputCls}
+                />
+              </div>
+            )}
+
+            {/* Email Address (Optional based on host configuration) */}
+            {askEmail && (
+              <div className="space-y-1">
+                <label className={labelCls}>Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="guest@example.com"
+                  className={inputCls}
+                />
+              </div>
+            )}
 
             {/* Attendance Toggle Pills */}
             <div className="space-y-1.5">
@@ -312,7 +396,7 @@ export default function RsvpSection({
             </div>
 
             {/* Compact Guests Stepper (Inline) */}
-            {status === 'attending' && (
+            {status === 'attending' && askHeadcount && (
               <div className="flex items-center justify-between pt-0.5">
                 <label className={labelCls}>Total Guests</label>
                 <div
@@ -357,17 +441,148 @@ export default function RsvpSection({
               </div>
             )}
 
+            {/* Ceremony / Functions Attending Selection */}
+            {status === 'attending' && askEvents && (
+              <div className="space-y-1.5">
+                <label className={labelCls}>Which Functions Will You Attend?</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {timeline.map((ev, idx) => {
+                    const evLabel = ev.title?.trim() || `Event ${idx + 1}`;
+                    const checked = selectedEvents.includes(evLabel);
+                    return (
+                      <button
+                        key={ev.id || idx}
+                        type="button"
+                        onClick={() => toggleEventSelection(evLabel)}
+                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-sans not-italic font-medium border transition-colors cursor-pointer ${
+                          checked
+                            ? darkPalace
+                              ? 'bg-[#E5C17B]/25 border-[#E5C17B] text-[#FFF4CF]'
+                              : 'bg-[#6E2E3A] border-[#6E2E3A] text-white'
+                            : darkPalace
+                            ? 'bg-[#281A12] border-[#E5C17B]/25 text-[#D8C398]'
+                            : 'bg-white border-[#dfd7c8] text-[#5c5246]'
+                        }`}
+                      >
+                        {checked ? '✓ ' : '+ '}
+                        {evLabel}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Meal Preference Dropdown */}
+            {status === 'attending' && askMeal && (
+              <div className="space-y-1">
+                <label className={labelCls}>Meal Preference</label>
+                <select
+                  value={mealChoice}
+                  onChange={(e) => setMealChoice(e.target.value)}
+                  className={inputCls}
+                >
+                  <option value="">Select meal preference</option>
+                  {mealOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Host-Defined Custom RSVP Fields */}
+            {customFields.map((field) => {
+              const val = customAnswers[field.id] || '';
+              const optionsList = (field.options || '')
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
+
+              return (
+                <div key={field.id} className="space-y-1">
+                  <label className={labelCls}>
+                    {field.label}
+                    {field.required && (
+                      <span className={darkPalace ? 'text-[#E5C17B]' : 'text-rose-700'}> *</span>
+                    )}
+                  </label>
+                  {field.type === 'yesno' ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Yes', 'No'].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() =>
+                            setCustomAnswers((prev) => ({ ...prev, [field.id]: opt }))
+                          }
+                          className={`py-1.5 px-3 rounded-lg text-xs font-sans not-italic font-medium border transition-colors cursor-pointer ${
+                            val === opt
+                              ? darkPalace
+                                ? 'bg-[#E5C17B]/20 border-[#E5C17B] text-[#FFF4CF]'
+                                : 'bg-[#6E2E3A] border-[#6E2E3A] text-white'
+                              : darkPalace
+                              ? 'bg-[#281A12] border-[#E5C17B]/25 text-[#D8C398]'
+                              : 'bg-white border-[#dfd7c8] text-[#5c5246]'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  ) : field.type === 'select' && optionsList.length > 0 ? (
+                    <select
+                      required={Boolean(field.required)}
+                      value={val}
+                      onChange={(e) =>
+                        setCustomAnswers((prev) => ({ ...prev, [field.id]: e.target.value }))
+                      }
+                      className={inputCls}
+                    >
+                      <option value="">Choose an option</option>
+                      {optionsList.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      required={Boolean(field.required)}
+                      value={val}
+                      onChange={(e) =>
+                        setCustomAnswers((prev) => ({ ...prev, [field.id]: e.target.value }))
+                      }
+                      placeholder={`Enter ${field.label.toLowerCase()}...`}
+                      className={inputCls}
+                    />
+                  )}
+                </div>
+              );
+            })}
+
             {/* Short Wishes / Message */}
-            <div className="space-y-1">
-              <label className={labelCls}>Wishes / Message (Optional)</label>
-              <textarea
-                rows={2}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Write your blessings for the couple..."
-                className={`${inputCls} resize-none`}
-              />
-            </div>
+            {askMessage && (
+              <div className="space-y-1">
+                <label className={labelCls}>Wishes / Message (Optional)</label>
+                <textarea
+                  rows={2}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Write your blessings for the couple..."
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+            )}
+
+            {submitError && (
+              <div className="rounded-lg bg-rose-500/10 border border-rose-400/40 px-3 py-2 text-xs font-sans not-italic text-rose-500 flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{submitError}</span>
+              </div>
+            )}
 
             {/* Submit Button */}
             <div className="pt-1">

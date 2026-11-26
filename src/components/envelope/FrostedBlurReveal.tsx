@@ -86,10 +86,14 @@ export default function FrostedBlurReveal({
           <span className="font-serif text-[30px] tracking-[0.12em] uppercase text-[#2C221E] leading-tight">
             {coupleNames.partner2}
           </span>
-          <div className="w-16 h-[1px] bg-[#C5A059] my-2.5" />
-          <span className="font-serif text-xs tracking-[0.22em] text-[#5C4D42]">
-            {eventDateFormatted}
-          </span>
+          {eventDateFormatted && (
+            <>
+              <div className="w-16 h-[1px] bg-[#C5A059] my-2.5" />
+              <span className="font-serif text-xs tracking-[0.22em] text-[#5C4D42]">
+                {eventDateFormatted}
+              </span>
+            </>
+          )}
         </div>
       </motion.div>
 

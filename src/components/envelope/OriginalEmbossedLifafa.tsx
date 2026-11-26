@@ -294,14 +294,18 @@ export default function OriginalEmbossedLifafa({
         <h3 className="font-serif text-2xl tracking-[0.1em] text-[#2F2A24] uppercase mt-3">
           {coupleNames.partner1}
         </h3>
-        <span className="font-great-vibes text-xl text-[#9C762B] -my-1">&amp;</span>
+        <span className="font-great-vibes text-xl text-[#9C762B] -my-1">weds</span>
         <h3 className="font-serif text-2xl tracking-[0.1em] text-[#2F2A24] uppercase">
           {coupleNames.partner2}
         </h3>
-        <div className="h-[1px] w-16 bg-[#C5A059]/60 my-3" />
-        <span className="font-serif text-sm tracking-[0.15em] text-[#5C5246]">
-          {eventDateFormatted}
-        </span>
+        {eventDateFormatted && (
+          <>
+            <div className="h-[1px] w-16 bg-[#C5A059]/60 my-3" />
+            <span className="font-serif text-sm tracking-[0.15em] text-[#5C5246]">
+              {eventDateFormatted}
+            </span>
+          </>
+        )}
       </motion.div>
 
       {/* =====================================================================

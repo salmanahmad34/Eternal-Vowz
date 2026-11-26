@@ -33,6 +33,26 @@ export interface FaqItem {
   a: string;
 }
 
+export interface RsvpCustomField {
+  id: string;
+  label: string;
+  type: 'text' | 'yesno' | 'select';
+  options?: string; // comma-separated options when type === 'select'
+  required?: boolean;
+}
+
+export interface RsvpConfig {
+  ask_phone?: boolean;
+  ask_email?: boolean;
+  ask_headcount?: boolean;
+  max_guests?: number;
+  ask_meal?: boolean;
+  meal_options?: string[];
+  ask_events?: boolean;
+  ask_message?: boolean;
+  custom_fields?: RsvpCustomField[];
+}
+
 export interface DesignConfig {
   couple_names: {
     partner1: string;
@@ -81,6 +101,7 @@ export interface DesignConfig {
   faqs?: FaqItem[];
 
   show_rsvp?: boolean;
+  rsvp_config?: RsvpConfig;
 }
 
 export interface Invitation {

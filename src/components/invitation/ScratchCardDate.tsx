@@ -168,45 +168,37 @@ export default function ScratchCardDate({
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    // Metallic gold foil gradient
+    // Pure metallic gold foil gradient (no text, no logo)
     const grad = ctx.createLinearGradient(0, 0, width, height);
     if (isDarkPalace) {
-      grad.addColorStop(0, '#D4AF37');
+      grad.addColorStop(0, '#C9A23F');
       grad.addColorStop(0.3, '#F5E3A9');
-      grad.addColorStop(0.6, '#B8860B');
+      grad.addColorStop(0.6, '#D2AA48');
       grad.addColorStop(1, '#8C6721');
     } else {
-      grad.addColorStop(0, '#E5C17B');
-      grad.addColorStop(0.3, '#FFF2D1');
-      grad.addColorStop(0.6, '#C5A059');
+      grad.addColorStop(0, '#E2BE74');
+      grad.addColorStop(0.3, '#FFF4D4');
+      grad.addColorStop(0.6, '#D4AC53');
       grad.addColorStop(1, '#9C7A38');
     }
 
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle decorative border on foil
+    // Subtle metallic diagonal texture lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+    ctx.lineWidth = 0.8;
+    for (let i = -height; i < width + height; i += 7) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + height * 0.5, height);
+      ctx.stroke();
+    }
+
+    // Minimal clean hairline frame
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(6, 6, width - 12, height - 12);
-
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(9, 9, width - 18, height - 18);
-
-    // Scratch Card Cover Typography
-    ctx.fillStyle = isDarkPalace ? '#2C1B0A' : '#3E2A12';
-    ctx.font = 'bold 12px "Cormorant Garamond", Georgia, serif';
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '3px';
-    ctx.fillText('✦ SCRATCH TO REVEAL DATE ✦', width / 2, height / 2 - 14);
-
-    ctx.font = '600 11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = isDarkPalace ? '#4A3215' : '#5A3D1B';
-    ctx.fillText('Rub with finger or mouse here', width / 2, height / 2 + 8);
-
-    ctx.font = '14px sans-serif';
-    ctx.fillText('✨ 🪙 ✨', width / 2, height / 2 + 28);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(5, 5, width - 10, height - 10);
   }, [isDarkPalace, isRevealed]);
 
   useEffect(() => {

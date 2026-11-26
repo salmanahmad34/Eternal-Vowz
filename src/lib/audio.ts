@@ -1,38 +1,24 @@
-// Eternal Vowz (E&V) Luxury Wedding Audio Engine
-// Plays curated background music tracks or custom uploaded bride & groom songs
-// with smooth volume fade-in, seamless looping, sample listening preview & mute control.
+// Eternal Vowz (E&V) Wedding Custom Audio Engine
+// Plays only custom user-uploaded or linked bride & groom songs
+// with smooth volume fade-in, seamless looping, sample preview & mute control.
 
-export const DEFAULT_WEDDING_AUDIO = '/assets/audio/wedding-nasheed.mp3';
+export const DEFAULT_WEDDING_AUDIO = '';
 
-export const TRACK_MAP: Record<string, string> = {
-  'wedding-nasheed': '/assets/audio/wedding-nasheed.mp3',
-  'dhadkan-rab-ne-milayi': '/assets/audio/dhadkan-rab-ne-milayi.mp3',
-  'royal-bansuri-flute': '/assets/audio/royal-bansuri-flute.mp3',
-  'romantic-piano-strings': '/assets/audio/romantic-piano-strings.mp3',
-  'shahi-sitar-melodies': '/assets/audio/shahi-sitar-melodies.mp3',
-  'ethereal-harp-strings': '/assets/audio/ethereal-harp-strings.mp3',
-
-  // Legacy theme aliases
-  'royal-harp': '/assets/audio/ethereal-harp-strings.mp3',
-  'acoustic-romance': '/assets/audio/royal-bansuri-flute.mp3',
-  'cinematic-piano': '/assets/audio/romantic-piano-strings.mp3',
-};
+export const TRACK_MAP: Record<string, string> = {};
 
 export function resolveTrackUrl(trackIdOrUrl?: string): string {
-  if (!trackIdOrUrl) return DEFAULT_WEDDING_AUDIO;
-  if (TRACK_MAP[trackIdOrUrl]) {
-    return TRACK_MAP[trackIdOrUrl];
-  }
+  if (!trackIdOrUrl) return '';
+  const trimmed = trackIdOrUrl.trim();
+  if (!trimmed || trimmed === 'custom' || trimmed === 'none') return '';
   if (
-    trackIdOrUrl.startsWith('http://') ||
-    trackIdOrUrl.startsWith('https://') ||
-    (trackIdOrUrl.startsWith('/') && !trackIdOrUrl.startsWith('//')) ||
-    trackIdOrUrl.startsWith('data:') ||
-    trackIdOrUrl.startsWith('blob:')
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:')
   ) {
-    return trackIdOrUrl;
+    return trimmed;
   }
-  return DEFAULT_WEDDING_AUDIO;
+  return '';
 }
 
 class LuxuryAudioPlayer {
@@ -42,7 +28,7 @@ class LuxuryAudioPlayer {
   private isPlaying = false;
   private isMuted = false;
   private fadeTimer: number | null = null;
-  private currentTrackOrUrl = 'wedding-nasheed';
+  private currentTrackOrUrl = '';
   private previewTrackOrUrl: string | null = null;
   private targetVolume = 0.78;
 
@@ -107,11 +93,16 @@ class LuxuryAudioPlayer {
     }
   }
 
-  // Starts the signature wedding MP3 immediately inside the user tap gesture with smooth volume fade-in
+  // Starts custom user wedding audio immediately inside the tap gesture with fade-in
   public startAmbientMusic(trackIdOrUrl?: string) {
     this.stopPreview();
     const resolvedUrl = resolveTrackUrl(trackIdOrUrl);
-    this.currentTrackOrUrl = trackIdOrUrl || 'wedding-nasheed';
+    if (!resolvedUrl) {
+      this.currentTrackOrUrl = '';
+      this.stop();
+      return;
+    }
+    this.currentTrackOrUrl = resolvedUrl;
 
     const el = this.ensureAudioElement(resolvedUrl);
     if (!el) return;
@@ -151,9 +142,13 @@ class LuxuryAudioPlayer {
     }
   }
 
-  // Previews an audio sample in the editor / dashboard form
+  // Previews a custom audio track in the editor / dashboard form
   public togglePreview(trackIdOrUrl: string): boolean {
     const resolvedUrl = resolveTrackUrl(trackIdOrUrl);
+    if (!resolvedUrl) {
+      this.stopPreview();
+      return false;
+    }
 
     // If currently previewing this track, pause it
     if (this.previewAudio && this.previewTrackOrUrl === trackIdOrUrl && !this.previewAudio.paused) {

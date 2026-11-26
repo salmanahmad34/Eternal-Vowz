@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem } from '@/types/database';
+import { Invitation, GuestWithRsvp, HostUser, ThemeId, TimelineItem, FaqItem, RsvpCustomField } from '@/types/database';
 import { DataService, INITIAL_DEMO_INVITATION, getCanonicalOrigin } from '@/lib/data-service';
-import { THEMES, MUSIC_TRACKS, ORDERED_THEME_IDS } from '@/lib/themes';
+import { THEMES, ORDERED_THEME_IDS } from '@/lib/themes';
 import { luxuryAudio } from '@/lib/audio';
 import EnvelopeExperience from '@/components/envelope/EnvelopeExperience';
 import { EternalLogoBadge } from '@/components/layout/EternalLoader';
@@ -40,10 +40,18 @@ import {
   Calendar,
   Settings,
   CreditCard,
+  RefreshCw,
   Music,
   Volume2,
   Upload,
+  CheckSquare,
 } from 'lucide-react';
+
+const LAST_THREE_OPENING_THEMES: ThemeId[] = [
+  'kashmir-lotus',
+  'shahi-crimson',
+  'jodhpur-sapphire',
+];
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -75,6 +83,52 @@ export default function DashboardPage() {
   const [checkoutCard, setCheckoutCard] = useState<Invitation | null>(null);
   const [checkoutMode, setCheckoutMode] = useState<'pay-existing' | 'create-new'>('pay-existing');
   const [previewTrackId, setPreviewTrackId] = useState<string | null>(null);
+  const [rsvpRefreshing, setRsvpRefreshing] = useState(false);
+  const [showAllCardRsvps, setShowAllCardRsvps] = useState(false);
+  const [laptopPhoneScale, setLaptopPhoneScale] = useState(1);
+
+  // Dynamically optimize right-side phone preview scale so the ENTIRE phone fits comfortably on any laptop screen
+  useEffect(() => {
+    const computeScale = () => {
+      if (typeof window === 'undefined') return;
+      const availH = window.innerHeight - 96; // Header + sticky top-20 offset + bottom breathing room
+      const availW = window.innerWidth >= 1024 ? window.innerWidth * 0.36 : 368;
+      const scaleH = availH / 724; // Full phone mockup + "Live Mobile Preview" header bar height
+      const scaleW = availW / 368;
+      setLaptopPhoneScale(Math.min(1, Math.max(0.58, Math.min(scaleH, scaleW))));
+    };
+    computeScale();
+    window.addEventListener('resize', computeScale);
+    return () => window.removeEventListener('resize', computeScale);
+  }, []);
+
+  const refreshGuestsOnly = async () => {
+    setRsvpRefreshing(true);
+    try {
+      const guests = await DataService.getAllGuests();
+      setAllGuests(guests);
+    } finally {
+      setRsvpRefreshing(false);
+    }
+  };
+
+  // Auto-refresh incoming RSVPs when returning to dashboard tab or periodically while viewing overview
+  useEffect(() => {
+    if (activeTab !== 'overview') return;
+    const onFocus = () => {
+      if (document.visibilityState === 'visible') {
+        refreshGuestsOnly();
+      }
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onFocus);
+    const interval = setInterval(refreshGuestsOnly, 25000);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus);
+      clearInterval(interval);
+    };
+  }, [activeTab]);
 
   const handleToggleAudioPreview = (trackIdOrUrl: string) => {
     const isNowPlaying = luxuryAudio.togglePreview(trackIdOrUrl);
@@ -130,7 +184,10 @@ export default function DashboardPage() {
     setAllGuests(guests);
 
     if (cards.length > 0) {
-      const current = cards.find((c) => c.id === selectedInvitation?.id) || cards[0];
+      const current =
+        cards.find((c) => c.id === selectedInvitation?.id) ||
+        cards.find((c) => guests.some((g) => g.invitation_id === c.id)) ||
+        cards[0];
       setSelectedInvitation(current);
     } else {
       setSelectedInvitation(null);
@@ -179,7 +236,8 @@ export default function DashboardPage() {
         },
         subtitle: 'TOGETHER WITH THEIR FAMILIES INVITE YOU',
         wax_seal_initial: 'E&V',
-        music_track: 'wedding-nasheed',
+        music_track: '',
+        custom_music_url: '',
         accent_color: '#D4AF37',
         font_style: 'cormorant',
         opening_style:
@@ -230,6 +288,16 @@ export default function DashboardPage() {
         show_faq: false,
         faqs: [],
         show_rsvp: true,
+        rsvp_config: {
+          ask_phone: true,
+          ask_email: false,
+          ask_headcount: true,
+          max_guests: 6,
+          ask_meal: false,
+          ask_events: false,
+          ask_message: true,
+          custom_fields: [],
+        },
       },
       is_published: true,
     };
@@ -355,9 +423,13 @@ export default function DashboardPage() {
     await loadData();
   };
 
-  const selectedCardGuests = selectedInvitation
+  const displayedGuests = showAllCardRsvps
+    ? allGuests
+    : selectedInvitation
     ? allGuests.filter((g) => g.invitation_id === selectedInvitation.id)
     : [];
+
+  const selectedCardGuests = displayedGuests;
 
   const totalInvitedParties = selectedCardGuests.length;
   const linksOpenedCount = selectedCardGuests.filter((g) => Boolean(g.link_opened_at)).length;
@@ -487,17 +559,19 @@ export default function DashboardPage() {
       'Guest Name',
       'Group Tag',
       'Phone',
+      'Email',
       'Link Opened',
       'RSVP Status',
       'Confirmed Headcount',
-      'Halal Meal Preference',
-      'Message',
+      'Meal Preference',
+      'Message & Answers',
       'Personalized URL',
     ];
     const rows = selectedCardGuests.map((g) => [
       `"${g.guest_name.replace(/"/g, '""')}"`,
       `"${g.group_tag || 'General'}"`,
       `"${g.phone || ''}"`,
+      `"${g.email || ''}"`,
       `"${g.link_opened_at ? new Date(g.link_opened_at).toLocaleString() : 'Not Opened'}"`,
       `"${g.rsvp?.status?.toUpperCase() || 'PENDING'}"`,
       g.rsvp?.status === 'attending' ? g.rsvp.headcount : 0,
@@ -516,9 +590,13 @@ export default function DashboardPage() {
   };
 
   const filteredGuests = selectedCardGuests.filter((g) => {
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      g.guest_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (g.group_tag || '').toLowerCase().includes(searchQuery.toLowerCase());
+      g.guest_name.toLowerCase().includes(q) ||
+      (g.group_tag || '').toLowerCase().includes(q) ||
+      (g.phone || '').toLowerCase().includes(q) ||
+      (g.email || '').toLowerCase().includes(q) ||
+      (g.rsvp?.message || '').toLowerCase().includes(q);
     if (!matchesSearch) return false;
     if (statusFilter === 'all') return true;
     if (statusFilter === 'pending') return !g.rsvp || g.rsvp.status === 'pending';
@@ -1094,6 +1172,31 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
+                {invitations.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllCardRsvps((v) => !v)}
+                    className={`px-3 py-2.5 rounded-md border text-xs font-medium cursor-pointer transition-colors ${
+                      showAllCardRsvps
+                        ? 'bg-[#291418] text-white border-[#291418]'
+                        : 'bg-white hover:bg-[#F6EEDB] border-[#E2D7BD] text-[#5A4636]'
+                    }`}
+                  >
+                    {showAllCardRsvps ? `Showing All Cards (${allGuests.length})` : 'Show All Cards'}
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={refreshGuestsOnly}
+                  disabled={rsvpRefreshing}
+                  className="px-3 py-2.5 rounded-md bg-white hover:bg-[#F6EEDB] border border-[#E2D7BD] text-[#291418] text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                  title="Check latest submitted RSVPs"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#C9A84C] ${rsvpRefreshing ? 'animate-spin' : ''}`} />
+                  <span>Refresh</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(true)}
@@ -1222,7 +1325,8 @@ export default function DashboardPage() {
               ) : (
                 <div className="divide-y divide-neutral-200">
                   {filteredGuests.map((guest) => {
-                    const inviteUrl = getGuestInviteUrl(guest);
+                    const guestCard = invitations.find((c) => c.id === guest.invitation_id) || selectedInvitation;
+                    const inviteUrl = getGuestInviteUrl(guest, guestCard);
                     const isCopied = copiedId === guest.id;
                     const rsvpStatus = guest.rsvp?.status || 'pending';
 
@@ -1234,13 +1338,18 @@ export default function DashboardPage() {
                         <div className="space-y-1 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <Link
-                              href={`/invite/${selectedInvitation.slug}?guest=${guest.unique_token}`}
+                              href={`/invite/${guestCard.slug}?guest=${guest.unique_token}`}
                               target="_blank"
                               className="text-sm font-semibold text-neutral-900 hover:underline inline-flex items-center gap-1"
                             >
                               <span>{guest.guest_name}</span>
                               <ExternalLink className="w-3 h-3 text-neutral-400" />
                             </Link>
+                            {showAllCardRsvps && guestCard && (
+                              <span className="px-2 py-0.5 rounded-md bg-[#FAF3E0] text-[#8B6508] text-[10px] font-semibold">
+                                {guestCard.design_config.couple_names.partner1} &amp; {guestCard.design_config.couple_names.partner2}
+                              </span>
+                            )}
                             <span className="px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-600 text-[11px]">
                               {guest.group_tag || 'Family'} &bull; Max {guest.max_allowed_guests}
                             </span>
@@ -1271,8 +1380,18 @@ export default function DashboardPage() {
                             )}
                           </div>
 
-                          {(guest.rsvp?.meal_choice || guest.rsvp?.message) && (
+                          {(guest.phone || guest.email || guest.rsvp?.meal_choice || guest.rsvp?.message) && (
                             <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-500 pt-0.5">
+                              {guest.phone && (
+                                <span className="inline-flex items-center gap-1 text-neutral-700 font-medium">
+                                  <span>📞 {guest.phone}</span>
+                                </span>
+                              )}
+                              {guest.email && (
+                                <span className="inline-flex items-center gap-1 text-neutral-700">
+                                  <span>✉️ {guest.email}</span>
+                                </span>
+                              )}
                               {guest.rsvp?.meal_choice && (
                                 <span className="inline-flex items-center gap-1 text-neutral-700">
                                   <Utensils className="w-3 h-3 text-neutral-400" />
@@ -1576,100 +1695,104 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* 3D Opening Animation Style Selector (Lifafa vs Palace Gates vs Frosted Blur Veil) */}
+                {/* 3D Opening Animation Style Selector (Shown ONLY for the last 3 cards: Kashmir Lotus, Shahi Crimson, Jodhpur Sapphire) */}
                 <div className="pt-3 border-t border-neutral-100">
-                  <label className="block text-xs font-medium text-neutral-700 mb-2">
-                    Opening Animation Style
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDraftCard({
-                          ...draftCard,
-                          design_config: {
-                            ...draftCard.design_config,
-                            opening_style: 'lifafa',
-                          },
-                        });
-                        setReplayTrigger((p) => p + 1);
-                      }}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
-                        draftCard.design_config.opening_style !== 'palace-gates' &&
-                        draftCard.design_config.opening_style !== 'frosted-blur'
-                          ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
-                          : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                      }`}
-                    >
-                      <Mail className="w-4 h-4 text-[#6E2E3A] shrink-0" />
-                      <div>
-                        <div className="text-xs font-semibold text-neutral-900">
-                          3D Royal Lifafa
-                        </div>
-                        <div className="text-[10px] text-neutral-500">
-                          Envelope &amp; wax seal
-                        </div>
-                      </div>
-                    </button>
+                  {LAST_THREE_OPENING_THEMES.includes(draftCard.theme_id) && (
+                    <>
+                      <label className="block text-xs font-medium text-neutral-700 mb-2">
+                        Opening Animation Style
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDraftCard({
+                              ...draftCard,
+                              design_config: {
+                                ...draftCard.design_config,
+                                opening_style: 'lifafa',
+                              },
+                            });
+                            setReplayTrigger((p) => p + 1);
+                          }}
+                          className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                            draftCard.design_config.opening_style !== 'palace-gates' &&
+                            draftCard.design_config.opening_style !== 'frosted-blur'
+                              ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
+                              : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                          }`}
+                        >
+                          <Mail className="w-4 h-4 text-[#6E2E3A] shrink-0" />
+                          <div>
+                            <div className="text-xs font-semibold text-neutral-900">
+                              3D Royal Lifafa
+                            </div>
+                            <div className="text-[10px] text-neutral-500">
+                              Envelope &amp; wax seal
+                            </div>
+                          </div>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDraftCard({
-                          ...draftCard,
-                          design_config: {
-                            ...draftCard.design_config,
-                            opening_style: 'palace-gates',
-                          },
-                        });
-                        setReplayTrigger((p) => p + 1);
-                      }}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
-                        draftCard.design_config.opening_style === 'palace-gates'
-                          ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
-                          : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                      }`}
-                    >
-                      <DoorOpen className="w-4 h-4 text-[#6E2E3A] shrink-0" />
-                      <div>
-                        <div className="text-xs font-semibold text-neutral-900">
-                          3D Palace Gates
-                        </div>
-                        <div className="text-[10px] text-neutral-500">
-                          Swinging double doors
-                        </div>
-                      </div>
-                    </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDraftCard({
+                              ...draftCard,
+                              design_config: {
+                                ...draftCard.design_config,
+                                opening_style: 'palace-gates',
+                              },
+                            });
+                            setReplayTrigger((p) => p + 1);
+                          }}
+                          className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                            draftCard.design_config.opening_style === 'palace-gates'
+                              ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
+                              : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                          }`}
+                        >
+                          <DoorOpen className="w-4 h-4 text-[#6E2E3A] shrink-0" />
+                          <div>
+                            <div className="text-xs font-semibold text-neutral-900">
+                              3D Palace Gates
+                            </div>
+                            <div className="text-[10px] text-neutral-500">
+                              Swinging double doors
+                            </div>
+                          </div>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDraftCard({
-                          ...draftCard,
-                          design_config: {
-                            ...draftCard.design_config,
-                            opening_style: 'frosted-blur',
-                          },
-                        });
-                        setReplayTrigger((p) => p + 1);
-                      }}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
-                        draftCard.design_config.opening_style === 'frosted-blur'
-                          ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
-                          : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                      }`}
-                    >
-                      <Eye className="w-4 h-4 text-[#6E2E3A] shrink-0" />
-                      <div>
-                        <div className="text-xs font-semibold text-neutral-900">
-                          Frosted-Blur Veil
-                        </div>
-                        <div className="text-[10px] text-neutral-500">
-                          Blur melts on tap
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDraftCard({
+                              ...draftCard,
+                              design_config: {
+                                ...draftCard.design_config,
+                                opening_style: 'frosted-blur',
+                              },
+                            });
+                            setReplayTrigger((p) => p + 1);
+                          }}
+                          className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                            draftCard.design_config.opening_style === 'frosted-blur'
+                              ? 'border-[#6E2E3A] bg-[#FAF6F0] ring-1 ring-[#6E2E3A]'
+                              : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                          }`}
+                        >
+                          <Eye className="w-4 h-4 text-[#6E2E3A] shrink-0" />
+                          <div>
+                            <div className="text-xs font-semibold text-neutral-900">
+                              Frosted-Blur Veil
+                            </div>
+                            <div className="text-[10px] text-neutral-500">
+                              Blur melts on tap
+                            </div>
+                          </div>
+                        </button>
                       </div>
-                    </button>
-                  </div>
+                    </>
+                  )}
 
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-xs font-semibold text-neutral-800">
@@ -1760,7 +1883,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Wedding Music Selection & Audio Player */}
+                {/* Custom Wedding Music Upload & URL Only (No preset tracks) */}
                 <div className="rounded-xl bg-white border border-neutral-200 p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1769,103 +1892,45 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <h4 className="text-sm font-semibold text-neutral-900">
-                          Wedding Background Music
+                          Custom Wedding Music (Optional)
                         </h4>
                         <p className="text-xs text-neutral-500">
-                          Plays continuously from the moment guest taps to open card (Listen samples or use custom song)
+                          Silent by default — upload or paste your own song if you want music on card open
                         </p>
                       </div>
                     </div>
-                  </div>
-
-                  {/* 5 Curated Tracks */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                    {MUSIC_TRACKS.map((track) => {
-                      const isSelected =
-                        (draftCard.design_config.music_track || 'wedding-nasheed') === track.id &&
-                        !draftCard.design_config.custom_music_url;
-                      const isPlaying = previewTrackId === track.id;
-
-                      return (
-                        <div
-                          key={track.id}
-                          className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-2 cursor-pointer ${
-                            isSelected
-                              ? 'border-[#B8860B] bg-[#FFFBF0] ring-1 ring-[#B8860B]'
-                              : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                          }`}
-                          onClick={() => {
-                            setDraftCard({
-                              ...draftCard,
-                              design_config: {
-                                ...draftCard.design_config,
-                                music_track: track.id,
-                                custom_music_url: '',
-                              },
-                            });
-                            setReplayTrigger((p) => p + 1);
-                          }}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span
-                                className={`w-2 h-2 rounded-full ${
-                                  isSelected ? 'bg-[#B8860B]' : 'bg-neutral-300'
-                                }`}
-                              />
-                              <div className="text-xs font-semibold text-neutral-900 truncate">
-                                {track.name}
-                              </div>
-                            </div>
-                            <div className="text-[11px] text-neutral-500 truncate mt-0.5">
-                              {track.mood}
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleAudioPreview(track.id);
-                            }}
-                            className={`p-1.5 px-2.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors shrink-0 ${
-                              isPlaying
-                                ? 'bg-[#B8860B] text-white border-[#B8860B]'
-                                : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100'
-                            }`}
-                            title={isPlaying ? 'Pause' : 'Listen Sample'}
-                          >
-                            <Volume2
-                              className={`w-3.5 h-3.5 ${isPlaying ? 'animate-pulse' : ''}`}
-                            />
-                            <span className="text-[10px]">{isPlaying ? 'Stop' : 'Listen'}</span>
-                          </button>
-                        </div>
-                      );
-                    })}
+                    {draftCard.design_config.custom_music_url && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          luxuryAudio.stopPreview();
+                          setPreviewTrackId(null);
+                          setDraftCard({
+                            ...draftCard,
+                            design_config: {
+                              ...draftCard.design_config,
+                              music_track: '',
+                              custom_music_url: '',
+                            },
+                          });
+                        }}
+                        className="px-2.5 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-semibold inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <X className="w-3 h-3" />
+                        <span>Remove Song</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Custom Music Upload & URL */}
-                  <div className="pt-2 border-t border-neutral-100 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-neutral-800 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#B8860B]" />
-                        <span>Add Custom Wedding Song (Bride &amp; Groom Choice)</span>
-                      </label>
-                      {draftCard.design_config.custom_music_url && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">
-                          Custom Song Active
-                        </span>
-                      )}
-                    </div>
-
+                  <div className="pt-1 space-y-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {/* Upload MP3 from device */}
                       <label className="border border-dashed border-neutral-300 hover:border-[#B8860B] rounded-xl p-3 flex items-center gap-2.5 cursor-pointer bg-neutral-50 hover:bg-[#FFFDF7] transition-all">
                         <Upload className="w-4 h-4 text-neutral-600 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-medium text-neutral-800 truncate">
-                            Upload Song (MP3, M4A, etc.)
+                            Upload Custom Song (MP3, M4A)
                           </div>
                           <div className="text-[10px] text-neutral-500">
                             Select custom audio file (up to 25MB)
@@ -1903,7 +1968,7 @@ export default function DashboardPage() {
                                 draftCard.design_config.custom_music_url!
                               )
                             }
-                            className="p-2 rounded-xl bg-[#B8860B] text-white text-xs hover:bg-[#996F08] shrink-0"
+                            className="p-2 rounded-xl bg-[#B8860B] text-white text-xs hover:bg-[#996F08] shrink-0 cursor-pointer"
                             title="Listen Custom Music"
                           >
                             <Volume2 className="w-3.5 h-3.5" />
@@ -2465,6 +2530,281 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
+
+                {/* 8. Customizable Guest RSVP Form */}
+                <div className="rounded-xl bg-white border border-neutral-200 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold text-neutral-900">
+                        8. Guest RSVP Form Builder
+                      </h4>
+                      <p className="text-xs text-neutral-500">
+                        Choose which fields &amp; custom questions guests fill on your RSVP card
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={draftCard.design_config.show_rsvp !== false}
+                      onChange={(e) =>
+                        setDraftCard({
+                          ...draftCard,
+                          design_config: {
+                            ...draftCard.design_config,
+                            show_rsvp: e.target.checked,
+                          },
+                        })
+                      }
+                      className="w-4 h-4 accent-neutral-900 cursor-pointer"
+                    />
+                  </div>
+
+                  {draftCard.design_config.show_rsvp !== false && (
+                    <div className="mt-3 pt-3 border-t border-neutral-100 space-y-3">
+                      <div className="text-[11px] font-semibold text-neutral-700 uppercase tracking-wider">
+                        Include Form Fields
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        {[
+                          { key: 'ask_phone', label: 'Phone / WhatsApp', defaultOn: true },
+                          { key: 'ask_email', label: 'Email Address', defaultOn: false },
+                          { key: 'ask_headcount', label: 'Guest Count', defaultOn: true },
+                          { key: 'ask_meal', label: 'Meal Preference', defaultOn: false },
+                          { key: 'ask_events', label: 'Events Attending', defaultOn: false },
+                          { key: 'ask_message', label: 'Wishes / Dua Note', defaultOn: true },
+                        ].map((item) => {
+                          const rsvpCfg = draftCard.design_config.rsvp_config || {};
+                          const checked =
+                            item.defaultOn
+                              ? (rsvpCfg as Record<string, unknown>)[item.key] !== false
+                              : (rsvpCfg as Record<string, unknown>)[item.key] === true;
+                          return (
+                            <label
+                              key={item.key}
+                              className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
+                                checked
+                                  ? 'bg-[#FAF6EE] border-[#C9A84C] text-neutral-900 font-medium'
+                                  : 'bg-neutral-50 border-neutral-200 text-neutral-600'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(e) =>
+                                  setDraftCard({
+                                    ...draftCard,
+                                    design_config: {
+                                      ...draftCard.design_config,
+                                      rsvp_config: {
+                                        ...(draftCard.design_config.rsvp_config || {}),
+                                        [item.key]: e.target.checked,
+                                      },
+                                    },
+                                  })
+                                }
+                                className="accent-[#C9A84C] cursor-pointer"
+                              />
+                              <span className="truncate">{item.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+
+                      {draftCard.design_config.rsvp_config?.ask_headcount !== false && (
+                        <div className="flex items-center gap-3 text-xs">
+                          <label className="text-neutral-600 font-medium">Max Guests Allowed:</label>
+                          <input
+                            type="number"
+                            min={1}
+                            max={20}
+                            value={draftCard.design_config.rsvp_config?.max_guests || 6}
+                            onChange={(e) =>
+                              setDraftCard({
+                                ...draftCard,
+                                design_config: {
+                                  ...draftCard.design_config,
+                                  rsvp_config: {
+                                    ...(draftCard.design_config.rsvp_config || {}),
+                                    max_guests: Math.max(1, Math.min(20, Number(e.target.value) || 6)),
+                                  },
+                                },
+                              })
+                            }
+                            className="w-20 px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200 text-xs"
+                          />
+                        </div>
+                      )}
+
+                      {draftCard.design_config.rsvp_config?.ask_meal && (
+                        <div className="space-y-1">
+                          <label className="block text-[11px] font-medium text-neutral-600">
+                            Meal Options (comma separated)
+                          </label>
+                          <input
+                            type="text"
+                            value={(
+                              draftCard.design_config.rsvp_config?.meal_options || [
+                                'Halal Royal Non-Veg Feast',
+                                'Vegetarian Gourmet',
+                                'Jain / Pure Veg',
+                                'Kids Menu',
+                              ]
+                            ).join(', ')}
+                            onChange={(e) =>
+                              setDraftCard({
+                                ...draftCard,
+                                design_config: {
+                                  ...draftCard.design_config,
+                                  rsvp_config: {
+                                    ...(draftCard.design_config.rsvp_config || {}),
+                                    meal_options: e.target.value
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .filter(Boolean),
+                                  },
+                                },
+                              })
+                            }
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-neutral-50 border border-neutral-200 text-xs"
+                          />
+                        </div>
+                      )}
+
+                      {/* Custom Questions */}
+                      <div className="pt-2 border-t border-neutral-100 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-neutral-700 uppercase tracking-wider flex items-center gap-1">
+                            <CheckSquare className="w-3.5 h-3.5 text-[#C9A84C]" />
+                            <span>Custom RSVP Fields (Optional)</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const current = draftCard.design_config.rsvp_config?.custom_fields || [];
+                              const newField: RsvpCustomField = {
+                                id: `cf-${Date.now()}`,
+                                label: 'City / Coming From',
+                                type: 'text',
+                                required: false,
+                              };
+                              setDraftCard({
+                                ...draftCard,
+                                design_config: {
+                                  ...draftCard.design_config,
+                                  rsvp_config: {
+                                    ...(draftCard.design_config.rsvp_config || {}),
+                                    custom_fields: [...current, newField],
+                                  },
+                                },
+                              });
+                            }}
+                            className="text-xs font-semibold text-[#C9A84C] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add Custom Field</span>
+                          </button>
+                        </div>
+
+                        {(draftCard.design_config.rsvp_config?.custom_fields || []).map((cf, cfIdx) => (
+                          <div
+                            key={cf.id}
+                            className="p-2.5 rounded-lg bg-neutral-50 border border-neutral-200 space-y-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={cf.label}
+                                onChange={(e) => {
+                                  const next = [...(draftCard.design_config.rsvp_config?.custom_fields || [])];
+                                  next[cfIdx] = { ...next[cfIdx], label: e.target.value };
+                                  setDraftCard({
+                                    ...draftCard,
+                                    design_config: {
+                                      ...draftCard.design_config,
+                                      rsvp_config: {
+                                        ...(draftCard.design_config.rsvp_config || {}),
+                                        custom_fields: next,
+                                      },
+                                    },
+                                  });
+                                }}
+                                placeholder="Field Name (e.g. Hotel Room Needed?)"
+                                className="flex-1 px-2.5 py-1 rounded bg-white border border-neutral-200 text-xs font-medium"
+                              />
+                              <select
+                                value={cf.type}
+                                onChange={(e) => {
+                                  const next = [...(draftCard.design_config.rsvp_config?.custom_fields || [])];
+                                  next[cfIdx] = {
+                                    ...next[cfIdx],
+                                    type: e.target.value as 'text' | 'yesno' | 'select',
+                                  };
+                                  setDraftCard({
+                                    ...draftCard,
+                                    design_config: {
+                                      ...draftCard.design_config,
+                                      rsvp_config: {
+                                        ...(draftCard.design_config.rsvp_config || {}),
+                                        custom_fields: next,
+                                      },
+                                    },
+                                  });
+                                }}
+                                className="px-2 py-1 rounded bg-white border border-neutral-200 text-xs"
+                              >
+                                <option value="text">Text Input</option>
+                                <option value="yesno">Yes / No</option>
+                                <option value="select">Options Dropdown</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const next = (draftCard.design_config.rsvp_config?.custom_fields || []).filter(
+                                    (_, i) => i !== cfIdx
+                                  );
+                                  setDraftCard({
+                                    ...draftCard,
+                                    design_config: {
+                                      ...draftCard.design_config,
+                                      rsvp_config: {
+                                        ...(draftCard.design_config.rsvp_config || {}),
+                                        custom_fields: next,
+                                      },
+                                    },
+                                  });
+                                }}
+                                className="p-1 text-neutral-400 hover:text-rose-600 cursor-pointer"
+                              >
+                                <Trash className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            {cf.type === 'select' && (
+                              <input
+                                type="text"
+                                value={cf.options || ''}
+                                onChange={(e) => {
+                                  const next = [...(draftCard.design_config.rsvp_config?.custom_fields || [])];
+                                  next[cfIdx] = { ...next[cfIdx], options: e.target.value };
+                                  setDraftCard({
+                                    ...draftCard,
+                                    design_config: {
+                                      ...draftCard.design_config,
+                                      rsvp_config: {
+                                        ...(draftCard.design_config.rsvp_config || {}),
+                                        custom_fields: next,
+                                      },
+                                    },
+                                  });
+                                }}
+                                placeholder="Options separated by commas (e.g. Flight, Train, Car)"
+                                className="w-full px-2.5 py-1 rounded bg-white border border-neutral-200 text-xs"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="pt-2 space-y-2">
@@ -2494,31 +2834,48 @@ export default function DashboardPage() {
               </div>
             </form>
 
-            {/* Right Column: Live Mobile Preview (1:1 Flush Fit inside Phone Frame) */}
+            {/* Right Column: Live Mobile Preview (Scaled dynamically to fit 100% inside laptop screen) */}
             <div className="hidden lg:block lg:col-span-5">
-              <div className="sticky top-28 flex flex-col items-center">
-                <div className="w-full max-w-[368px] flex items-center justify-between mb-2 px-3 py-1.5 rounded-full bg-white border border-[#E8DFD1] text-xs">
-                  <span className="font-medium text-[#6E5D53]">
-                    Live Mobile Preview
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setReplayTrigger((p) => p + 1)}
-                    className="font-semibold text-[#6E2E3A] hover:underline inline-flex items-center gap-1 cursor-pointer"
+              <div className="sticky top-20 flex flex-col items-center">
+                <div
+                  style={{
+                    width: 368,
+                    height: Math.round(724 * laptopPhoneScale),
+                    position: 'relative',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 368,
+                      transform: `scale(${laptopPhoneScale})`,
+                      transformOrigin: 'top center',
+                    }}
+                    className="flex flex-col items-center"
                   >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Replay Animation</span>
-                  </button>
-                </div>
+                    <div className="w-full flex items-center justify-between mb-2 px-3 py-1.5 rounded-full bg-white border border-[#E8DFD1] text-xs shadow-2xs">
+                      <span className="font-medium text-[#6E5D53]">
+                        Live Mobile Preview
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setReplayTrigger((p) => p + 1)}
+                        className="font-semibold text-[#6E2E3A] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Replay Animation</span>
+                      </button>
+                    </div>
 
-                <div className="w-full max-w-[368px] rounded-[42px] bg-[#241A16] p-[10px] shadow-xl border-2 border-[#D4AF37]/45">
-                  <div className="w-24 h-1.5 rounded-full bg-[#3D2E28] mx-auto mb-2" />
-                  <div className="w-full h-[640px] rounded-[32px] overflow-y-auto overflow-x-hidden bg-[#f4e2c1] relative">
-                    <EnvelopeExperience
-                      invitation={previewDraftCard}
-                      isPreview={true}
-                      replayTrigger={replayTrigger}
-                    />
+                    <div className="w-full rounded-[42px] bg-[#241A16] p-[10px] shadow-xl border-2 border-[#D4AF37]/45">
+                      <div className="w-24 h-1.5 rounded-full bg-[#3D2E28] mx-auto mb-2" />
+                      <div className="w-full h-[640px] rounded-[32px] overflow-y-auto overflow-x-hidden bg-[#f4e2c1] relative">
+                        <EnvelopeExperience
+                          invitation={previewDraftCard}
+                          isPreview={true}
+                          replayTrigger={replayTrigger}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
